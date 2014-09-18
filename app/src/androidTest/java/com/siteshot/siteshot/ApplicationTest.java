@@ -1,4 +1,4 @@
-package com.untitled.untitled;
+package com.siteshot.siteshot;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
