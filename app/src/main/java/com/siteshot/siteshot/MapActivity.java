@@ -2,6 +2,9 @@ package com.siteshot.siteshot;
 
 import java.util.Locale;
 
+import com.parse.Parse;
+import com.parse.ParseAnalytics;
+
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
@@ -38,6 +41,11 @@ public class MapActivity extends Activity implements ActionBar.TabListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        // Configure Parse.
+        Parse.initialize(this, "1v3hMSVlhYla6NduIkhn76wlZKqH2nHJCLBNSoI0",
+                "KO9ARhyVQm4qlknXlnvXQsMGl2oKlCurGZxgPvQp");
+        ParseAnalytics.trackAppOpened(getIntent());
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
