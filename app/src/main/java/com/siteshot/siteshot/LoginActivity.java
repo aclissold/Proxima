@@ -1,7 +1,6 @@
 package com.siteshot.siteshot;
 
-import com.parse.Parse;
-import com.parse.ParseAnalytics;
+import com.parse.LogInCallback;
 import com.parse.ParseUser;
 import com.parse.ParseException;
 
@@ -9,8 +8,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.AsyncTask;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -30,10 +29,7 @@ import android.widget.TextView;
  */
 public class LoginActivity extends Activity {
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
+    private final String TAG = LoginActivity.class.getName();
 
     // UI references.
     private AutoCompleteTextView mUsernameView;
@@ -47,11 +43,6 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        // Configure Parse.
-        Parse.initialize(this, "1v3hMSVlhYla6NduIkhn76wlZKqH2nHJCLBNSoI0",
-                "KO9ARhyVQm4qlknXlnvXQsMGl2oKlCurGZxgPvQp");
-        ParseAnalytics.trackAppOpened(getIntent());
 
         // Set up the login form.
         mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);
@@ -87,10 +78,6 @@ public class LoginActivity extends Activity {
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         // Reset errors.
         mUsernameView.setError(null);
         mPasswordView.setError(null);
@@ -112,8 +99,17 @@ public class LoginActivity extends Activity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
-            mAuthTask.execute((Void) null);
+            ParseUser.logInInBackground(username, password, new LogInCallback() {
+                public void done(ParseUser user, ParseException e) {
+                    showProgress(false);
+                    if (e == null && user != null) {
+                        finish();
+                    } else {
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+                    }
+                }
+            });
         }
     }
 
@@ -192,59 +188,5 @@ public class LoginActivity extends Activity {
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mUsername;
-        private final String mPassword;
-
-        UserLoginTask(String username, String password) {
-            mUsername = username;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                ParseUser.logIn(this.mUsername, this.mPassword);
-            } catch (ParseException e) {
-                // TODO: only sign up if it's because the username doesn't exist
-                ParseUser user = new ParseUser();
-                user.setUsername(this.mUsername);
-                user.setPassword(this.mPassword);
-                try {
-                    user.signUp();
-                } catch (ParseException f) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
 }
-
-
 

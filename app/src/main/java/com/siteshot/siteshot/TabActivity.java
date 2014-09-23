@@ -7,17 +7,26 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.parse.Parse;
+import com.parse.ParseAnalytics;
+import com.parse.ParseUser;
+
 
 public class TabActivity extends Activity implements ActionBar.TabListener {
+
+    private final String TAG = TabActivity.class.getName();
+    private Boolean didPerformInitialLogin = false;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -36,7 +45,14 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "create");
         super.onCreate(savedInstanceState);
+
+        // Configure Parse.
+        Parse.initialize(this, "1v3hMSVlhYla6NduIkhn76wlZKqH2nHJCLBNSoI0",
+                "KO9ARhyVQm4qlknXlnvXQsMGl2oKlCurGZxgPvQp");
+        ParseAnalytics.trackAppOpened(getIntent());
+
         setContentView(R.layout.activity_tab);
 
         // Set up the action bar.
@@ -74,6 +90,22 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ParseUser.getCurrentUser() == null) {
+            if (didPerformInitialLogin) {
+                Log.d(TAG, "user must be logged in");
+                finish();
+            } else {
+                didPerformInitialLogin = true;
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+            }
+        } else {
+            Log.d(TAG, "user is logged in");
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
