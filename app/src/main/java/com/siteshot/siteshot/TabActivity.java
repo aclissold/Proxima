@@ -123,6 +123,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
 
         switch (id) {
             case R.id.action_logout:
+                // Log user out of current account and create a new login activity
                 ParseUser.logOut();
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
