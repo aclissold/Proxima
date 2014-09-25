@@ -1,6 +1,7 @@
 package com.siteshot.siteshot;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,10 +50,24 @@ public class ProfileActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+        switch (id) {
 
+            // finishes profile activity and returns user to tab activity
+            case R.id.action_return:
+                finish();
+                return true;
+
+            // logout the user and redirect to login activity. finishes profile activity
+            // so the user will not have previous user's profile info displayed
+            case R.id.action_logout:
+                ParseUser.logOut();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+
+        }
+    }
 }
