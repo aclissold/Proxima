@@ -1,15 +1,13 @@
 package com.siteshot.siteshot;
 
-import java.util.Locale;
-
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,9 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
+
+import java.util.Locale;
 
 
 public class TabActivity extends Activity implements ActionBar.TabListener {
@@ -45,12 +44,8 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "create");
         super.onCreate(savedInstanceState);
 
-        // Configure Parse.
-        Parse.initialize(this, "1v3hMSVlhYla6NduIkhn76wlZKqH2nHJCLBNSoI0",
-                "KO9ARhyVQm4qlknXlnvXQsMGl2oKlCurGZxgPvQp");
         ParseAnalytics.trackAppOpened(getIntent());
 
         setContentView(R.layout.activity_tab);
