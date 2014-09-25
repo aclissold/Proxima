@@ -11,16 +11,18 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.Parse;
 import com.parse.ParseUser;
 
 
 public class ProfileActivity extends Activity {
 
-    private TextView mUsernameView;
+    public TextView mUsernameView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_profile);
 
         mUsernameView = (TextView) findViewById(R.id.profile_username);
