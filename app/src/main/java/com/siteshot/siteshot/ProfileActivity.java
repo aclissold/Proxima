@@ -7,16 +7,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.parse.ParseUser;
 
 
 public class ProfileActivity extends Activity {
+
+    private TextView mUsernameView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        mUsernameView = (TextView) findViewById(R.id.username);
+        mUsernameView.setText(ParseUser.getCurrentUser().getUsername());
         GridView photoGrid = (GridView) findViewById(R.id.photo_grid);
         photoGrid.setAdapter(new ImageAdapter(this));
 
