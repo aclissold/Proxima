@@ -8,15 +8,16 @@ import com.siteshot.siteshot.TabActivity;
 /**
  * Created by aclissold on 9/23/14.
  */
-public class Test extends ActivityInstrumentationTestCase2<TabActivity> {
+public class TabTest extends ActivityInstrumentationTestCase2<TabActivity> {
 
-    public Test() {
+    public TabTest() {
         super(TabActivity.class);
     }
 
     @Override
-    public void setUp() {
+    public void setUp() throws Exception {
         // Create the activity, to call Parse.initialize();
+        super.setUp();
         getActivity();
     }
 
