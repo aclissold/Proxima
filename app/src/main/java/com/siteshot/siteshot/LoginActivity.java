@@ -1,15 +1,9 @@
 package com.siteshot.siteshot;
 
-import com.parse.LogInCallback;
-import com.parse.ParseUser;
-import com.parse.ParseException;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,6 +15,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 
 /**
@@ -77,14 +76,14 @@ public class LoginActivity extends Activity {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    public void attemptLogin() {
+    private void attemptLogin() {
         // Reset errors.
         mUsernameView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String username = mUsernameView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String username = mUsernameView.getText().toString();
+        final String password = mPasswordView.getText().toString();
         String confirmPassword = mConfirmPasswordView.getText().toString();
 
         mFocusView = null;
@@ -101,10 +100,15 @@ public class LoginActivity extends Activity {
             showProgress(true);
             ParseUser.logInInBackground(username, password, new LogInCallback() {
                 public void done(ParseUser user, ParseException e) {
-                    showProgress(false);
                     if (e == null && user != null) {
+                        showProgress(false);
                         finish();
+                    } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+                        // don't call showProgress(false) yet
+                        // Either username not found or password wrong; try creating a user
+                        attemptSignUp(username, password);
                     } else {
+                        showProgress(false);
                         mPasswordView.setError(getString(R.string.error_incorrect_password));
                         mPasswordView.requestFocus();
                     }
@@ -113,9 +117,27 @@ public class LoginActivity extends Activity {
         }
     }
 
+    private void attemptSignUp(String username, String password) {
+        ParseUser user = new ParseUser();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.signUpInBackground(new SignUpCallback() {
+            @Override
+            public void done(ParseException e) {
+                showProgress(false);
+                if (e == null) {
+                    finish();
+                } else if (e.getCode() == ParseException.USERNAME_TAKEN) {
+                    mUsernameView.setError(getString(R.string.error_username_taken));
+                    mUsernameView.requestFocus();
+                }
+            }
+        });
+    }
+
     boolean isFieldsValid(String username, String password, String confirmPassword) {
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!TextUtils.isEmpty(password) && (password.length() < 6)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             mFocusView = mPasswordView;
             return false;
@@ -147,10 +169,6 @@ public class LoginActivity extends Activity {
         }
 
         return true;
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() > 5;
     }
 
     /**
