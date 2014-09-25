@@ -22,9 +22,9 @@ public class ProfileActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        mUsernameView = (TextView) findViewById(R.id.username);
+        mUsernameView = (TextView) findViewById(R.id.profile_username);
         mUsernameView.setText(ParseUser.getCurrentUser().getUsername());
-        GridView photoGrid = (GridView) findViewById(R.id.photo_grid);
+        GridView photoGrid = (GridView) findViewById(R.id.profile_photo_grid);
         photoGrid.setAdapter(new ImageAdapter(this));
 
         photoGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
