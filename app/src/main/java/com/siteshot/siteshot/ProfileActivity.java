@@ -20,8 +20,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -69,8 +72,19 @@ public class ProfileActivity extends Activity {
 
             Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, new BitmapFactory.Options());
             Bitmap rotatedBitmap = rotate(bitmap);
+            uploadImageToParse(rotatedBitmap);
             mUserIcon.setImageBitmap(rotatedBitmap);
         }
+    }
+
+    private void uploadImageToParse(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] data = stream.toByteArray();
+        ParseFile file = new ParseFile("userIcon.jpg",data);
+        ParseUser user = ParseUser.getCurrentUser();
+        user.put("icon", file);
+        user.saveInBackground();
     }
 
     private Bitmap rotate(Bitmap bitmap) {
