@@ -137,6 +137,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
+        
     }
 
     @Override
@@ -175,11 +176,11 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
+                    return "Feed";
                 case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
+                    return "Camera";
                 case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
+                    return "Map";
             }
             return null;
         }
