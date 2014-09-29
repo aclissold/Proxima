@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -64,9 +66,40 @@ public class ProfileActivity extends Activity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
+
             Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, new BitmapFactory.Options());
-            mUserIcon.setImageBitmap(bitmap);
+            Bitmap rotatedBitmap = rotate(bitmap);
+            mUserIcon.setImageBitmap(rotatedBitmap);
         }
+    }
+
+    private Bitmap rotate(Bitmap bitmap) {
+        int iconOrientation = 1;
+
+        try {
+            ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
+            iconOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+        } catch (IOException e) {
+            Log.d(TAG, e.getMessage());
+        }
+
+        Matrix matrix = new Matrix();
+
+        switch (iconOrientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+        }
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     @Override
