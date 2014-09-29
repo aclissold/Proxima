@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -57,7 +58,6 @@ public class ProfileActivity extends Activity {
             }
         });
 
-
         photoGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 //Placeholder for activity photo view
@@ -65,6 +65,24 @@ public class ProfileActivity extends Activity {
             }
         });
 
+        setUserIcon();
+    }
+
+    private void setUserIcon() {
+        ParseUser user = ParseUser.getCurrentUser();
+        ParseFile file = (ParseFile) user.get("icon");
+
+        if (file != null) {
+            try {
+                byte[] data = file.getData();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                mUserIcon.setImageBitmap(bitmap);
+            } catch (ParseException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
+
+        }
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
