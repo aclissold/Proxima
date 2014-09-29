@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
 
@@ -137,7 +138,6 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
-        
     }
 
     @Override
@@ -159,12 +159,22 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
         }
 
         @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-        }
+        public Fragment getItem(int index) {
 
+            switch (index) {
+                case 0:
+                    // Feed activity
+                    return new FeedFragment();
+                case 1:
+                    // Camera activity
+                    return new CameraFragment();
+                case 2:
+                    // Maps activity
+                    return new MapFragment();
+            }
+
+            return null;
+        }
         @Override
         public int getCount() {
             // Show 3 total pages.
@@ -187,9 +197,9 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A placeholder fragment containing the feed view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class FeedFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -200,23 +210,94 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static FeedFragment newInstance(int sectionNumber) {
+            FeedFragment fragment = new FeedFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
+
             return fragment;
         }
 
-        public PlaceholderFragment() {
+        public FeedFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_tab, container, false);
+            View rootView = inflater.inflate(R.layout.feed_fragment, container, false);
             return rootView;
         }
+
     }
 
+    /**
+     * A placeholder fragment containing the camera view.
+     */
+    public static class CameraFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static CameraFragment newInstance(int sectionNumber) {
+            CameraFragment fragment = new CameraFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+
+            return fragment;
+        }
+
+        public CameraFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.camera_fragment, container, false);
+            return rootView;
+        }
+
+    }
+
+    /**
+     * A placeholder fragment containing the map view.
+     */
+    public static class MapFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static MapFragment newInstance(int sectionNumber) {
+            MapFragment fragment = new MapFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+
+            return fragment;
+        }
+
+        public MapFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.map_fragment, container, false);
+            return rootView;
+        }
+
+    }
 }
