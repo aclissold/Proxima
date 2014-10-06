@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +29,20 @@ public class PhotoUtils {
         return mCurrentPhotoPath;
     }
 
+    public Bitmap uploadPhoto(Bitmap bitmap) {
+        Bitmap rotatedBitmap = rotate(bitmap);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] data = stream.toByteArray();
+        ParseFile file = new ParseFile("photo.jpg", data);
+        ParseObject object = new ParseObject("UserPhoto");
+        object.put("photo", file);
+        object.saveInBackground();
+
+        return rotatedBitmap;
+    }
+
     /**
      *
      * @param bitmap the image to upload to Parse
@@ -40,7 +55,7 @@ public class PhotoUtils {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] data = stream.toByteArray();
-        ParseFile file = new ParseFile("userIcon.jpg",data);
+        ParseFile file = new ParseFile("userIcon.jpg", data);
         ParseUser user = ParseUser.getCurrentUser();
         user.put("icon", file);
         user.saveInBackground();
