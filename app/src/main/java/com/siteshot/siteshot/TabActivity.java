@@ -167,7 +167,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
                     return new FeedFragment();
                 case 1:
                     // Camera activity
-                    return new CameraFragment();
+                    return new com.siteshot.siteshot.CameraFragment();
                 case 2:
                     // Maps activity
                     return new MapFragment();
@@ -255,6 +255,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
         }
 
         public CameraFragment() {
+
         }
 
         @Override

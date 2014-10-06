@@ -14,4 +14,10 @@
         android:orderInCategory="100"
         android:showAsAction="never" />
 
+    <item android:id="@+id/menu_switch_cam"
+        android:title="switch"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+
+
 </menu>
