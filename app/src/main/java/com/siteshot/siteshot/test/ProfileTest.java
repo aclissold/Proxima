@@ -10,7 +10,7 @@ import com.siteshot.siteshot.activities.ProfileActivity;
  */
 public class ProfileTest extends ActivityInstrumentationTestCase2<ProfileActivity> {
 
-    ProfileActivity mProfileActivity;
+    private ProfileActivity mProfileActivity;
 
     public ProfileTest() {
         super(ProfileActivity.class);
