@@ -1,4 +1,4 @@
-package com.siteshot.siteshot;
+package com.siteshot.siteshot.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
+import com.siteshot.siteshot.R;
 
 import java.util.Locale;
 
