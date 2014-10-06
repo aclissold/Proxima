@@ -16,15 +16,18 @@ import android.view.View;
         import android.view.Menu;
         import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
         import android.widget.ImageView;
         import android.widget.Toast;
 
-public class CameraFragment extends Fragment {
+public class CameraFragment extends Fragment implements View.OnClickListener {
 
     private Camera cameraObject;
     private ShowCamera showCamera;
     private ImageView pic;
+
+
     public static Camera isCameraAvailiable(){
         Camera object = null;
         try {
@@ -49,6 +52,12 @@ public class CameraFragment extends Fragment {
                 Toast.makeText(getActivity().getApplicationContext(), "taken", Toast.LENGTH_SHORT).show();
             }
             cameraObject.release();
+            cameraObject = isCameraAvailiable();
+            showCamera = new ShowCamera(getActivity(), cameraObject);
+            FrameLayout preview = (FrameLayout) getView().findViewById(R.id.camera_preview);
+            preview.addView(showCamera);
+
+
         }
     };
 
@@ -56,6 +65,8 @@ public class CameraFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rV = inflater.inflate(R.layout.camera_fragment, container, false);
+        Button upButton = (Button) rV.findViewById(R.id.button_capture);
+        upButton.setOnClickListener(this);
         return rV;
     }
     @Override
@@ -69,6 +80,13 @@ public class CameraFragment extends Fragment {
         preview.addView(showCamera);
     }
 
+    @Override
+    public void onClick(View v) {
+            snapIt(v);
+
+
+
+    }
 
     public void snapIt(View view){
         cameraObject.takePicture(null, null, capturedIt);
