@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.siteshot.siteshot.ProfileActivity" >
+    tools:context="com.siteshot.siteshot.activities.ProfileActivity" >
 
     <!-- Return menu item, goes back to tab activity -->
     <item android:id="@+id/action_return"

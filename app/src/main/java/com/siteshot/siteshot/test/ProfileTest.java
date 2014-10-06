@@ -3,7 +3,7 @@ package com.siteshot.siteshot.test;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.parse.ParseUser;
-import com.siteshot.siteshot.ProfileActivity;
+import com.siteshot.siteshot.activities.ProfileActivity;
 
 /**
  * Created by aclissold on 9/25/14.

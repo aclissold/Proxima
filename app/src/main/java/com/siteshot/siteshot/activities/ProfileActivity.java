@@ -1,4 +1,4 @@
-package com.siteshot.siteshot;
+package com.siteshot.siteshot.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,8 +22,9 @@ import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.siteshot.siteshot.adapters.ImageAdapter;
+import com.siteshot.siteshot.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
