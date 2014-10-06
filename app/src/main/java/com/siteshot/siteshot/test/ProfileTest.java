@@ -3,14 +3,14 @@ package com.siteshot.siteshot.test;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.parse.ParseUser;
-import com.siteshot.siteshot.ProfileActivity;
+import com.siteshot.siteshot.activities.ProfileActivity;
 
 /**
  * Created by aclissold on 9/25/14.
  */
 public class ProfileTest extends ActivityInstrumentationTestCase2<ProfileActivity> {
 
-    ProfileActivity mProfileActivity;
+    private ProfileActivity mProfileActivity;
 
     public ProfileTest() {
         super(ProfileActivity.class);
@@ -19,7 +19,7 @@ public class ProfileTest extends ActivityInstrumentationTestCase2<ProfileActivit
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        mProfileActivity = getActivity(); // initializes Parse
+        mProfileActivity = getActivity();
         if (ParseUser.getCurrentUser() == null) {
             ParseUser.logIn("test", "test");
         }

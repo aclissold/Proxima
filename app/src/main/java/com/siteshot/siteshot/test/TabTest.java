@@ -3,7 +3,7 @@ package com.siteshot.siteshot.test;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.parse.ParseUser;
-import com.siteshot.siteshot.TabActivity;
+import com.siteshot.siteshot.activities.TabActivity;
 
 /**
  * Created by aclissold on 9/23/14.
