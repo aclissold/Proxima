@@ -2,22 +2,42 @@ package com.siteshot.siteshot;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class ProfileActivity extends Activity {
 
     public TextView mUsernameView;
+    public ImageView mUserIcon;
+    String mCurrentPhotoPath;
+    private final String TAG = ProfileActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +46,17 @@ public class ProfileActivity extends Activity {
         setContentView(R.layout.activity_profile);
 
         mUsernameView = (TextView) findViewById(R.id.profile_username);
+        mUserIcon = (ImageView) findViewById(R.id.profile_user_icon);
         mUsernameView.setText(ParseUser.getCurrentUser().getUsername());
         GridView photoGrid = (GridView) findViewById(R.id.profile_photo_grid);
         photoGrid.setAdapter(new ImageAdapter(this));
+
+        mUserIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
+            }
+        });
 
         photoGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -37,6 +65,73 @@ public class ProfileActivity extends Activity {
             }
         });
 
+        setUserIcon();
+    }
+
+    private void setUserIcon() {
+        ParseUser user = ParseUser.getCurrentUser();
+        ParseFile file = (ParseFile) user.get("icon");
+
+        if (file != null) {
+            try {
+                byte[] data = file.getData();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                mUserIcon.setImageBitmap(bitmap);
+            } catch (ParseException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
+
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+
+            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, new BitmapFactory.Options());
+            Bitmap rotatedBitmap = rotate(bitmap);
+            uploadImageToParse(rotatedBitmap);
+            mUserIcon.setImageBitmap(rotatedBitmap);
+        }
+    }
+
+    private void uploadImageToParse(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] data = stream.toByteArray();
+        ParseFile file = new ParseFile("userIcon.jpg",data);
+        ParseUser user = ParseUser.getCurrentUser();
+        user.put("icon", file);
+        user.saveInBackground();
+    }
+
+    private Bitmap rotate(Bitmap bitmap) {
+        int iconOrientation = 1;
+
+        try {
+            ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
+            iconOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+        } catch (IOException e) {
+            Log.d(TAG, e.getMessage());
+        }
+
+        Matrix matrix = new Matrix();
+
+        switch (iconOrientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+        }
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     @Override
@@ -71,5 +166,46 @@ public class ProfileActivity extends Activity {
 
 
         }
+    }
+
+    static final int REQUEST_TAKE_PHOTO = 1;
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Log.e(TAG, ex.getMessage());
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 }
