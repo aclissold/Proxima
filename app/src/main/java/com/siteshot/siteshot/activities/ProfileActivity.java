@@ -4,11 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -23,22 +20,20 @@ import android.widget.Toast;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
-import com.siteshot.siteshot.adapters.ImageAdapter;
 import com.siteshot.siteshot.R;
+import com.siteshot.siteshot.adapters.ImageAdapter;
+import com.siteshot.siteshot.utils.PhotoUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class ProfileActivity extends Activity {
 
     public TextView mUsernameView;
     public ImageView mUserIcon;
-    String mCurrentPhotoPath;
     private final String TAG = ProfileActivity.class.getName();
+    private PhotoUtils mPhotoUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +62,8 @@ public class ProfileActivity extends Activity {
         });
 
         setUserIcon();
+
+        mPhotoUtils = new PhotoUtils();
     }
 
     private void setUserIcon() {
@@ -88,51 +85,13 @@ public class ProfileActivity extends Activity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-
-            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, new BitmapFactory.Options());
-            Bitmap rotatedBitmap = rotate(bitmap);
-            uploadImageToParse(rotatedBitmap);
+            String photoPath = mPhotoUtils.getCurrentPhotoPath();
+            Bitmap bitmap = BitmapFactory.decodeFile(photoPath, new BitmapFactory.Options());
+            Log.d(TAG, "uploading");
+            Bitmap rotatedBitmap = mPhotoUtils.upload(bitmap);
+            Log.d(TAG, "setting");
             mUserIcon.setImageBitmap(rotatedBitmap);
         }
-    }
-
-    private void uploadImageToParse(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] data = stream.toByteArray();
-        ParseFile file = new ParseFile("userIcon.jpg",data);
-        ParseUser user = ParseUser.getCurrentUser();
-        user.put("icon", file);
-        user.saveInBackground();
-    }
-
-    private Bitmap rotate(Bitmap bitmap) {
-        int iconOrientation = 1;
-
-        try {
-            ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
-            iconOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-        } catch (IOException e) {
-            Log.d(TAG, e.getMessage());
-        }
-
-        Matrix matrix = new Matrix();
-
-        switch (iconOrientation) {
-            case ExifInterface.ORIENTATION_NORMAL:
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                matrix.setRotate(90);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                matrix.setRotate(180);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                matrix.setRotate(-90);
-                break;
-        }
-
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     @Override
@@ -178,7 +137,7 @@ public class ProfileActivity extends Activity {
             // Create the File where the photo should go
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = mPhotoUtils.createPhotoFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
                 Log.e(TAG, ex.getMessage());
@@ -192,21 +151,4 @@ public class ProfileActivity extends Activity {
         }
     }
 
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
 }
