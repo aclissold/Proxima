@@ -34,7 +34,7 @@ public class PhotoUtils {
      *
      * @return       the same bitmap, rotated if necessary
      */
-    public Bitmap upload(Bitmap bitmap) {
+    public Bitmap uploadProfilePhoto(Bitmap bitmap) {
         Bitmap rotatedBitmap = rotate(bitmap);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

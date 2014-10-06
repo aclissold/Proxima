@@ -19,7 +19,7 @@ public class ProfileTest extends ActivityInstrumentationTestCase2<ProfileActivit
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        mProfileActivity = getActivity(); // initializes Parse
+        mProfileActivity = getActivity();
         if (ParseUser.getCurrentUser() == null) {
             ParseUser.logIn("test", "test");
         }

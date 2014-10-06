@@ -87,9 +87,7 @@ public class ProfileActivity extends Activity {
         if (resultCode == RESULT_OK) {
             String photoPath = mPhotoUtils.getCurrentPhotoPath();
             Bitmap bitmap = BitmapFactory.decodeFile(photoPath, new BitmapFactory.Options());
-            Log.d(TAG, "uploading");
-            Bitmap rotatedBitmap = mPhotoUtils.upload(bitmap);
-            Log.d(TAG, "setting");
+            Bitmap rotatedBitmap = mPhotoUtils.uploadProfilePhoto(bitmap);
             mUserIcon.setImageBitmap(rotatedBitmap);
         }
     }
