@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.hardware.Camera.CameraInfo;
 
 import com.siteshot.siteshot.utils.PhotoUtils;
 
@@ -44,6 +45,13 @@ public class CameraFragment extends Fragment {
     private Camera mCamera;
     // View to display the camera output.
     private CameraPreview mPreview;
+    int mNumberOfCameras;
+    int mCurrentCamera;  // Camera ID currently chosen
+    int mCameraCurrentlyLocked;  // Camera ID that's actually acquired
+    // The first rear facing camera
+    int mDefaultCameraId;
+
+
     // Reference to the containing view.
     private View mCameraView;
     /**
@@ -77,7 +85,19 @@ public class CameraFragment extends Fragment {
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
 // Create our Preview view and set it as the content of our activity.
         mPhotoUtils = new PhotoUtils();
-        boolean opened = safeCameraOpenInView(view);
+        // Find the total number of cameras available
+        mNumberOfCameras = Camera.getNumberOfCameras();
+
+        // Find the ID of the rear-facing ("default") camera
+        CameraInfo cameraInfo = new CameraInfo();
+        for (int i = 0; i < mNumberOfCameras; i++) {
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing == CameraInfo.CAMERA_FACING_BACK) {
+                mCurrentCamera = mDefaultCameraId = i;
+            }
+        }
+
+            boolean opened = safeCameraOpenInView(view);
         if(opened == false){
             Log.d("CameraGuide","Error, Camera failed to open");
             return view;
@@ -93,6 +113,38 @@ public class CameraFragment extends Fragment {
                     }
                 }
         );
+        Button flipButton = (Button) view.findViewById(R.id.button_flip);
+        if(Camera.getNumberOfCameras() == 1){
+            flipButton.setVisibility(View.INVISIBLE);
+        }
+        else {
+            flipButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mCamera != null) {
+                            mCamera.stopPreview();
+                            //mPreview.setCamera(null);
+                            mCamera.release();
+                            mCamera = null;
+                        }
+
+                        // Acquire the next camera and request Preview to reconfigure
+                        // parameters.
+                        mCurrentCamera = (mCameraCurrentlyLocked + 1) % mNumberOfCameras;
+                        mCamera = Camera.open(mCurrentCamera);
+                        mCameraCurrentlyLocked = mCurrentCamera;
+                        mPreview.switchCamera(mCamera);
+
+                        // Start the preview
+                        mCamera.startPreview();
+
+                    }
+                }
+                    );
+
+        }
+
         return view;
     }
     /**
@@ -190,6 +242,18 @@ public class CameraFragment extends Fragment {
 // deprecated setting, but required on Android versions prior to 3.0
             mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         }
+
+        public void switchCamera(Camera camera) {
+            setCamera(camera);
+            try {
+                camera.setDisplayOrientation(90);
+                camera.setPreviewDisplay(mHolder);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+
         /**
          * Begin the preview of the camera input.
          */
