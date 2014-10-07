@@ -1,30 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="horizontal"
     android:baselineAligned="false">
 
-    <GridLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.30"
-        android:orientation="vertical" >
+    <FrameLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="fill_parent"
+        android:layout_height="533dp"
+        android:layout_row="1"
+        android:layout_column="1">
 
-        <FrameLayout
-            android:id="@+id/camera_preview"
-            android:layout_width="fill_parent"
-            android:layout_height="475dp" />
+    </FrameLayout>
 
-        <Button
-            android:id="@+id/button_capture"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="snapIt"
-            android:text="@string/Capture"
-            android:layout_row="18"
-            android:layout_column="0" />
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="89dp"
+        android:layout_height="56dp"
+        android:onClick="snapIt"
+        android:text="@string/Capture"
+        android:id="@+id/button_capture"
+        android:layout_gravity="center_horizontal|bottom"
+        android:clickable="false"
+        android:foreground="@drawable/cam"
+        android:background="@drawable/cam"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
-    </GridLayout>
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/button_flip"
+        android:foreground="@drawable/rotate"
+        android:layout_gravity="left|bottom"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false" />
 
- </LinearLayout>
+</RelativeLayout>
