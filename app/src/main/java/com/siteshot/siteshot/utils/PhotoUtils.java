@@ -70,15 +70,18 @@ public class PhotoUtils {
     }
 
     private Bitmap rotate(Bitmap bitmap) {
-        int iconOrientation = 1;
+        //temporary forced portrait upload by forcing 90 degree rotation of the bitmap when uploading
+        int iconOrientation = 6;
 
+        /* this method gives iconOrientation = 0 which is undefined so it does not do any image
+        rotation, TODO: figure out why the orientation is undefined.
         try {
             ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
             iconOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
         } catch (IOException e) {
             Log.d(TAG, e.getMessage());
         }
-
+        */
         Matrix matrix = new Matrix();
 
         switch (iconOrientation) {
