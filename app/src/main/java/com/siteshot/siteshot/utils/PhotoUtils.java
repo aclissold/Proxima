@@ -1,6 +1,7 @@
 package com.siteshot.siteshot.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.Environment;
@@ -27,6 +28,11 @@ public class PhotoUtils {
 
     public String getCurrentPhotoPath() {
         return mCurrentPhotoPath;
+    }
+
+    public Bitmap uploadPhoto(byte[] data){
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        return uploadPhoto(bitmap);
     }
 
     public Bitmap uploadPhoto(Bitmap bitmap) {
