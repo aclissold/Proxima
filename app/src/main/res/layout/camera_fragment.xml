@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:baselineAligned="false">
 
-    <LinearLayout
+    <GridLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.30"
@@ -14,22 +14,17 @@
         <FrameLayout
             android:id="@+id/camera_preview"
             android:layout_width="fill_parent"
-            android:layout_height="199dp" />
+            android:layout_height="475dp" />
 
         <Button
             android:id="@+id/button_capture"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="snapIt"
-            android:text="@string/Capture" />
+            android:text="@string/Capture"
+            android:layout_row="18"
+            android:layout_column="0" />
 
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_launcher" />
-
-    </LinearLayout>
+    </GridLayout>
 
  </LinearLayout>
