@@ -79,6 +79,10 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
      */
     ViewPager mViewPager;
 
+    public Location getCurrentLocation() {
+        return currentLocation;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,6 +198,33 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
 
     // LOCATION METHODS
 
+    /*
+     * Called when the Activity is no longer visible at all. Stop updates and disconnect.
+     */
+    @Override
+    public void onStop() {
+        // If the client is connected
+        if (locationClient.isConnected()) {
+            stopPeriodicUpdates();
+        }
+
+        // After disconnect() is called, the client is considered "dead".
+        locationClient.disconnect();
+
+        super.onStop();
+    }
+
+    /*
+     * Called when the Activity is restarted, even before it becomes visible.
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Connect to the location services client
+        locationClient.connect();
+    }
+
     private void startPeriodicUpdates() {
         locationClient.requestLocationUpdates(locationRequest, this);
     }
@@ -204,6 +235,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
 
     private Location getLocation() {
         if (servicesConnected()) {
+            Log.d(TAG, locationClient.getLastLocation().toString());
             return locationClient.getLastLocation();
         } else {
             return null;

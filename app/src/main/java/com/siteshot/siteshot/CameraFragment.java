@@ -23,6 +23,7 @@ import android.widget.Toast;
 import android.hardware.Camera.CameraInfo;
 
 import com.parse.ParseGeoPoint;
+import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
 import java.io.File;
@@ -488,9 +489,8 @@ public class CameraFragment extends Fragment {
                 e.printStackTrace();
             }
             // get the location data and upload the photo to parse
-            Intent intent = getActivity().getIntent();
-            Location location = intent.getParcelableExtra("location");
-            Log.d(TAG, location.toString());
+            TabActivity activity = (TabActivity) getActivity();
+            Location location = activity.getCurrentLocation();
             ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
             mPhotoUtils.uploadPhoto(data, geoPoint, rotateFlag);
 
