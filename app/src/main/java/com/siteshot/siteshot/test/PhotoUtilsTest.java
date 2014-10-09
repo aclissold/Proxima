@@ -8,6 +8,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.siteshot.siteshot.activities.ProfileActivity;
@@ -46,7 +47,8 @@ public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActi
         final Bitmap mockBitmap = createMockBitmap();
 
         // Upload it to Parse.
-        mPhotoUtils.uploadPhoto(mockBitmap, rotateFlag);
+        mPhotoUtils.uploadPhoto(mockBitmap, new ParseGeoPoint(), rotateFlag);
+
 
         // Get it back from Parse.
         Handler handler = new Handler();

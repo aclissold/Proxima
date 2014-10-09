@@ -6,6 +6,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,8 +18,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationListener;
 import com.parse.ParseAnalytics;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.siteshot.siteshot.CameraFragment;
 import com.siteshot.siteshot.R;
@@ -29,10 +37,32 @@ import java.util.Locale;
  * Main Activity for the app, creates three fragments for each of the three tabs. The three
  * tabs/fragments are feed, camera
  */
-public class TabActivity extends Activity implements ActionBar.TabListener {
+public class TabActivity extends Activity implements ActionBar.TabListener, LocationListener,
+        GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener {
 
-    private final String TAG = TabActivity.class.getName();
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    // The update interval
+    private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+    // A fast interval ceiling
+    private static final int FAST_CEILING_IN_SECONDS = 1;
+    // A fast ceiling of update intervals, used when the app is visible
+    private static final long FAST_INTERVAL_CEILING_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
+            * FAST_CEILING_IN_SECONDS;
+    // Update interval in milliseconds
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
+            * UPDATE_INTERVAL_IN_SECONDS;
+
+     private final String TAG = TabActivity.class.getName();
     private Boolean didPerformInitialLogin = false;
+
+    private Location lastLocation;
+    private Location currentLocation;
+
+    private LocationRequest locationRequest;
+    private LocationClient locationClient;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -56,6 +86,13 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
         ParseAnalytics.trackAppOpened(getIntent());
 
         setContentView(R.layout.activity_tab);
+
+        // Set up location services.
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setFastestInterval(FAST_INTERVAL_CEILING_IN_MILLISECONDS);
+        locationClient = new LocationClient(this, this, this);
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
@@ -154,6 +191,76 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
+
+    // LOCATION METHODS
+
+    private void startPeriodicUpdates() {
+        locationClient.requestLocationUpdates(locationRequest, this);
+    }
+
+    private void stopPeriodicUpdates() {
+        locationClient.removeLocationUpdates((LocationListener) this);
+    }
+
+    private Location getLocation() {
+        if (servicesConnected()) {
+            return locationClient.getLastLocation();
+        } else {
+            return null;
+        }
+    }
+
+    public void onConnected(Bundle bundle) {
+        currentLocation = getLocation();
+        startPeriodicUpdates();
+    }
+
+    public void onDisconnected() {
+        Log.d(TAG, "disconnected from location services");
+    }
+
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
+            } catch (IntentSender.SendIntentException e) {
+            }
+        } else {
+            Log.e(TAG, "onConnectionFailed: " + connectionResult.getErrorCode());
+        }
+    }
+
+    public void onLocationChanged(Location location) {
+        currentLocation = location;
+        if (lastLocation != null
+                && geoPointFromLocation(location)
+                .distanceInKilometersTo(geoPointFromLocation(lastLocation)) < 0.01) {
+            return;
+        }
+        lastLocation = location;
+        // Update the display
+    }
+
+    private boolean servicesConnected() {
+    // Check that Google Play services is available
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        // If Google Play services is available
+        if (ConnectionResult.SUCCESS == resultCode) {
+            // Continue
+            return true;
+            // Google Play services was not available for some reason
+        } else {
+            // Display an error dialog
+            Log.e(TAG, "could not get Google Play services");
+            return false;
+        }
+    }
+
+    private ParseGeoPoint geoPointFromLocation(Location loc) {
+        return new ParseGeoPoint(loc.getLatitude(), loc.getLongitude());
+    }
+
+    // END LOCATION METHODS
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

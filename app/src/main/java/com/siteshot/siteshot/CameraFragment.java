@@ -1,8 +1,11 @@
 package com.siteshot.siteshot;
 
+import android.app.Application;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -19,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import android.hardware.Camera.CameraInfo;
 
+import com.parse.ParseGeoPoint;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
 import java.io.File;
@@ -39,6 +43,8 @@ import java.util.List;
  * modified from code by Rex St. John (on behalf of AirPair.com) on 3/4/14.
  */
 public class CameraFragment extends Fragment {
+    private static final String TAG = CameraFragment.class.getName();
+
     // Photo utilities object to facilitate uploading photos to parse
     private PhotoUtils mPhotoUtils;
     // Native camera.
@@ -481,8 +487,12 @@ public class CameraFragment extends Fragment {
             } catch (IOException e){
                 e.printStackTrace();
             }
-            // upload the photo to parse
-            mPhotoUtils.uploadPhoto(data, rotateFlag);
+            // get the location data and upload the photo to parse
+            Intent intent = getActivity().getIntent();
+            Location location = intent.getParcelableExtra("location");
+            Log.d(TAG, location.toString());
+            ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+            mPhotoUtils.uploadPhoto(data, geoPoint, rotateFlag);
 
             // temporary file save to local device for testing
             if (pictureFile == null){
