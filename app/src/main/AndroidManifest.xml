@@ -37,7 +37,9 @@
         <activity
             android:name=".activities.ProfileActivity"
             android:label="@string/title_activity_profile" >
-         </activity>
+        </activity>
+
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
     </application>
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
@@ -45,7 +47,4 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <meta-data android:name="com.google.android.gms.version"
-        android:value="@integer/google_play_services_version" />
 </manifest>
