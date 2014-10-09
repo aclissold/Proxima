@@ -24,6 +24,9 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
@@ -55,7 +58,9 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
             * UPDATE_INTERVAL_IN_SECONDS;
 
-     private final String TAG = TabActivity.class.getName();
+    private MapFragment mapFragment;
+
+    private final String TAG = TabActivity.class.getName();
     private Boolean didPerformInitialLogin = false;
 
     private Location lastLocation;
@@ -316,7 +321,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
                     return new CameraFragment();
                 case 2:
                     // Maps activity
-                    return new MapFragment();
+                    return new SiteShotMapFragment();
             }
 
             return null;
@@ -380,7 +385,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
     /**
      * A placeholder fragment containing the map view.
      */
-    public static class MapFragment extends Fragment {
+    public static class SiteShotMapFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -391,8 +396,8 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static MapFragment newInstance(int sectionNumber) {
-            MapFragment fragment = new MapFragment();
+        public static SiteShotMapFragment newInstance(int sectionNumber) {
+            SiteShotMapFragment fragment = new SiteShotMapFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
@@ -400,13 +405,26 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
             return fragment;
         }
 
-        public MapFragment() {
+        public SiteShotMapFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.map_fragment, container, false);
+
+            // Set up the Map fragment.
+            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
+            // Enable the current location "blue dot"
+            mapFragment.getMap().setMyLocationEnabled(true);
+            // Set up the camera change handler
+            mapFragment.getMap().setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                public void onCameraChange(CameraPosition position) {
+                    // When the camera changes, update the query
+                    // doMapQuery();
+                }
+            });
+
             return rootView;
         }
 
