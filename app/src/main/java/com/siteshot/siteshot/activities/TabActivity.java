@@ -19,11 +19,16 @@ import android.view.ViewGroup;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
+import com.siteshot.siteshot.CameraFragment;
 import com.siteshot.siteshot.R;
 
 import java.util.Locale;
 
-
+/**
+ * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/11/14.
+ * Main Activity for the app, creates three fragments for each of the three tabs. The three
+ * tabs/fragments are feed, camera
+ */
 public class TabActivity extends Activity implements ActionBar.TabListener {
 
     private final String TAG = TabActivity.class.getName();
@@ -169,7 +174,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
                     return new FeedFragment();
                 case 1:
                     // Camera activity
-                    return new com.siteshot.siteshot.CameraFragment();
+                    return new CameraFragment();
                 case 2:
                     // Maps activity
                     return new MapFragment();
@@ -228,42 +233,6 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.feed_fragment, container, false);
-            return rootView;
-        }
-
-    }
-
-    /**
-     * A placeholder fragment containing the camera view.
-     */
-    public static class CameraFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static CameraFragment newInstance(int sectionNumber) {
-            CameraFragment fragment = new CameraFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-
-            return fragment;
-        }
-
-        public CameraFragment() {
-
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.camera_fragment, container, false);
             return rootView;
         }
 

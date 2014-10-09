@@ -18,7 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by aclissold on 10/6/14.
+ * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/6/14.
+ * Class that contains utilities for uploading photos to parse
  */
 public class PhotoUtils {
 
@@ -30,13 +31,32 @@ public class PhotoUtils {
         return mCurrentPhotoPath;
     }
 
-    public Bitmap uploadPhoto(byte[] data){
+    /**
+     * Convert an image taken by embedded camera to a bitmap and then upload the bitmap to
+     * Parse
+     *
+     * @param data the image taken from embedded camera
+     * @param rotateFlag flag to denote rotation correction
+     *
+     * @return       the image converted to bitmap uploaded to Parse
+     *
+     */
+    public Bitmap uploadPhoto(byte[] data, boolean rotateFlag){
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        return uploadPhoto(bitmap);
+        return uploadPhoto(bitmap, rotateFlag);
     }
 
-    public Bitmap uploadPhoto(Bitmap bitmap) {
-        Bitmap rotatedBitmap = rotate(bitmap);
+    /**
+     * Upload an image Parse attributed to the current user
+     *
+     * @param bitmap the image to upload to Parse
+     * @param rotateFlag flag to denote rotation correction
+     *
+     * @return       the same bitmap, rotated if necessary
+     *
+     */
+    public Bitmap uploadPhoto(Bitmap bitmap, boolean rotateFlag) {
+        Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -50,13 +70,15 @@ public class PhotoUtils {
     }
 
     /**
+     * Upload an image to be used as user profile icon to Parse
      *
      * @param bitmap the image to upload to Parse
      *
      * @return       the same bitmap, rotated if necessary
+     *
      */
-    public Bitmap uploadProfilePhoto(Bitmap bitmap) {
-        Bitmap rotatedBitmap = rotate(bitmap);
+    public Bitmap uploadProfilePhoto(Bitmap bitmap, boolean profileRotate) {
+        Bitmap rotatedBitmap = rotate(bitmap, profileRotate);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -69,19 +91,31 @@ public class PhotoUtils {
         return rotatedBitmap;
     }
 
-    private Bitmap rotate(Bitmap bitmap) {
-        //temporary forced portrait upload by forcing 90 degree rotation of the bitmap when uploading
-        int iconOrientation = 6;
-
-        /* this method gives iconOrientation = 0 which is undefined so it does not do any image
-        rotation, TODO: figure out why the orientation is undefined.
-        try {
-            ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
-            iconOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-        } catch (IOException e) {
-            Log.d(TAG, e.getMessage());
-        }
+    // method to rotate the bitmap for upload if necessary
+    private Bitmap rotate(Bitmap bitmap, boolean shouldRotate) {
+        boolean rotateFlag = shouldRotate;
+        int iconOrientation;
+        /* portrait upload by forcing 90 degree rotation of the bitmap when uploading from the
+         * embedded camera
         */
+        if (rotateFlag) {
+            iconOrientation = 6;
+        }
+        else {
+            iconOrientation = 1;
+        }
+
+        /* if the upload is from native camera rotate the result using the headers added by the
+         * native camera. if upload is from embedded camera force 90 degree rotation
+        */
+        if (rotateFlag == false) {
+            try {
+                ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
+                iconOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+            } catch (IOException e) {
+                Log.d(TAG, e.getMessage());
+            }
+        }
         Matrix matrix = new Matrix();
 
         switch (iconOrientation) {

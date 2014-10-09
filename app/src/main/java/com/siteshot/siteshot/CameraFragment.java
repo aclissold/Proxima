@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.hardware.Camera.CameraInfo;
 
@@ -30,30 +29,35 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 /**
+ * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/6/14.
  * Take a picture directly from inside the app using this fragment.
  *
  * Reference: http://developer.android.com/training/camera/cameradirect.html
  * Reference: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
  * Reference: http://stackoverflow.com/questions/10913181/camera-preview-is-not-restarting
  *
- * Created by Rex St. John (on behalf of AirPair.com) on 3/4/14.
+ * modified from code by Rex St. John (on behalf of AirPair.com) on 3/4/14.
  */
 public class CameraFragment extends Fragment {
-
+    // Photo utilities object to facilitate uploading photos to parse
     private PhotoUtils mPhotoUtils;
     // Native camera.
     private Camera mCamera;
     // View to display the camera output.
     private CameraPreview mPreview;
     int mNumberOfCameras;
-    int mCurrentCamera;  // Camera ID currently chosen
-    int mCameraCurrentlyLocked;  // Camera ID that's actually acquired
+    // Camera ID currently chosen
+    int mCurrentCamera;
+    // Camera ID that's actually acquired
+    int mCameraCurrentlyLocked;
     // The first rear facing camera
     int mDefaultCameraId;
-
-
     // Reference to the containing view.
+
     private View mCameraView;
+
+    boolean pauseFlag = true;
+
     /**
      * Default empty constructor.
      */
@@ -72,6 +76,7 @@ public class CameraFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     /**
      * OnCreateView fragment override
      * @param inflater
@@ -82,9 +87,12 @@ public class CameraFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Create our Preview view and set it as the content of our activity.
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
-// Create our Preview view and set it as the content of our activity.
+
+        // Create a new PhotoUtils object to facilitate photo uploading
         mPhotoUtils = new PhotoUtils();
+
         // Find the total number of cameras available
         mNumberOfCameras = Camera.getNumberOfCameras();
 
@@ -97,23 +105,27 @@ public class CameraFragment extends Fragment {
             }
         }
 
-            boolean opened = safeCameraOpenInView(view);
+        //open the camera for use
+        boolean opened = safeCameraOpenInView(view);
         if(opened == false){
             Log.d("CameraGuide","Error, Camera failed to open");
             return view;
         }
-// Trap the capture button.
+
+        // Trap the capture button.
         Button captureButton = (Button) view.findViewById(R.id.button_capture);
         captureButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-// get an image from the camera
-                        mCamera.takePicture(null, null, mPicture);
-                    }
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // get an image from the camera
+                    mCamera.takePicture(null, null, mPicture);
                 }
+            }
         );
+        // Trap the camera flip button.
         Button flipButton = (Button) view.findViewById(R.id.button_flip);
+        // Check if there is a front camera, if not make the flip button unaccessable
         if(Camera.getNumberOfCameras() == 1){
             flipButton.setVisibility(View.INVISIBLE);
         }
@@ -124,27 +136,21 @@ public class CameraFragment extends Fragment {
                     public void onClick(View v) {
                         if (mCamera != null) {
                             mCamera.stopPreview();
-                            //mPreview.setCamera(null);
                             mCamera.release();
                             mCamera = null;
                         }
-
                         // Acquire the next camera and request Preview to reconfigure
                         // parameters.
                         mCurrentCamera = (mCameraCurrentlyLocked + 1) % mNumberOfCameras;
                         mCamera = Camera.open(mCurrentCamera);
                         mCameraCurrentlyLocked = mCurrentCamera;
                         mPreview.switchCamera(mCamera);
-
                         // Start the preview
                         mCamera.startPreview();
-
                     }
                 }
-                    );
-
+            );
         }
-
         return view;
     }
     /**
@@ -154,11 +160,15 @@ public class CameraFragment extends Fragment {
      */
     private boolean safeCameraOpenInView(View view) {
         boolean qOpened = false;
+        // make sure camera is availiable
         releaseCameraAndPreview();
+        // get a camera object
         mCamera = getCameraInstance();
+        // set the camera orientation to portrait
         mCamera.setDisplayOrientation(90);
         mCameraView = view;
         qOpened = (mCamera != null);
+        // add the camera preview to the layout
         if(qOpened == true){
             mPreview = new CameraPreview(getActivity().getBaseContext(), mCamera,view);
             FrameLayout preview = (FrameLayout) view.findViewById(R.id.camera_preview);
@@ -174,25 +184,46 @@ public class CameraFragment extends Fragment {
     public static Camera getCameraInstance(){
         Camera c = null;
         try {
-            c = Camera.open(); // attempt to get a Camera instance
+            // attempt to get a Camera instance
+            c = Camera.open();
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        return c; // returns null if camera is unavailable
+        // returns null if camera is unavailable
+        return c;
     }
+
+    // release the camera on pause so it is availiable for other applications
     @Override
     public void onPause() {
         super.onPause();
+        releaseCameraAndPreview();
+
+        pauseFlag = true;
     }
+
+    // restart the camera preview when fragment is resumed
+    @Override
+    public void onResume() {
+        super.onResume();
+        View newView = getView();
+        if (pauseFlag = true){
+            safeCameraOpenInView(newView);
+        }
+    }
+
+    // release the camera when the fragment is destroyed to make it availiable for other
+    // applications
     @Override
     public void onDestroy() {
         super.onDestroy();
         releaseCameraAndPreview();
     }
+
     /**
      * Clear any existing preview / camera.
-     */
+    */
     private void releaseCameraAndPreview() {
         if (mCamera != null) {
             FrameLayout preview = (FrameLayout) getView().findViewById(R.id.camera_preview);
@@ -203,10 +234,10 @@ public class CameraFragment extends Fragment {
             mCamera = null;
         }
         if(mPreview != null){
-            //mPreview.destroyDrawingCache();
             mPreview.mCamera = null;
         }
     }
+
     /**
      * Surface on which the camera projects it's capture results. This is derived both from Google's docs and the
      * excellent StackOverflow answer provided below.
@@ -228,31 +259,34 @@ public class CameraFragment extends Fragment {
         private List<String> mSupportedFlashModes;
         // View holding this camera.
         private View mCameraView;
+
+        // Create the surface holder for the camera preview
         public CameraPreview(Context context, Camera camera, View cameraView) {
             super(context);
-// Capture the context
+            // Capture the context
             mCameraView = cameraView;
             mContext = context;
             setCamera(camera);
-// Install a SurfaceHolder.Callback so we get notified when the
-// underlying surface is created and destroyed.
+            // Install a SurfaceHolder.Callback so we get notified when the
+            // underlying surface is created and destroyed.
             mHolder = getHolder();
             mHolder.addCallback(this);
             mHolder.setKeepScreenOn(true);
-// deprecated setting, but required on Android versions prior to 3.0
+            // deprecated setting, but required on Android versions prior to 3.0
             mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         }
 
+        // switch from front to back camera or vice versa
         public void switchCamera(Camera camera) {
             setCamera(camera);
             try {
+                // orient the camera display to portrait
                 camera.setDisplayOrientation(90);
                 camera.setPreviewDisplay(mHolder);
             } catch (IOException exception) {
                 exception.printStackTrace();
             }
         }
-
 
         /**
          * Begin the preview of the camera input.
@@ -267,17 +301,18 @@ public class CameraFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
         /**
          * Extract supported preview and flash modes from the camera.
          * @param camera
          */
         private void setCamera(Camera camera)
         {
-// Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
+            // Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
             mCamera = camera;
             mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
             mSupportedFlashModes = mCamera.getParameters().getSupportedFlashModes();
-// Set the camera to Auto Flash mode.
+            // Set the camera to Auto Flash mode.
             if (mSupportedFlashModes != null && mSupportedFlashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)){
                 Camera.Parameters parameters = mCamera.getParameters();
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
@@ -285,6 +320,7 @@ public class CameraFragment extends Fragment {
             }
             requestLayout();
         }
+
         /**
          * The Surface has been created, now tell the camera where to draw the preview.
          * @param holder
@@ -296,6 +332,7 @@ public class CameraFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
         /**
          * Dispose of the camera preview.
          * @param holder
@@ -305,6 +342,7 @@ public class CameraFragment extends Fragment {
                 mCamera.stopPreview();
             }
         }
+
         /**
          * React to surface changed events
          * @param holder
@@ -313,18 +351,18 @@ public class CameraFragment extends Fragment {
          * @param h
          */
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-// If your preview can change or rotate, take care of those events here.
-// Make sure to stop the preview before resizing or reformatting it.
+            // If your preview can change or rotate, take care of those events here.
+            // Make sure to stop the preview before resizing or reformatting it.
             if (mHolder.getSurface() == null){
-// preview surface does not exist
+                // preview surface does not exist
                 return;
             }
-// stop preview before making changes
+            // stop preview before making changes
             try {
                 Camera.Parameters parameters = mCamera.getParameters();
-// Set the auto-focus mode to "continuous"
+                // Set the auto-focus mode to "continuous"
                 parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-// Preview size must exist.
+                // Preview size must exist.
                 if(mPreviewSize != null) {
                     Camera.Size previewSize = mPreviewSize;
                     parameters.setPreviewSize(previewSize.width, previewSize.height);
@@ -335,6 +373,7 @@ public class CameraFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
         /**
          * Calculate the measurements of the layout
          * @param widthMeasureSpec
@@ -343,7 +382,7 @@ public class CameraFragment extends Fragment {
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
         {
-// Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
+            // Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
             final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
             final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
             setMeasuredDimension(width, height);
@@ -351,6 +390,7 @@ public class CameraFragment extends Fragment {
                 mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
             }
         }
+
         /**
          * Update the layout based on rotation and orientation changes.
          * @param changed
@@ -362,7 +402,7 @@ public class CameraFragment extends Fragment {
         @Override
         protected void onLayout(boolean changed, int left, int top, int right, int bottom)
         {
-// Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
+            // Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
             if (changed) {
                 final int width = right - left;
                 final int height = bottom - top;
@@ -396,6 +436,7 @@ public class CameraFragment extends Fragment {
                 mCameraView.layout(0, height - scaledChildHeight, width, height);
             }
         }
+
         /**
          *
          * @param sizes
@@ -405,11 +446,11 @@ public class CameraFragment extends Fragment {
          */
         private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int width, int height)
         {
-// Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
+            // Source: http://stackoverflow.com/questions/7942378/android-camera-will-not-work-startpreview-fails
             Camera.Size optimalSize = null;
             final double ASPECT_TOLERANCE = 0.1;
             double targetRatio = (double) height / width;
-// Try to find a size match which suits the whole screen minus the menu on the left.
+            // Try to find a size match which suits the whole screen minus the menu on the left.
             for (Camera.Size size : sizes){
                 if (size.height != width) continue;
                 double ratio = (double) size.width / size.height;
@@ -417,26 +458,33 @@ public class CameraFragment extends Fragment {
                     optimalSize = size;
                 }
             }
-// If we cannot find the one that matches the aspect ratio, ignore the requirement.
+            // If we cannot find the one that matches the aspect ratio, ignore the requirement.
             if (optimalSize == null) {
-// TODO : Backup in case we don't get a size.
+                // TODO : Backup in case we don't get a size.
             }
             return optimalSize;
         }
     }
+
     /**
      * Picture Callback for handling a picture capture and saving it out to a file.
      */
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
+            // rotate the picture for embedded camera
+            boolean rotateFlag = true;
             File pictureFile = getOutputMediaFile();
+            // create a parse photo file to facilitate uploading
             try {
                 mPhotoUtils.createPhotoFile();
             } catch (IOException e){
                 e.printStackTrace();
             }
-            mPhotoUtils.uploadPhoto(data);
+            // upload the photo to parse
+            mPhotoUtils.uploadPhoto(data, rotateFlag);
+
+            // temporary file save to local device for testing
             if (pictureFile == null){
                 Toast.makeText(getActivity(), "Image retrieval failed.", Toast.LENGTH_SHORT)
                         .show();
@@ -446,7 +494,7 @@ public class CameraFragment extends Fragment {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
                 fos.close();
-// Restart the camera preview.
+            // Restart the camera preview.
                 safeCameraOpenInView(mCameraView);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -455,7 +503,11 @@ public class CameraFragment extends Fragment {
             }
         }
     };
-    /**
+
+    /*
+     * temporary local storage for testing/debugging
+
+
      * Used to return the camera File output.
      * @return
      */
@@ -468,7 +520,7 @@ public class CameraFragment extends Fragment {
                 return null;
             }
         }
-// Create a media file name
+        // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_"+ timeStamp + ".jpg");

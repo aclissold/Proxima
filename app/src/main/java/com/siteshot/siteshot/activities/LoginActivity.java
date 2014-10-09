@@ -24,8 +24,8 @@ import com.siteshot.siteshot.R;
 
 
 /**
+ * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/11/14.
  * A login screen that offers login via email/password.
-
  */
 public class LoginActivity extends Activity {
 

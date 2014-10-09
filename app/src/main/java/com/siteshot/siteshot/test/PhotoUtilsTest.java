@@ -41,11 +41,12 @@ public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActi
         String photoPath = mPhotoUtils.getCurrentPhotoPath();
         assertNotNull(photoPath);
 
+        boolean rotateFlag = false;
         // Write mock data to it.
         final Bitmap mockBitmap = createMockBitmap();
 
         // Upload it to Parse.
-        mPhotoUtils.uploadPhoto(mockBitmap);
+        mPhotoUtils.uploadPhoto(mockBitmap, rotateFlag);
 
         // Get it back from Parse.
         Handler handler = new Handler();

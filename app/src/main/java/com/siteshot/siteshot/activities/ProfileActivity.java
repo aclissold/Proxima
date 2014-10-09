@@ -27,7 +27,10 @@ import com.siteshot.siteshot.utils.PhotoUtils;
 import java.io.File;
 import java.io.IOException;
 
-
+/**
+ * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/25/14.
+ * Activity that displays user profile, user album, user settings
+ */
 public class ProfileActivity extends Activity {
 
     public TextView mUsernameView;
@@ -84,10 +87,12 @@ public class ProfileActivity extends Activity {
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // do not correct rotation for native camera
+        boolean profileRotate = false;
         if (resultCode == RESULT_OK) {
             String photoPath = mPhotoUtils.getCurrentPhotoPath();
             Bitmap bitmap = BitmapFactory.decodeFile(photoPath, new BitmapFactory.Options());
-            Bitmap rotatedBitmap = mPhotoUtils.uploadProfilePhoto(bitmap);
+            Bitmap rotatedBitmap = mPhotoUtils.uploadProfilePhoto(bitmap, profileRotate);
             mUserIcon.setImageBitmap(rotatedBitmap);
         }
     }
