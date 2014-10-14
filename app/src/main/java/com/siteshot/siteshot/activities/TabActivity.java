@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
@@ -42,24 +43,9 @@ import java.util.Locale;
  * Main Activity for the app, creates three fragments for each of the three tabs. The three
  * tabs/fragments are feed, camera
  */
-public class TabActivity extends Activity implements ActionBar.TabListener, LocationListener,
-        GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener {
+public class TabActivity extends Activity implements ActionBar.TabListener {
 
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-
-    private static final int MILLISECONDS_PER_SECOND = 1000;
-    // The update interval
-    private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
-    // A fast interval ceiling
-    private static final int FAST_CEILING_IN_SECONDS = 1;
-    // A fast ceiling of update intervals, used when the app is visible
-    private static final long FAST_INTERVAL_CEILING_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
-            * FAST_CEILING_IN_SECONDS;
-    // Update interval in milliseconds
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
-            * UPDATE_INTERVAL_IN_SECONDS;
-
+    public static Context c;
     private MapFragment mapFragment;
 
     private final String TAG = TabActivity.class.getName();
@@ -98,12 +84,8 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
 
         setContentView(R.layout.activity_tab);
 
-        // Set up location services.
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setFastestInterval(FAST_INTERVAL_CEILING_IN_MILLISECONDS);
-        locationClient = new LocationClient(this, this, this);
+        c = this;
+
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
@@ -203,104 +185,6 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-    // LOCATION METHODS
-
-    /*
-     * Called when the Activity is no longer visible at all. Stop updates and disconnect.
-     */
-    @Override
-    public void onStop() {
-        // If the client is connected
-        if (locationClient.isConnected()) {
-            stopPeriodicUpdates();
-        }
-
-        // After disconnect() is called, the client is considered "dead".
-        locationClient.disconnect();
-
-        super.onStop();
-    }
-
-    /*
-     * Called when the Activity is restarted, even before it becomes visible.
-     */
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // Connect to the location services client
-        locationClient.connect();
-    }
-
-    private void startPeriodicUpdates() {
-        locationClient.requestLocationUpdates(locationRequest, this);
-    }
-
-    private void stopPeriodicUpdates() {
-        locationClient.removeLocationUpdates((LocationListener) this);
-    }
-
-    private Location getLocation() {
-        if (servicesConnected()) {
-            Log.d(TAG, locationClient.getLastLocation().toString());
-            return locationClient.getLastLocation();
-        } else {
-            return null;
-        }
-    }
-
-    public void onConnected(Bundle bundle) {
-        currentLocation = getLocation();
-        startPeriodicUpdates();
-    }
-
-    public void onDisconnected() {
-        Log.d(TAG, "disconnected from location services");
-    }
-
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-            }
-        } else {
-            Log.e(TAG, "onConnectionFailed: " + connectionResult.getErrorCode());
-        }
-    }
-
-    public void onLocationChanged(Location location) {
-        currentLocation = location;
-        if (lastLocation != null
-                && geoPointFromLocation(location)
-                .distanceInKilometersTo(geoPointFromLocation(lastLocation)) < 0.01) {
-            return;
-        }
-        lastLocation = location;
-
-        // Update the display
-    }
-
-    private boolean servicesConnected() {
-    // Check that Google Play services is available
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-            // Continue
-            return true;
-            // Google Play services was not available for some reason
-        } else {
-            // Display an error dialog
-            Log.e(TAG, "could not get Google Play services");
-            return false;
-        }
-    }
-
-    private ParseGeoPoint geoPointFromLocation(Location loc) {
-        return new ParseGeoPoint(loc.getLatitude(), loc.getLongitude());
-    }
-
-    // END LOCATION METHODS
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
