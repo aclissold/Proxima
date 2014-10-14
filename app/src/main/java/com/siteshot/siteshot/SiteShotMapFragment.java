@@ -34,10 +34,13 @@ import com.parse.ParseGeoPoint;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
 import com.siteshot.siteshot.activities.TabActivity;
+import com.siteshot.siteshot.models.UserPhoto;
+import com.siteshot.siteshot.utils.PhotoUtils;
 
 //import java.text.ParseException;
 import java.util.HashMap;
@@ -155,7 +158,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         mapFragment.getMap().setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
                 // When the camera changes, update the query
-                 doMapQuery();
+                doMapQuery();
             }
         });
 
@@ -397,91 +400,69 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             return;
         }
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
-        // Create the map Parse query
-        /*ParseQuery<SiteShotMapData> mapQuery = SiteShotMapData.getQuery();
-        // Set up additional query filters
-        mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
-        mapQuery.include("user");
-        mapQuery.orderByDescending("createdAt");
-        mapQuery.setLimit(MAX_POST_SEARCH_RESULTS);
-        // Kick off the query in the background
-        mapQuery.findInBackground(new FindCallback<SiteShotMapData>() {
-            @Override
-            public void done(List<SiteShotMapData> objects, ParseException e) {
-                if (e != null) {
-                    //if (Application.APPDEBUG) {
-                    //    Log.d(Application.APPTAG, "An error occurred while querying for map posts.", e);
-                    //}
-                    return;
-                }
-                */
-        /*
-         * Make sure we're processing results from
-         * the most recent update, in case there
-         * may be more than one in progress.
-         */
-        return;
-               /* if (myUpdateNumber != mostRecentMapUpdate) {
-                    return;
-                }
-                // Posts to show on the map
-                Set<String> toKeep = new HashSet<String>();
-                // Loop through the results of the search
-                for (SiteShotMapData post : objects) {
-                    // Add this post to the list of map pins to keep
-                    toKeep.add(post.getObjectId());
-                    // Check for an existing marker for this post
-                    Marker oldMarker = mapMarkers.get(post.getObjectId());
-                    // Set up the map marker's location
-                    MarkerOptions markerOpts =
-                            new MarkerOptions().position(new LatLng(post.getLocation().getLatitude(), post
-                                    .getLocation().getLongitude()));
-                    // Set up the marker properties based on if it is within the search radius
-                    if (post.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
-                            / METERS_PER_KILOMETER) {
-                        // Check for an existing out of range marker
-                        if (oldMarker != null) {
-                            if (oldMarker.getSnippet() == null) {
-                                // Out of range marker already exists, skip adding it
-                                continue;
-                            } else {
-                                // Marker now out of range, needs to be refreshed
-                                oldMarker.remove();
-                            }
-                        }
-                        // Display a red marker with a predefined title and no snippet
-                        markerOpts =
-                                markerOpts.title(getResources().getString(R.string.post_out_of_range)).icon(
-                                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        List<UserPhoto> objects = PhotoUtils.getInstance().getUserPhotos();
+        if (myUpdateNumber != mostRecentMapUpdate) {
+            return;
+        }
+
+        // Posts to show on the map
+        Set<String> toKeep = new HashSet<String>();
+        // Loop through the results of the search
+        for (UserPhoto photo : objects) {
+            // Add this post to the list of map pins to keep
+            toKeep.add(photo.getObjectId());
+            // Check for an existing marker for this post
+            Marker oldMarker = mapMarkers.get(photo.getObjectId());
+            // Set up the map marker's location
+            MarkerOptions markerOpts =
+                    new MarkerOptions().position(new LatLng(photo.getLocation().getLatitude(), photo
+                            .getLocation().getLongitude()));
+            // Set up the marker properties based on if it is within the search radius
+            if (photo.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+                    / METERS_PER_KILOMETER) {
+                // Check for an existing out of range marker
+                if (oldMarker != null) {
+                    if (oldMarker.getSnippet() == null) {
+                        // Out of range marker already exists, skip adding it
+                        continue;
                     } else {
-                        // Check for an existing in range marker
-                        if (oldMarker != null) {
-                            if (oldMarker.getSnippet() != null) {
-                                // In range marker already exists, skip adding it
-                                continue;
-                            } else {
-                                // Marker now in range, needs to be refreshed
-                                oldMarker.remove();
-                            }
-                        }
-                        // Display a green marker with the post information
-                        markerOpts =
-                                markerOpts.title(post.getText()).snippet(post.getUser().getUsername())
-                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                    }
-                    // Add a new marker
-                    Marker marker = mapFragment.getMap().addMarker(markerOpts);
-                    mapMarkers.put(post.getObjectId(), marker);
-                    if (post.getObjectId().equals(selectedPostObjectId)) {
-                        marker.showInfoWindow();
-                        selectedPostObjectId = null;
+                        // Marker now out of range, needs to be refreshed
+                        oldMarker.remove();
                     }
                 }
-                // Clean up old markers.
-                cleanUpMarkers(toKeep);
+                // Display a red marker with a predefined title and no snippet
+                markerOpts =
+                        markerOpts.title(getResources().getString(R.string.post_out_of_range)).icon(
+                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            } else {
+                // Check for an existing in range marker
+                if (oldMarker != null) {
+                    if (oldMarker.getSnippet() != null) {
+                        // In range marker already exists, skip adding it
+                        continue;
+                    } else {
+                        // Marker now in range, needs to be refreshed
+                        oldMarker.remove();
+                    }
+                }
+                // Display a green marker with the post information
+                markerOpts =
+                        markerOpts.title("temp").snippet(photo.getUser().getUsername())
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             }
-        });*/
+            // Add a new marker
+            Marker marker = mapFragment.getMap().addMarker(markerOpts);
+            mapMarkers.put(photo.getObjectId(), marker);
+            if (photo.getObjectId().equals(selectedPostObjectId)) {
+                marker.showInfoWindow();
+                selectedPostObjectId = null;
+            }
+        }
+        // Clean up old markers.
+        cleanUpMarkers(toKeep);
     }
+
+
 
     /*
      * Helper method to clean up old markers
