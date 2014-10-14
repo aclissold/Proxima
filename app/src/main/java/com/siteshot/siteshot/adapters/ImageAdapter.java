@@ -1,15 +1,26 @@
 package com.siteshot.siteshot.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.siteshot.siteshot.R;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.siteshot.siteshot.utils.PhotoUtils;
 
+/**
+ * Adapts PhotoUtils' List of UserPhotos.
+ */
 public class ImageAdapter extends BaseAdapter {
+    private final String TAG = getClass().getName();
+
     private Context mContext;
 
     public ImageAdapter(Context c) {
@@ -17,7 +28,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return mThumbIds.length * 4;
+        return PhotoUtils.getInstance().getUserPhotos().size();
     }
 
     public Object getItem(int position) {
@@ -40,22 +51,20 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageResource(mThumbIds[position % mThumbIds.length]);
+        // Retrieve the photo data from the UserPhoto instance.
+        ParseObject object = PhotoUtils.getInstance().getUserPhotos().get(position);
+        ParseFile file = object.getParseFile("photo");
+        byte[] data = new byte[0];
+        try {
+            data = file.getData();
+        } catch (ParseException e) {
+            Log.e(TAG, "could not get data from ParseFile:");
+            e.printStackTrace();
+        }
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        imageView.setImageBitmap(bitmap);
+
         return imageView;
     }
 
-    // references to our images
-    private Integer[] mThumbIds = {
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7
-    };
 }
