@@ -4,17 +4,22 @@ import android.app.Application;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
+import com.siteshot.siteshot.utils.PhotoUtils;
 
 /**
  * Created by aclissold on 9/25/14.
  */
-public class SiteshotApplication extends Application {
+public class SiteShotApplication extends Application {
+
+    private final String TAG = getClass().getName();
 
     @Override
     public void onCreate() {
         Parse.initialize(this, "1v3hMSVlhYla6NduIkhn76wlZKqH2nHJCLBNSoI0",
                 "KO9ARhyVQm4qlknXlnvXQsMGl2oKlCurGZxgPvQp");
         ParseACL.setDefaultACL(new ParseACL(), true);
+
+        PhotoUtils.getInstance().downloadUserPhotos();
     }
 }
 

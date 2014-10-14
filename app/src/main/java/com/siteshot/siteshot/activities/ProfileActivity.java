@@ -36,7 +36,6 @@ public class ProfileActivity extends Activity {
     public TextView mUsernameView;
     public ImageView mUserIcon;
     private final String TAG = ProfileActivity.class.getName();
-    private PhotoUtils mPhotoUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +64,6 @@ public class ProfileActivity extends Activity {
         });
 
         setUserIcon();
-
-        mPhotoUtils = new PhotoUtils();
     }
 
     private void setUserIcon() {
@@ -90,9 +87,9 @@ public class ProfileActivity extends Activity {
         // do not correct rotation for native camera
         boolean profileRotate = false;
         if (resultCode == RESULT_OK) {
-            String photoPath = mPhotoUtils.getCurrentPhotoPath();
+            String photoPath = PhotoUtils.getInstance().getCurrentPhotoPath();
             Bitmap bitmap = BitmapFactory.decodeFile(photoPath, new BitmapFactory.Options());
-            Bitmap rotatedBitmap = mPhotoUtils.uploadProfilePhoto(bitmap, profileRotate);
+            Bitmap rotatedBitmap = PhotoUtils.getInstance().uploadProfilePhoto(bitmap, profileRotate);
             mUserIcon.setImageBitmap(rotatedBitmap);
         }
     }
@@ -140,7 +137,7 @@ public class ProfileActivity extends Activity {
             // Create the File where the photo should go
             File photoFile = null;
             try {
-                photoFile = mPhotoUtils.createPhotoFile();
+                photoFile = PhotoUtils.getInstance().createPhotoFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
                 Log.e(TAG, ex.getMessage());

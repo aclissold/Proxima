@@ -1,10 +1,9 @@
 package com.siteshot.siteshot;
 
-import android.app.Application;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,7 +19,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import android.hardware.Camera.CameraInfo;
 
 import com.parse.ParseGeoPoint;
 import com.siteshot.siteshot.activities.TabActivity;
@@ -46,8 +44,6 @@ import java.util.List;
 public class CameraFragment extends Fragment {
     private static final String TAG = CameraFragment.class.getName();
 
-    // Photo utilities object to facilitate uploading photos to parse
-    private PhotoUtils mPhotoUtils;
     // Native camera.
     private Camera mCamera;
     // View to display the camera output.
@@ -96,9 +92,6 @@ public class CameraFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Create our Preview view and set it as the content of our activity.
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
-
-        // Create a new PhotoUtils object to facilitate photo uploading
-        mPhotoUtils = new PhotoUtils();
 
         // Find the total number of cameras available
         mNumberOfCameras = Camera.getNumberOfCameras();
@@ -484,7 +477,7 @@ public class CameraFragment extends Fragment {
             File pictureFile = getOutputMediaFile();
             // create a parse photo file to facilitate uploading
             try {
-                mPhotoUtils.createPhotoFile();
+                PhotoUtils.getInstance().createPhotoFile();
             } catch (IOException e){
                 e.printStackTrace();
             }
@@ -492,7 +485,7 @@ public class CameraFragment extends Fragment {
             TabActivity activity = (TabActivity) getActivity();
             Location location = activity.getCurrentLocation();
             ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-            mPhotoUtils.uploadPhoto(data, geoPoint, rotateFlag);
+            PhotoUtils.getInstance().uploadPhoto(data, geoPoint, rotateFlag);
 
             // temporary file save to local device for testing
             if (pictureFile == null){
