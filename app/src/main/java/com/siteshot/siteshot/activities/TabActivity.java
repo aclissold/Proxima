@@ -5,7 +5,10 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,11 +19,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.parse.ParseAnalytics;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.siteshot.siteshot.CameraFragment;
 import com.siteshot.siteshot.R;
+import com.siteshot.siteshot.SiteShotMapFragment;
 
 import java.util.Locale;
 
@@ -31,8 +45,17 @@ import java.util.Locale;
  */
 public class TabActivity extends Activity implements ActionBar.TabListener {
 
+    public static Context c;
+    private MapFragment mapFragment;
+
     private final String TAG = TabActivity.class.getName();
     private Boolean didPerformInitialLogin = false;
+
+    private Location lastLocation;
+    private Location currentLocation;
+
+    private LocationRequest locationRequest;
+    private LocationClient locationClient;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -49,6 +72,10 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
      */
     ViewPager mViewPager;
 
+    public Location getCurrentLocation() {
+        return currentLocation;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +83,9 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
         ParseAnalytics.trackAppOpened(getIntent());
 
         setContentView(R.layout.activity_tab);
+
+        c = this;
+
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
@@ -155,6 +185,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -177,7 +208,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
                     return new CameraFragment();
                 case 2:
                     // Maps activity
-                    return new MapFragment();
+                    return new SiteShotMapFragment();
             }
 
             return null;
@@ -238,38 +269,5 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
 
     }
 
-    /**
-     * A placeholder fragment containing the map view.
-     */
-    public static class MapFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static MapFragment newInstance(int sectionNumber) {
-            MapFragment fragment = new MapFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-
-            return fragment;
-        }
-
-        public MapFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.map_fragment, container, false);
-            return rootView;
-        }
-
-    }
 }

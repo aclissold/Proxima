@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -41,9 +42,9 @@ public class PhotoUtils {
      * @return       the image converted to bitmap uploaded to Parse
      *
      */
-    public Bitmap uploadPhoto(byte[] data, boolean rotateFlag){
+    public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag){
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        return uploadPhoto(bitmap, rotateFlag);
+        return uploadPhoto(bitmap, geoPoint, rotateFlag);
     }
 
     /**
@@ -55,7 +56,7 @@ public class PhotoUtils {
      * @return       the same bitmap, rotated if necessary
      *
      */
-    public Bitmap uploadPhoto(Bitmap bitmap, boolean rotateFlag) {
+    public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, boolean rotateFlag) {
         Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -64,6 +65,7 @@ public class PhotoUtils {
         ParseFile file = new ParseFile("photo.jpg", data);
         ParseObject object = new ParseObject("UserPhoto");
         object.put("photo", file);
+        object.put("location", geoPoint);
         object.saveInBackground();
 
         return rotatedBitmap;
