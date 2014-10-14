@@ -26,7 +26,20 @@ public class PhotoUtils {
 
     private static final String TAG = PhotoUtils.class.getName();
 
+    private static PhotoUtils mInstance = null;
+
     private String mCurrentPhotoPath;
+
+    private PhotoUtils() {}
+
+    public static PhotoUtils getInstance() {
+        if (mInstance == null) {
+            mInstance = new PhotoUtils();
+        }
+        return mInstance;
+    }
+
+
 
     public String getCurrentPhotoPath() {
         return mCurrentPhotoPath;

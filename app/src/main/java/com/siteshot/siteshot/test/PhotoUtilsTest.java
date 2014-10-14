@@ -23,7 +23,6 @@ import java.util.Random;
 public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActivity> {
 
     private ProfileActivity mProfileActivity;
-    private PhotoUtils mPhotoUtils;
 
     public PhotoUtilsTest() {
         super(ProfileActivity.class);
@@ -33,13 +32,12 @@ public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActi
     public void setUp() throws Exception {
         super.setUp();
         mProfileActivity = getActivity();
-        mPhotoUtils = new PhotoUtils();
     }
 
     public void testPhotoUpload() throws IOException {
         // Create the photo file.
-        mPhotoUtils.createPhotoFile();
-        String photoPath = mPhotoUtils.getCurrentPhotoPath();
+        PhotoUtils.getInstance().createPhotoFile();
+        String photoPath = PhotoUtils.getInstance().getCurrentPhotoPath();
         assertNotNull(photoPath);
 
         boolean rotateFlag = false;
@@ -47,7 +45,7 @@ public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActi
         final Bitmap mockBitmap = createMockBitmap();
 
         // Upload it to Parse.
-        mPhotoUtils.uploadPhoto(mockBitmap, new ParseGeoPoint(), rotateFlag);
+        PhotoUtils.getInstance().uploadPhoto(mockBitmap, new ParseGeoPoint(), rotateFlag);
 
 
         // Get it back from Parse.
