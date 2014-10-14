@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by aclissold on 9/25/14.
  */
-public class SiteshotApplication extends Application {
+public class SiteShotApplication extends Application {
 
     private final String TAG = getClass().getName();
 
