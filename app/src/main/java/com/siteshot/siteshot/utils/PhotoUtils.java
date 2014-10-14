@@ -7,16 +7,21 @@ import android.media.ExifInterface;
 import android.os.Environment;
 import android.util.Log;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.siteshot.siteshot.models.UserPhoto;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/6/14.
@@ -25,9 +30,9 @@ import java.util.Date;
 public class PhotoUtils {
 
     private static final String TAG = PhotoUtils.class.getName();
-
     private static PhotoUtils mInstance = null;
 
+    private List<UserPhoto> mUserPhotos;
     private String mCurrentPhotoPath;
 
     private PhotoUtils() {}
@@ -39,7 +44,24 @@ public class PhotoUtils {
         return mInstance;
     }
 
+    public void downloadUserPhotos() {
+        ParseQuery<UserPhoto> query = UserPhoto.getQuery();
+        query.findInBackground(new FindCallback<UserPhoto>() {
+            @Override
+            public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
+                if (e == null) {
+                    mUserPhotos = resultUserPhotos;
+                } else {
+                    Log.e(TAG, "error retrieving user photos:");
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
+    public List<UserPhoto> getUserPhotos() {
+        return mUserPhotos;
+    }
 
     public String getCurrentPhotoPath() {
         return mCurrentPhotoPath;

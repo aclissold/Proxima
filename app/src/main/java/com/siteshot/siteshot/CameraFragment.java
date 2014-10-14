@@ -1,10 +1,9 @@
 package com.siteshot.siteshot;
 
-import android.app.Application;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,7 +19,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import android.hardware.Camera.CameraInfo;
 
 import com.parse.ParseGeoPoint;
 import com.siteshot.siteshot.activities.TabActivity;
