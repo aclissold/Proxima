@@ -26,6 +26,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.parse.ParseAnalytics;
 import com.parse.ParseGeoPoint;
@@ -386,6 +387,8 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
      * A placeholder fragment containing the map view.
      */
     public static class SiteShotMapFragment extends Fragment {
+
+        MapView mapFragment;
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -411,10 +414,13 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.map_fragment, container, false);
+            View rootView = inflater.inflate(R.layout.siteshot_map_fragment, container, false);
+
 
             // Set up the Map fragment.
-            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
+            mapFragment = (MapView) rootView.findViewById(R.id.mapView);
+            mapFragment.onCreate(savedInstanceState);
+
             // Enable the current location "blue dot"
             mapFragment.getMap().setMyLocationEnabled(true);
             // Set up the camera change handler
@@ -427,6 +433,8 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
 
             return rootView;
         }
+
+
 
     }
 }
