@@ -420,6 +420,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener, Loca
             // Set up the Map fragment.
             mapFragment = (MapView) rootView.findViewById(R.id.mapView);
             mapFragment.onCreate(savedInstanceState);
+            mapFragment.onResume();
 
             // Enable the current location "blue dot"
             mapFragment.getMap().setMyLocationEnabled(true);
