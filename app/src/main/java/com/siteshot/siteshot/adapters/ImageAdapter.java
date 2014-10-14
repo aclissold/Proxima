@@ -19,7 +19,9 @@ import com.siteshot.siteshot.utils.PhotoUtils;
  * Adapts PhotoUtils' List of UserPhotos.
  */
 public class ImageAdapter extends BaseAdapter {
+
     private final String TAG = getClass().getName();
+    private final int width = 90, height = 90;
 
     private Context mContext;
 
@@ -45,7 +47,7 @@ public class ImageAdapter extends BaseAdapter {
         ImageView imageView;
         if (convertView == null) {
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(90, 90));
+            imageView.setLayoutParams(new GridView.LayoutParams(width, height));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         } else {
             imageView = (ImageView) convertView;
@@ -62,6 +64,9 @@ public class ImageAdapter extends BaseAdapter {
             e.printStackTrace();
         }
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+        imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
+
         imageView.setImageBitmap(bitmap);
 
         return imageView;
