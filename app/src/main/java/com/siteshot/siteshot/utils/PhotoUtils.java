@@ -98,7 +98,7 @@ public class PhotoUtils {
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] data = stream.toByteArray();
         ParseFile file = new ParseFile("photo.jpg", data);
-        ParseObject object = new ParseObject("UserPhoto");
+        ParseObject object = ParseObject.create("UserPhoto");
         object.put("photo", file);
         object.put("location", geoPoint);
         object.saveInBackground();

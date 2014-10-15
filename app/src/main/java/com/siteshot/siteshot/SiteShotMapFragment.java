@@ -117,7 +117,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
      * The fragment argument representing the section number for this
      * fragment.
      */
-    private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final String ARG_SECTION_NUMBER = "Map";
 
     // Adapter for the Parse query
     private ParseQueryAdapter<SiteShotMapData> postsQueryAdapter;
@@ -165,6 +165,24 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         return rootView;
     }
+
+    // Set up a customized query
+    ParseQueryAdapter.QueryFactory<UserPhoto> factory =
+            new ParseQueryAdapter.QueryFactory<UserPhoto>() {
+                public ParseQuery<UserPhoto> create() {
+                    Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+                    ParseQuery<UserPhoto> query = UserPhoto.getQuery();
+                    query.include("user");
+                    query.orderByDescending("createdAt");
+                    query.whereWithinKilometers("location", geoPointFromLocation(myLoc), radius
+                            * METERS_PER_FEET / METERS_PER_KILOMETER);
+                    query.setLimit(MAX_POST_SEARCH_RESULTS);
+                    return query;
+                }
+            };
+
+
+
     public Location getCurrentLocation() {
         return currentLocation;
     }
@@ -311,7 +329,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         */
 
         // new method not in max zoom
-        mapFragment.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 18));
+        mapFragment.getMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 5));
 
     }
 
@@ -391,7 +409,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     /*
  * Set up the query to update the map view
  */
-    private void doMapQuery() {
+    public void doMapQuery() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
         Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
         // If location info isn't available, clean up any existing markers
