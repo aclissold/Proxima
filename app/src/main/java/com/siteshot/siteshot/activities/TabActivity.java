@@ -11,8 +11,10 @@ import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,6 +67,40 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
      * may be best to switch to a
      * {@link android.support.v13.app.FragmentStatePagerAdapter}.
      */
+    /*
+Extension of FragmentStatePagerAdapter which intelligently caches
+all active fragments and manages the fragment lifecycles.
+Usage involves extending from SmartFragmentStatePagerAdapter as you would any other PagerAdapter.
+*/
+    public abstract class SmartFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
+        // Sparse array to keep track of registered fragments in memory
+        private SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+
+        public SmartFragmentStatePagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        // Register the fragment when the item is instantiated
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            registeredFragments.put(position, fragment);
+            return fragment;
+        }
+
+        // Unregister when the item is inactive
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            registeredFragments.remove(position);
+            super.destroyItem(container, position, object);
+        }
+
+        // Returns the fragment for the position (if instantiated)
+        public Fragment getRegisteredFragment(int position) {
+            return registeredFragments.get(position);
+        }
+    }
+
     SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
@@ -73,9 +109,15 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
     ViewPager mViewPager;
 
     public Location getCurrentLocation() {
+        SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(2);
+        currentLocation = test.getCurrentLocation();
         return currentLocation;
     }
 
+    public void refreshMark() {
+        SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(2);
+        test.doMapQuery();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,7 +232,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends SmartFragmentStatePagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -202,13 +244,13 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
             switch (index) {
                 case 0:
                     // Feed activity
-                    return new FeedFragment();
+                    return new FeedFragment().newInstance(0);
                 case 1:
                     // Camera activity
-                    return new CameraFragment();
+                    return new CameraFragment().newInstance(1);
                 case 2:
                     // Maps activity
-                    return new SiteShotMapFragment();
+                    return new SiteShotMapFragment().newInstance(2);
             }
 
             return null;
@@ -242,7 +284,7 @@ public class TabActivity extends Activity implements ActionBar.TabListener {
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final String ARG_SECTION_NUMBER = "feed";
 
         /**
          * Returns a new instance of this fragment for the given section
