@@ -28,18 +28,18 @@ public class ConfirmationActivity extends Activity {
         postButton = (Button) findViewById(R.id.button_post);
         cancelButton = (Button) findViewById(R.id.button_cancel);
 
-
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent confirmationIntent = getIntent();
-                Location location = (Location) confirmationIntent.getExtras().get("location");
-                Boolean rotateFlag = confirmationIntent.getExtras().getBoolean("rotateFlag");
-                Log.d(TAG, rotateFlag.toString());
+                // Get the photo components from the extras.
+                Bundle extras = getIntent().getExtras();
+                Location location = (Location) extras.get("location");
+                Boolean rotateFlag = extras.getBoolean("rotateFlag");
+                byte[] data = extras.getByteArray("data");
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
 
-                PhotoUtils.getInstance().uploadPhoto(confirmationIntent.getExtras().getByteArray("data"), geoPoint,
-                rotateFlag);
+                // Upload the photo.
+                PhotoUtils.getInstance().uploadPhoto(data, geoPoint, rotateFlag);
             }
         });
     }

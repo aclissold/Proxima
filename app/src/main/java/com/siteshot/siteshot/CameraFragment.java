@@ -487,7 +487,6 @@ public class CameraFragment extends Fragment {
             // get the location data and upload the photo to parse
             TabActivity activity = (TabActivity) getActivity();
             Location location = activity.getCurrentLocation();
-            Log.d(TAG, location.toString());
            // ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
             //PhotoUtils.getInstance().uploadPhoto(data, geoPoint, rotateFlag);
 
