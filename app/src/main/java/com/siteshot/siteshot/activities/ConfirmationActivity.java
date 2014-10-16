@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.parse.ParseException;
@@ -19,8 +20,9 @@ import com.siteshot.siteshot.utils.PhotoUtils;
 
 public class ConfirmationActivity extends Activity {
 
-    Button postButton;
-    Button cancelButton;
+    Button mPostButton;
+    Button mCancelButton;
+    EditText mDescriptionEditText;
     private final String TAG = getClass().getName();
 
     @Override
@@ -28,20 +30,25 @@ public class ConfirmationActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirmation);
 
-        postButton = (Button) findViewById(R.id.button_post);
-        cancelButton = (Button) findViewById(R.id.button_cancel);
+        mPostButton = (Button) findViewById(R.id.button_post);
+        mCancelButton = (Button) findViewById(R.id.button_cancel);
+        mDescriptionEditText = (EditText) findViewById(R.id.edit_text);
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
 
-        postButton.setOnClickListener(new View.OnClickListener() {
+        mPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get the photo components from the extras.
+                // Get the entered description.
+                String description = mDescriptionEditText.getText().toString();
+                Log.d(TAG, "Description: " + description); // TODO: associate with UserPhoto
+
+                // Get the photo components sent over in extras.
                 Bundle extras = getIntent().getExtras();
                 Location location = (Location) extras.get("location");
                 Boolean rotateFlag = extras.getBoolean("rotateFlag");
@@ -49,6 +56,7 @@ public class ConfirmationActivity extends Activity {
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
 
                 // Upload the photo.
+                // TODO: upload with description
                 PhotoUtils.getInstance().uploadPhoto(data, geoPoint, rotateFlag, new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -56,7 +64,7 @@ public class ConfirmationActivity extends Activity {
                             // Upload succeeded; dismiss activity.
                             finish();
                         } else {
-                            // Error occured; display it and don't dismiss.
+                            // Error occurred; display it and don't dismiss.
                             CharSequence message = getString(R.string.error_photo_upload_failed);
                             Context context = getApplicationContext();
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show();

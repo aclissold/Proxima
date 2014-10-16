@@ -73,6 +73,7 @@ public class PhotoUtils {
         return mCurrentPhotoPath;
     }
 
+    // TODO: add description parameter
     public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag,
                               SaveCallback callback) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
