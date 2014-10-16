@@ -1,7 +1,7 @@
 package com.siteshot.siteshot.activities;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,8 +9,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.SaveCallback;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
@@ -28,6 +31,13 @@ public class ConfirmationActivity extends Activity {
         postButton = (Button) findViewById(R.id.button_post);
         cancelButton = (Button) findViewById(R.id.button_cancel);
 
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -39,7 +49,21 @@ public class ConfirmationActivity extends Activity {
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
 
                 // Upload the photo.
-                PhotoUtils.getInstance().uploadPhoto(data, geoPoint, rotateFlag);
+                PhotoUtils.getInstance().uploadPhoto(data, geoPoint, rotateFlag, new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            // Upload succeeded; dismiss activity.
+                            finish();
+                        } else {
+                            // Error occured; display it and don't dismiss.
+                            CharSequence message = getString(R.string.error_photo_upload_failed);
+                            Context context = getApplicationContext();
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                            Log.e(TAG, message.toString());
+                        }
+                    }
+                });
             }
         });
     }

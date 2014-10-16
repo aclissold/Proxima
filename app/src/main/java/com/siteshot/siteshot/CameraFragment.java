@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.parse.ParseGeoPoint;
 import com.siteshot.siteshot.activities.ConfirmationActivity;
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.utils.PhotoUtils;

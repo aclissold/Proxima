@@ -14,6 +14,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.siteshot.siteshot.models.UserPhoto;
 
 import java.io.ByteArrayOutputStream;
@@ -72,6 +73,12 @@ public class PhotoUtils {
         return mCurrentPhotoPath;
     }
 
+    public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag,
+                              SaveCallback callback) {
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        return uploadPhoto(bitmap, geoPoint, rotateFlag, callback);
+    }
+
     /**
      * Convert an image taken by embedded camera to a bitmap and then upload the bitmap to
      * Parse
@@ -107,6 +114,23 @@ public class PhotoUtils {
         object.put("photo", file);
         object.put("location", geoPoint);
         object.saveInBackground();
+
+        return rotatedBitmap;
+    }
+
+    // Overloaded version of the above for when a callback is necessary.
+    public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, boolean rotateFlag,
+                              SaveCallback callback) {
+        Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] data = stream.toByteArray();
+        ParseFile file = new ParseFile("photo.jpg", data);
+        ParseObject object = ParseObject.create("UserPhoto");
+        object.put("photo", file);
+        object.put("location", geoPoint);
+        object.saveInBackground(callback);
 
         return rotatedBitmap;
     }
