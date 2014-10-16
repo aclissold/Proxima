@@ -10,5 +10,6 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="Capture">Capture</string>
     <string name="post_out_of_range">Can\'t view post! Get closer.</string>
+    <string name="title_activity_confirmation">ConfirmationActivity</string>
 
 </resources>
