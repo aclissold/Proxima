@@ -2,6 +2,7 @@ package com.siteshot.siteshot;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.location.Location;
@@ -21,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.parse.ParseGeoPoint;
+import com.siteshot.siteshot.activities.ConfirmationActivity;
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
@@ -485,8 +487,16 @@ public class CameraFragment extends Fragment {
             // get the location data and upload the photo to parse
             TabActivity activity = (TabActivity) getActivity();
             Location location = activity.getCurrentLocation();
-            ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-            PhotoUtils.getInstance().uploadPhoto(data, geoPoint, rotateFlag);
+            Log.d(TAG, location.toString());
+           // ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+            //PhotoUtils.getInstance().uploadPhoto(data, geoPoint, rotateFlag);
+
+            Intent confirmationIntent = new Intent(getActivity(), ConfirmationActivity.class);
+            confirmationIntent.putExtra("data", data);
+            confirmationIntent.putExtra("location", location);
+            confirmationIntent.putExtra("rotateFlag", rotateFlag);
+            getActivity().startActivity(confirmationIntent);
+
 
             // temporary file save to local device for testing
             if (pictureFile == null){
