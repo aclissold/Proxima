@@ -78,7 +78,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     private Circle mapCircle;
 
     // Fields for the map radius in feet
-    private float radius = 30;
+    private float radius = 50;
     private float lastRadius;
 
     // Fields for helping process map and location changes
@@ -417,7 +417,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             cleanUpMarkers(new HashSet<String>());
             return;
         }
-        
+
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
         List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
         if (myUpdateNumber != mostRecentMapUpdate) {
