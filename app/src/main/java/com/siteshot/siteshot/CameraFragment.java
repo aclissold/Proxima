@@ -42,6 +42,7 @@ import java.util.List;
  * modified from code by Rex St. John (on behalf of AirPair.com) on 3/4/14.
  */
 public class CameraFragment extends Fragment {
+    public static final String ARG_SECTION_NUMBER = "Cam";
     private static final String TAG = CameraFragment.class.getName();
 
     // Native camera.
@@ -75,7 +76,7 @@ public class CameraFragment extends Fragment {
     public static CameraFragment newInstance(int sectionNumber) {
         CameraFragment fragment = new CameraFragment();
         Bundle args = new Bundle();
-        //args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
     }
@@ -499,6 +500,7 @@ public class CameraFragment extends Fragment {
                 fos.close();
             // Restart the camera preview.
                 safeCameraOpenInView(mCameraView);
+                activity.refreshMark();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
