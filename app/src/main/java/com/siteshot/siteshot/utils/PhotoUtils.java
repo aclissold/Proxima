@@ -63,6 +63,11 @@ public class PhotoUtils {
         return mUserPhotos;
     }
 
+    public List<UserPhoto> updateUserPhotos() {
+        downloadUserPhotos();
+        return mUserPhotos;
+    }
+
     public String getCurrentPhotoPath() {
         return mCurrentPhotoPath;
     }

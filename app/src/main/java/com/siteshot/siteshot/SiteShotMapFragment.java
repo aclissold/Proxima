@@ -78,7 +78,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     private Circle mapCircle;
 
     // Fields for the map radius in feet
-    private float radius;
+    private float radius = 30;
     private float lastRadius;
 
     // Fields for helping process map and location changes
@@ -120,7 +120,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     private static final String ARG_SECTION_NUMBER = "Map";
 
     // Adapter for the Parse query
-    private ParseQueryAdapter<SiteShotMapData> postsQueryAdapter;
+    //private ParseQueryAdapter<SiteShotMapData> postsQueryAdapter;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -417,8 +417,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             cleanUpMarkers(new HashSet<String>());
             return;
         }
+        
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
-        List<UserPhoto> objects = PhotoUtils.getInstance().getUserPhotos();
+        List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
         if (myUpdateNumber != mostRecentMapUpdate) {
             return;
         }
@@ -465,7 +466,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 }
                 // Display a green marker with the post information
                 markerOpts =
-                        markerOpts.title("temp").snippet(photo.getUser().getUsername())
+                        markerOpts.title("temp")//.snippet(photo.getUser().getUsername())
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             }
             // Add a new marker
