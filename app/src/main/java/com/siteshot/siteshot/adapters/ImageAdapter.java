@@ -21,12 +21,17 @@ import com.siteshot.siteshot.utils.PhotoUtils;
 public class ImageAdapter extends BaseAdapter {
 
     private final String TAG = getClass().getName();
-    private final int width = 90, height = 90;
-
+    private int mWidth, mHeight;
+    private static final float SIZE_DP = 90.0f;
     private Context mContext;
 
     public ImageAdapter(Context c) {
         mContext = c;
+        final float scale = c.getResources().getDisplayMetrics().density;
+
+        // Adjust the width and height "constants" based on screen density.
+        mWidth = (int) (SIZE_DP * scale + 0.5f);
+        mHeight = mWidth;
     }
 
     public int getCount() {
@@ -47,7 +52,7 @@ public class ImageAdapter extends BaseAdapter {
         ImageView imageView;
         if (convertView == null) {
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(width, height));
+            imageView.setLayoutParams(new GridView.LayoutParams(mWidth, mHeight));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         } else {
             imageView = (ImageView) convertView;
@@ -65,7 +70,7 @@ public class ImageAdapter extends BaseAdapter {
         }
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
-        imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, width, height, false));
+        imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, mWidth, mHeight, false));
 
         imageView.setImageBitmap(bitmap);
 
