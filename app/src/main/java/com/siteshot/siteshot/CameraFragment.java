@@ -46,7 +46,6 @@ import java.util.List;
 public class CameraFragment extends Fragment {
     public static final String ARG_SECTION_NUMBER = "Cam";
     private static final String TAG = CameraFragment.class.getName();
-
     // Native camera.
     private Camera mCamera;
     // View to display the camera output.
@@ -210,9 +209,11 @@ public class CameraFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         View newView = getView();
-        if (pauseFlag = true){
+        if (pauseFlag){
             safeCameraOpenInView(newView);
+
         }
     }
 
@@ -229,7 +230,7 @@ public class CameraFragment extends Fragment {
     */
     private void releaseCameraAndPreview() {
         if (mCamera != null) {
-            FrameLayout preview = (FrameLayout) getView().findViewById(R.id.camera_preview);
+            FrameLayout preview = (FrameLayout) this.getActivity().findViewById(R.id.camera_preview);
             preview.removeView(mPreview);
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();

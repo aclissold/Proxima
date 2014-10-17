@@ -117,6 +117,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
     public void refreshMark() {
         SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(2);
         test.doMapQuery();
+        //mViewPager.setCurrentItem(2);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +141,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
+        mViewPager.setOffscreenPageLimit(3);
         // When swiping between different sections, select the corresponding
         // tab. We can also use ActionBar.Tab#select() to do this if we have
         // a reference to the Tab.
@@ -162,6 +163,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+        mViewPager.setCurrentItem(2);
     }
 
     @Override
@@ -244,10 +246,10 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
             switch (index) {
                 case 0:
                     // Feed activity
-                    return new FeedFragment().newInstance(0);
+                    return new CameraFragment().newInstance(0);
                 case 1:
                     // Camera activity
-                    return new CameraFragment().newInstance(1);
+                    return new FeedFragment().newInstance(1);
                 case 2:
                     // Maps activity
                     return new SiteShotMapFragment().newInstance(2);
@@ -266,9 +268,9 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return "Feed";
+                    return "Cam";
                 case 1:
-                    return "Camera";
+                    return "Feed";
                 case 2:
                     return "Map";
             }
@@ -310,6 +312,4 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
         }
 
     }
-
-
 }
