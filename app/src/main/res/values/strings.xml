@@ -9,6 +9,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="Capture">Capture</string>
+    <string name="title_activity_confirmation">ConfirmationActivity</string>
     <string name="post_out_of_range">Can\'t view marker! Get closer.</string>
 
 </resources>
