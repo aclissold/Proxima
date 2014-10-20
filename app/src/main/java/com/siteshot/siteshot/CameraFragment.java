@@ -209,7 +209,7 @@ public class CameraFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        View newView = getView();
+        View newView = getActivity().findViewById(R.id.camera_preview);
         if (pauseFlag){
             safeCameraOpenInView(newView);
 

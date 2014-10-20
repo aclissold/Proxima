@@ -108,7 +108,6 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
     public void refreshMark() {
         SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(2);
         test.doMapQuery();
-        //mViewPager.setCurrentItem(2);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,6 +171,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
         } else {
             Log.d(TAG, "user is logged in");
         }
+
     }
 
     @Override
