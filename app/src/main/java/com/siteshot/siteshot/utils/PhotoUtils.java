@@ -73,11 +73,10 @@ public class PhotoUtils {
         return mCurrentPhotoPath;
     }
 
-    // TODO: add description parameter
-    public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag,
-                              SaveCallback callback) {
+    public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, String description,
+                              boolean rotateFlag, SaveCallback callback) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        return uploadPhoto(bitmap, geoPoint, rotateFlag, callback);
+        return uploadPhoto(bitmap, geoPoint, description, rotateFlag, callback);
     }
 
     /**
@@ -90,7 +89,7 @@ public class PhotoUtils {
      * @return       the image converted to bitmap uploaded to Parse
      *
      */
-    public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag){
+    public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         return uploadPhoto(bitmap, geoPoint, rotateFlag);
     }
@@ -120,8 +119,8 @@ public class PhotoUtils {
     }
 
     // Overloaded version of the above for when a callback is necessary.
-    public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, boolean rotateFlag,
-                              SaveCallback callback) {
+    public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, String description,
+                              boolean rotateFlag, SaveCallback callback) {
         Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -131,6 +130,7 @@ public class PhotoUtils {
         ParseObject object = ParseObject.create("UserPhoto");
         object.put("photo", file);
         object.put("location", geoPoint);
+        object.put("description", description);
         object.saveInBackground(callback);
 
         return rotatedBitmap;
