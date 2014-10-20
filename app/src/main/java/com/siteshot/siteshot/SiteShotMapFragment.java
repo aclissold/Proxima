@@ -1,7 +1,5 @@
 package com.siteshot.siteshot;
 
-import android.app.Application;
-import android.app.Dialog;
 import android.app.Fragment;
 import android.content.IntentSender;
 import android.graphics.Color;
@@ -31,23 +29,19 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
-
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
-//import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+//import java.text.ParseException;
 
 /**
  * A placeholder fragment containing the map view.
