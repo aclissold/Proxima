@@ -1,7 +1,7 @@
 package com.siteshot.siteshot.activities;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,15 +9,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.SaveCallback;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
 public class ConfirmationActivity extends Activity {
 
-    Button postButton;
-    Button cancelButton;
+    Button mPostButton;
+    Button mCancelButton;
+    EditText mDescriptionEditText;
     private final String TAG = getClass().getName();
 
     @Override
@@ -25,21 +30,47 @@ public class ConfirmationActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirmation);
 
-        postButton = (Button) findViewById(R.id.button_post);
-        cancelButton = (Button) findViewById(R.id.button_cancel);
+        mPostButton = (Button) findViewById(R.id.button_post);
+        mCancelButton = (Button) findViewById(R.id.button_cancel);
+        mDescriptionEditText = (EditText) findViewById(R.id.edit_text);
 
-
-        postButton.setOnClickListener(new View.OnClickListener() {
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent confirmationIntent = getIntent();
-                Location location = (Location) confirmationIntent.getExtras().get("location");
-                Boolean rotateFlag = confirmationIntent.getExtras().getBoolean("rotateFlag");
-                Log.d(TAG, rotateFlag.toString());
+                finish();
+            }
+        });
+
+        mPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the entered description.
+                String description = mDescriptionEditText.getText().toString();
+
+                // Get the photo components sent over in extras.
+                Bundle extras = getIntent().getExtras();
+                Location location = (Location) extras.get("location");
+                Boolean rotateFlag = extras.getBoolean("rotateFlag");
+                byte[] data = extras.getByteArray("data");
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
 
-                PhotoUtils.getInstance().uploadPhoto(confirmationIntent.getExtras().getByteArray("data"), geoPoint,
-                rotateFlag);
+                // Upload the photo.
+                PhotoUtils.getInstance().uploadPhoto(data, geoPoint, description, rotateFlag,
+                        new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    // Upload succeeded; dismiss activity.
+                                    finish();
+                                } else {
+                                    // Error occurred; display it and don't dismiss.
+                                    CharSequence message = getString(R.string.error_photo_upload_failed);
+                                    Context context = getApplicationContext();
+                                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                                    Log.e(TAG, message.toString());
+                                }
+                            }
+                        });
             }
         });
     }

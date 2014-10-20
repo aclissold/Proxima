@@ -1,6 +1,7 @@
 package com.siteshot.siteshot;
 
 import android.app.Application;
+import android.widget.Toast;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -24,5 +25,14 @@ public class SiteShotApplication extends Application {
 
         PhotoUtils.getInstance().downloadUserPhotos();
     }
+
+    public void showShortToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public void showLongToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
 }
 
