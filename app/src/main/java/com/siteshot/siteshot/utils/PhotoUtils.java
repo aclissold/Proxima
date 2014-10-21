@@ -47,6 +47,7 @@ public class PhotoUtils {
 
     public void downloadUserPhotos() {
         ParseQuery<UserPhoto> query = UserPhoto.getQuery();
+        // TODO: make this an ordered query
         query.findInBackground(new FindCallback<UserPhoto>() {
             @Override
             public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
