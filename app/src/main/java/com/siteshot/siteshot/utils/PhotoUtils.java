@@ -91,7 +91,7 @@ public class PhotoUtils {
      */
     public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        return uploadPhoto(bitmap, geoPoint, rotateFlag);
+        return uploadPhoto(bitmap, geoPoint, null, rotateFlag);
     }
 
     /**
@@ -103,7 +103,8 @@ public class PhotoUtils {
      * @return       the same bitmap, rotated if necessary
      *
      */
-    public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, boolean rotateFlag) {
+    public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, String description,
+                              boolean rotateFlag) {
         Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -113,6 +114,7 @@ public class PhotoUtils {
         ParseObject object = ParseObject.create("UserPhoto");
         object.put("photo", file);
         object.put("location", geoPoint);
+        if (description != null) { object.put("description", description); }
         object.saveInBackground();
 
         return rotatedBitmap;

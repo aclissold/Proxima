@@ -45,7 +45,7 @@ public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActi
         final Bitmap mockBitmap = createMockBitmap();
 
         // Upload it to Parse.
-        PhotoUtils.getInstance().uploadPhoto(mockBitmap, new ParseGeoPoint(), rotateFlag);
+        PhotoUtils.getInstance().uploadPhoto(mockBitmap, new ParseGeoPoint(), null, rotateFlag);
 
 
         // Get it back from Parse.
@@ -75,6 +75,42 @@ public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActi
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
                 assertEquals(mockBitmap, bitmap);
+            }
+        }, 2000);
+    }
+
+    public void testDescriptionAssociated() throws IOException {
+        // Create the photo file.
+        PhotoUtils.getInstance().createPhotoFile();
+        String photoPath = PhotoUtils.getInstance().getCurrentPhotoPath();
+        assertNotNull(photoPath);
+
+        boolean rotateFlag = false;
+        // Write mock data to it.
+        final Bitmap mockBitmap = createMockBitmap();
+
+        // Upload it to Parse.
+        String description = "test description";
+        PhotoUtils.getInstance().uploadPhoto(mockBitmap, new ParseGeoPoint(), description, rotateFlag);
+
+
+        // Get it back from Parse.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                ParseQuery query = new ParseQuery("UserPhoto");
+                query.orderByDescending("createdAt");
+                String foundDesc = null;
+                try {
+                    ParseObject object = query.getFirst();
+                    foundDesc = object.getString("description");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                assertNotNull(foundDesc);
+
+                // Verify its contents.
+                assertEquals("test description", foundDesc);
             }
         }, 2000);
     }
