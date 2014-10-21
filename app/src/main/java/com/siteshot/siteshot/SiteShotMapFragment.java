@@ -44,7 +44,12 @@ import java.util.Set;
 //import java.text.ParseException;
 
 /**
- * A placeholder fragment containing the map view.
+ * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/12/14.
+ * Fragment containing the map view. Will display a map centered around user's location. Will
+ * display photos taken by the user as well as other SiteShot users.
+ *
+ * Adapted from code from Parse.com AnyWall tutorial
+ * https://parse.com/tutorials/anywall-android
  */
 public class SiteShotMapFragment extends Fragment implements LocationListener,
         GooglePlayServicesClient.ConnectionCallbacks,
@@ -460,7 +465,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 }
                 // Display a green marker with the post information
                 markerOpts =
-                        markerOpts.title("temp")//.snippet(photo.getUser().getUsername())
+                        markerOpts.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             }
             // Add a new marker

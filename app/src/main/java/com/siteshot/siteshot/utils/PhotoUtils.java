@@ -158,6 +158,10 @@ public class PhotoUtils {
         return rotatedBitmap;
     }
 
+    public Bitmap rotatePreview(Bitmap bitmap, boolean shouldRotate){
+        return rotate (bitmap, shouldRotate);
+    }
+
     // method to rotate the bitmap for upload if necessary
     private Bitmap rotate(Bitmap bitmap, boolean shouldRotate) {
         boolean rotateFlag = shouldRotate;

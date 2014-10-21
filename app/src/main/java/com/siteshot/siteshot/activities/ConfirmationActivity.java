@@ -2,6 +2,8 @@ package com.siteshot.siteshot.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
@@ -18,10 +21,16 @@ import com.parse.SaveCallback;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
+/**
+ * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/16/14.
+ * Upload Activity for the app, displays a preview of a taken photo, asks user to add comment,
+ * and then allows user to post to Parse or cancel the post.
+ */
 public class ConfirmationActivity extends Activity {
 
     Button mPostButton;
     Button mCancelButton;
+    ImageView mImageView;
     EditText mDescriptionEditText;
     private final String TAG = getClass().getName();
 
@@ -33,6 +42,17 @@ public class ConfirmationActivity extends Activity {
         mPostButton = (Button) findViewById(R.id.button_post);
         mCancelButton = (Button) findViewById(R.id.button_cancel);
         mDescriptionEditText = (EditText) findViewById(R.id.edit_text);
+        mImageView = (ImageView) findViewById(R.id.imageView);
+        // get extras containing photo data and rotate flag
+        Bundle extras = getIntent().getExtras();
+        byte[] photo = extras.getByteArray("data");
+        Boolean rotateFlag = extras.getBoolean("rotateFlag");
+        // convert photo data to bitmap rotate it and display it
+        Bitmap previewPhoto = BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        previewPhoto = PhotoUtils.getInstance().rotatePreview(previewPhoto, rotateFlag);
+        mImageView.setImageBitmap(previewPhoto);
+
+
 
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
