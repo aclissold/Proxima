@@ -2,6 +2,7 @@ package com.siteshot.siteshot;
 
 import android.app.Fragment;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -31,10 +32,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
+import com.parse.ParseUser;
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -82,6 +85,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     // Fields for helping process map and location changes
     private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
+    private final Map<Marker, UserPhoto> markerPhotos = new HashMap<Marker, UserPhoto>();
     private int mostRecentMapUpdate;
     private boolean hasSetUpInitialLocation;
     private String selectedPostObjectId;
@@ -161,6 +165,53 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             }
         });
 
+        mapFragment.getMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                double latitude = marker.getPosition().latitude;
+                double longitude = marker.getPosition().longitude;
+                ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
+                ParseGeoPoint myPoint = geoPointFromLocation(currentLocation);
+
+                // Unlock the marker if it's within range.
+                if (markerPoint.distanceInKilometersTo(myPoint) <= radius * METERS_PER_FEET
+                    / METERS_PER_KILOMETER) {
+
+                    UserPhoto phoot = markerPhotos.get(marker);
+                    String username = ParseUser.getCurrentUser().getUsername();
+                    ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
+
+                    // TODO: re-query UserPhoto in case it changed in the meantime.
+
+                    // TODO: remove this check once unlock and cluster branches are merged.
+                    if (unlocked == null) { unlocked = new ArrayList<String>(); }
+
+                    if (!unlocked.contains(username)) {
+                        // Persist the unlocked state.
+                        unlocked.add(username);
+                        phoot.put("unlocked", unlocked);
+                        phoot.saveInBackground();
+
+                        // Configure the marker as unlocked.
+                        marker.setTitle("Just Unlocked");
+                        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+
+                        // Modify the List of UserPhotos to contain the new unlocked state so doMapQuery
+                        // will know about it without having to wait for network conditions.
+                        List<UserPhoto> photos = PhotoUtils.getInstance().getUserPhotos();
+                        for (UserPhoto photo : photos) {
+                            if (photo.getObjectId().equals(phoot.getObjectId())) {
+                                photo.put("unlocked", unlocked);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Center on the tapped marker and show its info window.
+                return false;
+            }
+        });
 
         return rootView;
     }
@@ -405,7 +456,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         return builder.build();
     }
 
-    /*
+ /*
  * Set up the query to update the map view
  */
     public void doMapQuery() {
@@ -451,7 +502,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 // Display a red marker with a predefined title and no snippet
                 markerOpts =
                         markerOpts.title(getResources().getString(R.string.post_out_of_range)).icon(
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
             } else {
                 // Check for an existing in range marker
                 if (oldMarker != null) {
@@ -466,11 +517,22 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 // Display a green marker with the post information
                 markerOpts =
                         markerOpts.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            }
+
+            // Set unlocked markers to green.
+            ArrayList<String> unlocked = (ArrayList) photo.getList("unlocked");
+            String username = ParseUser.getCurrentUser().getUsername();
+            if (unlocked != null && unlocked.contains(username)) {
+                markerOpts =
+                        markerOpts.title("Unlocked")
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             }
+
             // Add a new marker
             Marker marker = mapFragment.getMap().addMarker(markerOpts);
             mapMarkers.put(photo.getObjectId(), marker);
+            markerPhotos.put(marker, photo);
             if (photo.getObjectId().equals(selectedPostObjectId)) {
                 marker.showInfoWindow();
                 selectedPostObjectId = null;
@@ -479,8 +541,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // Clean up old markers.
         cleanUpMarkers(toKeep);
     }
-
-
 
     /*
      * Helper method to clean up old markers
