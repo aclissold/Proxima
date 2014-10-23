@@ -4,12 +4,15 @@ import android.app.Fragment;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -29,6 +32,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.Algorithm;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import com.google.maps.android.ui.IconGenerator;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -115,6 +123,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     // Maximum post search radius for map in kilometers
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
+
+    private ClusterManager<MyCluster> mClusterManager;
+
 
     /**
      * The fragment argument representing the section number for this
@@ -460,7 +471,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
  * Set up the query to update the map view
  */
     public void doMapQuery() {
-        final int myUpdateNumber = ++mostRecentMapUpdate;
+        /*final int myUpdateNumber = ++mostRecentMapUpdate;
         Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
         // If location info isn't available, clean up any existing markers
         if (myLoc == null) {
@@ -472,9 +483,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
         if (myUpdateNumber != mostRecentMapUpdate) {
             return;
-        }
+        }*/
 
-        // Posts to show on the map
+        /*// Posts to show on the map
         Set<String> toKeep = new HashSet<String>();
         // Loop through the results of the search
         for (UserPhoto photo : objects) {
@@ -540,6 +551,11 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
         // Clean up old markers.
         cleanUpMarkers(toKeep);
+        for (UserPhoto photo : objects) {
+        }*/
+
+            setUpClusterer();
+
     }
 
     /*
@@ -556,9 +572,162 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
+    private class MyClusterRenderer extends DefaultClusterRenderer<MyCluster> {
+        /*private final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
+        private final IconGenerator mClusterIconGenerator = new IconGenerator(getApplicationContext());
+        private final ImageView mImageView;
+        private final ImageView mClusterImageView;
+        private final int mDimension;
+*/
+        public MyClusterRenderer() {
+            super(getActivity(), mapFragment.getMap(), mClusterManager);
+
+            /*View multiProfile = getLayoutInflater().inflate(R.layout.multi_profile, null);
+            mClusterIconGenerator.setContentView(multiProfile);
+            mClusterImageView = (ImageView) multiProfile.findViewById(R.id.image);
+
+            mImageView = new ImageView(getApplicationContext());
+            mDimension = (int) getResources().getDimension(R.dimen.custom_profile_image);
+            mImageView.setLayoutParams(new ViewGroup.LayoutParams(mDimension, mDimension));
+            int padding = (int) getResources().getDimension(R.dimen.custom_profile_padding);
+            mImageView.setPadding(padding, padding, padding, padding);
+            mIconGenerator.setContentView(mImageView);*/
+        }
+
+        @Override
+        protected void onBeforeClusterItemRendered(MyCluster cluster, MarkerOptions markerOptions) {
+            double latitude = cluster.getPosition().latitude;
+            double longitude = cluster.getPosition().longitude;
+            ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
+
+            Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+            final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+
+            if (markerPoint.distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+                    / METERS_PER_KILOMETER) {
+                // Display a red marker with a predefined title and no snippet
+                markerOptions =
+                        markerOptions.title(getResources().getString(R.string.post_out_of_range)).icon(
+                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+            } else {
+
+                // Display a green marker with the post information
+                markerOptions =
+                        markerOptions.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+            }
+            /*
+            // Draw a single person.
+            // Set the info window to show their name.
+            mImageView.setImageResource(cluster.profilePhoto);
+            Bitmap icon = mIconGenerator.makeIcon();
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(cluster.name);*/
+        }
+
+        @Override
+        protected void onBeforeClusterRendered(Cluster<MyCluster> cluster, MarkerOptions markerOptions) {
+            /*
+            // Draw multiple people.
+            // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
+            List<Drawable> profilePhotos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
+            int width = mDimension;
+            int height = mDimension;
+
+            for (MyCluster p : cluster.getItems()) {
+                // Draw 4 at most.
+                if (profilePhotos.size() == 4) break;
+                Drawable drawable = getResources().getDrawable(p.profilePhoto);
+                drawable.setBounds(0, 0, width, height);
+                profilePhotos.add(drawable);
+            }
+            /*MultiDrawable multiDrawable = new MultiDrawable(profilePhotos);
+            multiDrawable.setBounds(0, 0, width, height);
+
+            mClusterImageView.setImageDrawable(multiDrawable);
+            Bitmap icon = mClusterIconGenerator.makeIcon(String.valueOf(cluster.getSize()));
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));*/
+        }
+
+        @Override
+        protected boolean shouldRenderAsCluster(Cluster cluster) {
+            // Always render clusters.
+            return cluster.getSize() > 1;
+        }
+    }
+
+    //@Override
+    public boolean onClusterClick(Cluster<MyCluster> cluster) {
+        // Show a toast with some info when the cluster is clicked.
+        //String firstName = cluster.getItems().iterator().next().name;
+        //Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+
+    public void onClusterInfoWindowClick(Cluster<MyCluster> cluster) {
+        // Does nothing, but you could go to a list of the users.
+    }
+
+
+    public boolean onClusterItemClick(MyCluster item) {
+        // Does nothing, but you could go into the user's profile page, for example.
+        return false;
+    }
+
+
+    public void onClusterItemInfoWindowClick(MyCluster item) {
+        // Does nothing, but you could go into the user's profile page, for example.
+    }
+
+    private void setUpClusterer() {
+        // Declare a variable for the cluster manager.
+        //ClusterManager<MyCluster> mClusterManager;
+
+        // Initialize the manager with the context and the map.
+        // (Activity extends context, so we can pass 'this' in the constructor.)
+        mClusterManager = new ClusterManager<MyCluster>(getActivity(), mapFragment.getMap());
+        mClusterManager.setRenderer(new MyClusterRenderer());
+
+        // Point the map's listeners at the listeners implemented by the cluster
+        // manager.
+        mapFragment.getMap().setOnCameraChangeListener(mClusterManager);
+        mapFragment.getMap().setOnMarkerClickListener(mClusterManager);
 
 
 
+        // Add cluster items (markers) to the cluster manager.
+        addItems();
+    }
+
+    private void addItems() {
+
+        final int myUpdateNumber = ++mostRecentMapUpdate;
+        Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+        // If location info isn't available, clean up any existing markers
+        if (myLoc == null) {
+            cleanUpMarkers(new HashSet<String>());
+            return;
+        }
+
+        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+        List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
+
+        if (myUpdateNumber != mostRecentMapUpdate) {
+            return;
+        }
+
+        // Posts to show on the map
+        Set<String> toKeep = new HashSet<String>();
+        // Loop through the results of the search
+        for (UserPhoto photo : objects) {
+            MyCluster offsetItem = new MyCluster(photo.getLocation().getLatitude(), photo.getLocation().getLongitude());
+
+            mClusterManager.addItem(offsetItem);
 
 
+        }
+        cleanUpMarkers(toKeep);
+
+    }
 }

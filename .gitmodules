@@ -1,0 +1,3 @@
+[submodule "app/libs/android-maps-utils"]
+	path = app/libs/android-maps-utils
+	url = https://github.com/googlemaps/android-maps-utils.git
