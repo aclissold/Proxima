@@ -580,15 +580,38 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         @Override
         protected void onBeforeClusterItemRendered(MyCluster cluster, MarkerOptions markerOptions) {
+            double latitude = cluster.getPosition().latitude;
+            double longitude = cluster.getPosition().longitude;
+            ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
+
+            Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+            final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+
+            if (markerPoint.distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+                    / METERS_PER_KILOMETER) {
+                // Display a red marker with a predefined title and no snippet
+                markerOptions =
+                        markerOptions.title(getResources().getString(R.string.post_out_of_range)).icon(
+                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+            } else {
+
+                // Display a green marker with the post information
+                markerOptions =
+                        markerOptions.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+            }
+            /*
             // Draw a single person.
             // Set the info window to show their name.
             mImageView.setImageResource(cluster.profilePhoto);
             Bitmap icon = mIconGenerator.makeIcon();
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(cluster.name);
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(cluster.name);*/
         }
 
         @Override
         protected void onBeforeClusterRendered(Cluster<MyCluster> cluster, MarkerOptions markerOptions) {
+            /*
             // Draw multiple people.
             // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
             List<Drawable> profilePhotos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
@@ -617,11 +640,11 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    @Override
+    //@Override
     public boolean onClusterClick(Cluster<MyCluster> cluster) {
         // Show a toast with some info when the cluster is clicked.
-        String firstName = cluster.getItems().iterator().next().name;
-        Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
+        //String firstName = cluster.getItems().iterator().next().name;
+        //Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
         return true;
     }
 
