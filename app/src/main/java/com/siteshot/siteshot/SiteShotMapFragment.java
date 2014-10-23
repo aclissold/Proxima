@@ -187,13 +187,24 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                     if (unlocked == null) { unlocked = new ArrayList<String>(); }
 
                     if (!unlocked.contains(username)) {
+                        // Persist the unlocked state.
                         unlocked.add(username);
-
                         phoot.put("unlocked", unlocked);
                         phoot.saveInBackground();
 
+                        // Configure the marker as unlocked.
                         marker.setTitle("Just Unlocked");
                         marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+
+                        // Modify the List of UserPhotos to contain the new unlocked state so doMapQuery
+                        // will know about it without having to wait for network conditions.
+                        List<UserPhoto> photos = PhotoUtils.getInstance().getUserPhotos();
+                        for (UserPhoto photo : photos) {
+                            if (photo.getObjectId().equals(phoot.getObjectId())) {
+                                photo.put("unlocked", unlocked);
+                                break;
+                            }
+                        }
                     }
                 }
 
