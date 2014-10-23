@@ -181,20 +181,21 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                     String username = ParseUser.getCurrentUser().getUsername();
                     ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
 
+                    // TODO: re-query UserPhoto in case it changed in the meantime
+
                     if (unlocked == null) {
                         unlocked = new ArrayList<String>();
                     }
 
-                    // TODO: re-query UserPhoto in case it changed in the meantime
                     if (!unlocked.contains(username)) {
                         unlocked.add(username);
+
+                        phoot.put("unlocked", unlocked);
+                        phoot.saveInBackground();
+
+                        marker.setTitle("Just Unlocked");
+                        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                     }
-
-                    phoot.put("unlocked", unlocked);
-                    phoot.saveInBackground();
-
-                    marker.setTitle("Just Unlocked");
-                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 }
 
                 // Center on the tapped marker and show its info window.
