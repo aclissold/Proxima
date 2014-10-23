@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -111,6 +112,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     // Maximum post search radius for map in kilometers
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
+
+    private ClusterManager<MyCluster> mClusterManager;
+
 
     /**
      * The fragment argument representing the section number for this
@@ -478,6 +482,10 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
         // Clean up old markers.
         cleanUpMarkers(toKeep);
+        for (UserPhoto photo : objects) {
+        }
+
+            setUpClusterer();
     }
 
 
@@ -496,9 +504,39 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
+    private void setUpClusterer() {
+        // Declare a variable for the cluster manager.
+        //ClusterManager<MyCluster> mClusterManager;
 
+        // Position the map.
+        mapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
 
+        // Initialize the manager with the context and the map.
+        // (Activity extends context, so we can pass 'this' in the constructor.)
+        mClusterManager = new ClusterManager<MyCluster>(getActivity(), mapFragment.getMap());
 
+        // Point the map's listeners at the listeners implemented by the cluster
+        // manager.
+        mapFragment.getMap().setOnCameraChangeListener(mClusterManager);
+        mapFragment.getMap().setOnMarkerClickListener(mClusterManager);
 
+        // Add cluster items (markers) to the cluster manager.
+        addItems();
+    }
 
+    private void addItems() {
+
+        // Set some lat/lng coordinates to start with.
+        double lat = 51.5145160;
+        double lng = -0.1270060;
+
+        // Add ten cluster items in close proximity, for purposes of this example.
+        for (int i = 0; i < 10; i++) {
+            double offset = i / 60d;
+            lat = lat + offset;
+            lng = lng + offset;
+            MyCluster offsetItem = new MyCluster(lat, lng);
+            mClusterManager.addItem(offsetItem);
+        }
+    }
 }
