@@ -2,6 +2,7 @@ package com.siteshot.siteshot;
 
 import android.app.Fragment;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -177,7 +178,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                     / METERS_PER_KILOMETER) {
 
                     UserPhoto phoot = markerPhotos.get(marker);
-                    Log.d(TAG, phoot.getObjectId());
                     String username = ParseUser.getCurrentUser().getUsername();
                     ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
 
@@ -193,13 +193,11 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                     phoot.put("unlocked", unlocked);
                     phoot.saveInBackground();
 
-                    marker.setTitle("TODO: Image thumbnail");
+                    marker.setTitle("Just Unlocked");
                     marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 }
 
-                // Either way, show the info window.
-                marker.showInfoWindow();
-
+                // Center on the tapped marker and show its info window.
                 return false;
             }
         });
@@ -510,6 +508,16 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                         markerOpts.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
             }
+
+            // Set unlocked markers to green.
+            ArrayList<String> unlocked = (ArrayList) photo.getList("unlocked");
+            String username = ParseUser.getCurrentUser().getUsername();
+            if (unlocked != null && unlocked.contains(username)) {
+                markerOpts =
+                        markerOpts.title("Unlocked")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            }
+
             // Add a new marker
             Marker marker = mapFragment.getMap().addMarker(markerOpts);
             mapMarkers.put(photo.getObjectId(), marker);
@@ -522,8 +530,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // Clean up old markers.
         cleanUpMarkers(toKeep);
     }
-
-
 
     /*
      * Helper method to clean up old markers
