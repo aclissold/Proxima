@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.Algorithm;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -413,7 +414,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
  * Set up the query to update the map view
  */
     public void doMapQuery() {
-        final int myUpdateNumber = ++mostRecentMapUpdate;
+        /*final int myUpdateNumber = ++mostRecentMapUpdate;
         Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
         // If location info isn't available, clean up any existing markers
         if (myLoc == null) {
@@ -425,9 +426,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
         if (myUpdateNumber != mostRecentMapUpdate) {
             return;
-        }
+        }*/
 
-        // Posts to show on the map
+        /*// Posts to show on the map
         Set<String> toKeep = new HashSet<String>();
         // Loop through the results of the search
         for (UserPhoto photo : objects) {
@@ -483,9 +484,10 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // Clean up old markers.
         cleanUpMarkers(toKeep);
         for (UserPhoto photo : objects) {
-        }
+        }*/
 
             setUpClusterer();
+
     }
 
 
@@ -508,9 +510,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // Declare a variable for the cluster manager.
         //ClusterManager<MyCluster> mClusterManager;
 
-        // Position the map.
-        mapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
-
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
         mClusterManager = new ClusterManager<MyCluster>(getActivity(), mapFragment.getMap());
@@ -520,23 +519,37 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         mapFragment.getMap().setOnCameraChangeListener(mClusterManager);
         mapFragment.getMap().setOnMarkerClickListener(mClusterManager);
 
+
+
         // Add cluster items (markers) to the cluster manager.
         addItems();
     }
 
     private void addItems() {
 
-        // Set some lat/lng coordinates to start with.
-        double lat = 51.5145160;
-        double lng = -0.1270060;
+        final int myUpdateNumber = ++mostRecentMapUpdate;
+        Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+        // If location info isn't available, clean up any existing markers
+        if (myLoc == null) {
+            cleanUpMarkers(new HashSet<String>());
+            return;
+        }
 
-        // Add ten cluster items in close proximity, for purposes of this example.
-        for (int i = 0; i < 10; i++) {
-            double offset = i / 60d;
-            lat = lat + offset;
-            lng = lng + offset;
-            MyCluster offsetItem = new MyCluster(lat, lng);
+        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+        List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
+
+        if (myUpdateNumber != mostRecentMapUpdate) {
+            return;
+        }
+
+        // Posts to show on the map
+        Set<String> toKeep = new HashSet<String>();
+        // Loop through the results of the search
+        for (UserPhoto photo : objects) {
+            MyCluster offsetItem = new MyCluster(photo.getLocation().getLatitude(), photo.getLocation().getLongitude());
             mClusterManager.addItem(offsetItem);
         }
+        cleanUpMarkers(toKeep);
+
     }
 }
