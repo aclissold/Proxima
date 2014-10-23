@@ -31,10 +31,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
+import com.parse.ParseUser;
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -82,6 +84,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     // Fields for helping process map and location changes
     private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
+    private final Map<Marker, UserPhoto> markerPhotos = new HashMap<Marker, UserPhoto>();
     private int mostRecentMapUpdate;
     private boolean hasSetUpInitialLocation;
     private String selectedPostObjectId;
@@ -172,6 +175,23 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 // Unlock the marker if it's within range.
                 if (markerPoint.distanceInKilometersTo(myPoint) <= radius * METERS_PER_FEET
                     / METERS_PER_KILOMETER) {
+
+                    UserPhoto phoot = markerPhotos.get(marker);
+                    Log.d(TAG, phoot.getObjectId());
+                    String username = ParseUser.getCurrentUser().getUsername();
+                    ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
+
+                    if (unlocked == null) {
+                        unlocked = new ArrayList<String>();
+                    }
+
+                    // TODO: re-query UserPhoto in case it changed in the meantime
+                    if (!unlocked.contains(username)) {
+                        unlocked.add(username);
+                    }
+
+                    phoot.put("unlocked", unlocked);
+                    phoot.saveInBackground();
 
                     marker.setTitle("TODO: Image thumbnail");
                     marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
@@ -493,6 +513,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             // Add a new marker
             Marker marker = mapFragment.getMap().addMarker(markerOpts);
             mapMarkers.put(photo.getObjectId(), marker);
+            markerPhotos.put(marker, photo);
             if (photo.getObjectId().equals(selectedPostObjectId)) {
                 marker.showInfoWindow();
                 selectedPostObjectId = null;
