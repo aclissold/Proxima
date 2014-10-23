@@ -181,11 +181,10 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                     String username = ParseUser.getCurrentUser().getUsername();
                     ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
 
-                    // TODO: re-query UserPhoto in case it changed in the meantime
+                    // TODO: re-query UserPhoto in case it changed in the meantime.
 
-                    if (unlocked == null) {
-                        unlocked = new ArrayList<String>();
-                    }
+                    // TODO: remove this check once unlock and cluster branches are merged.
+                    if (unlocked == null) { unlocked = new ArrayList<String>(); }
 
                     if (!unlocked.contains(username)) {
                         unlocked.add(username);
