@@ -161,6 +161,18 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             }
         });
 
+        mapFragment.getMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                // Unlock the marker if it's within range.
+                marker.setTitle("TODO: Image thumbnail");
+                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                marker.showInfoWindow();
+                selectedPostObjectId = null;
+
+                return false;
+            }
+        });
 
         return rootView;
     }
@@ -405,7 +417,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         return builder.build();
     }
 
-    /*
+ /*
  * Set up the query to update the map view
  */
     public void doMapQuery() {
