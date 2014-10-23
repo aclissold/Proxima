@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -106,15 +107,23 @@ public class PhotoUtils {
      */
     public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, String description,
                               boolean rotateFlag) {
+        // Prepare the image data.
         Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
-
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] data = stream.toByteArray();
         ParseFile file = new ParseFile("photo.jpg", data);
+
+        // Get the current user to pre-unlock the photo.
+        String username = ParseUser.getCurrentUser().getUsername();
+        ArrayList<String> unlocked = new ArrayList<String>();
+        unlocked.add(username);
+
+        // Create and save the ParseObject.
         ParseObject object = ParseObject.create("UserPhoto");
         object.put("photo", file);
         object.put("location", geoPoint);
+        object.put("unlocked", unlocked);
         if (description != null) { object.put("description", description); }
         object.saveInBackground();
 
@@ -124,16 +133,24 @@ public class PhotoUtils {
     // Overloaded version of the above for when a callback is necessary.
     public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, String description,
                               boolean rotateFlag, SaveCallback callback) {
+        // Prepare the image data.
         Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
-
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] data = stream.toByteArray();
         ParseFile file = new ParseFile("photo.jpg", data);
+
+        // Get the current user to pre-unlock the photo.
+        String username = ParseUser.getCurrentUser().getUsername();
+        ArrayList<String> unlocked = new ArrayList<String>();
+        unlocked.add(username);
+
+        // Create and save the ParseObject.
         ParseObject object = ParseObject.create("UserPhoto");
         object.put("photo", file);
         object.put("location", geoPoint);
         object.put("description", description);
+        object.put("unlocked", unlocked);
         object.saveInBackground(callback);
 
         return rotatedBitmap;
