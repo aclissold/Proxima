@@ -168,8 +168,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // Set up the camera change handler.
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
-                // When the camera changes, update the query.
-                doMapQuery();
+                // When the camera changes, reconfigure the map.
+                setUpClusterer();
             }
         });
 
@@ -350,8 +350,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
         // Update map radius indicator
         updateCircle(myLatLng);
-        doMapQuery();
-        //doListQuery();
+        setUpClusterer();
     }
 
     private boolean servicesConnected() {
@@ -482,13 +481,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     }
 
     /*
-     * Set up the query to update the map view
-     */
-    public void doMapQuery() {
-        setUpClusterer();
-    }
-
-    /*
      * Helper method to clean up old markers
      */
     private void cleanUpMarkers(Set<String> markersToKeep) {
@@ -578,7 +570,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     }
 
-    private void setUpClusterer() {
+    public void setUpClusterer() {
         // Declare a variable for the cluster manager.
 
         // Initialize the manager with the context and the map.
