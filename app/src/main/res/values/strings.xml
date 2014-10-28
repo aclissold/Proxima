@@ -12,5 +12,6 @@
     <string name="title_activity_confirmation">ConfirmationActivity</string>
     <string name="post_out_of_range">Can\'t view marker! Get closer.</string>
     <string name="error_photo_upload_failed">An error occured and your photo has not been uploaded.</string>
+    <string name="title_activity_photo_detail">Photo Details</string>
 
 </resources>
