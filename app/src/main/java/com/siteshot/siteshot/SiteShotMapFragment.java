@@ -64,7 +64,7 @@ import java.util.Set;
  */
 public class SiteShotMapFragment extends Fragment implements LocationListener,
         GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener{
+        GooglePlayServicesClient.OnConnectionFailedListener {
 
     private final String TAG = TabActivity.class.getName();
 
@@ -125,6 +125,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
 
     private ClusterManager<MyCluster> mClusterManager;
+    private ClusterListener mClusterListener;
 
 
     /**
@@ -549,28 +550,39 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    //@Override
-    public boolean onClusterClick(Cluster<MyCluster> cluster) {
-        // Show a toast with some info when the cluster is clicked.
-        //String firstName = cluster.getItems().iterator().next().name;
-        //Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
-        return true;
-    }
+    private class ClusterListener implements
+            ClusterManager.OnClusterInfoWindowClickListener<MyCluster>,
+            ClusterManager.OnClusterClickListener<MyCluster>,
+            ClusterManager.OnClusterItemClickListener<MyCluster>,
+            ClusterManager.OnClusterItemInfoWindowClickListener<MyCluster> {
 
+        @Override
+        public boolean onClusterClick(Cluster<MyCluster> cluster) {
+            Log.d(TAG, "cluster click");
+            // Show a toast with some info when the cluster is clicked.
+            //String firstName = cluster.getItems().iterator().next().name;
+            //Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
-    public void onClusterInfoWindowClick(Cluster<MyCluster> cluster) {
-        // Does nothing, but you could go to a list of the users.
-    }
+        @Override
+        public void onClusterInfoWindowClick(Cluster<MyCluster> cluster) {
+            Log.d(TAG, "cluster info window click");
+        }
 
+        @Override
+        public boolean onClusterItemClick(MyCluster item) {
+            Log.d(TAG, "cluster item click");
+            // Does nothing, but you could go into the user's profile page, for example.
+            return false;
+        }
 
-    public boolean onClusterItemClick(MyCluster item) {
-        // Does nothing, but you could go into the user's profile page, for example.
-        return false;
-    }
+        @Override
+        public void onClusterItemInfoWindowClick(MyCluster item) {
+            Log.d(TAG, "cluster item info window click");
+            // Does nothing, but you could go into the user's profile page, for example.
+        }
 
-
-    public void onClusterItemInfoWindowClick(MyCluster item) {
-        // Does nothing, but you could go into the user's profile page, for example.
     }
 
     private void setUpClusterer() {
@@ -580,6 +592,13 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // (Activity extends context, so we can pass 'this' in the constructor.)
         mClusterManager = new ClusterManager<MyCluster>(getActivity(), mapFragment.getMap());
         mClusterManager.setRenderer(new MyClusterRenderer());
+
+        // Set listeners.
+        mClusterListener = new ClusterListener();
+        mClusterManager.setOnClusterClickListener(mClusterListener);
+        mClusterManager.setOnClusterInfoWindowClickListener(mClusterListener);
+        mClusterManager.setOnClusterItemClickListener(mClusterListener);
+        mClusterManager.setOnClusterItemInfoWindowClickListener(mClusterListener);
 
         // Point the map's listeners at the listeners implemented by the cluster
         // manager.
