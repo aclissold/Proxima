@@ -2,17 +2,13 @@ package com.siteshot.siteshot;
 
 import android.app.Fragment;
 import android.content.IntentSender;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -34,14 +30,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.algo.Algorithm;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import com.google.maps.android.ui.IconGenerator;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.siteshot.siteshot.activities.TabActivity;
+import com.siteshot.siteshot.models.SiteShotCluster;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
@@ -124,7 +119,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     // Maximum post search radius for map in kilometers
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
 
-    private ClusterManager<MyCluster> mClusterManager;
+    private ClusterManager<SiteShotCluster> mClusterManager;
     private ClusterListener mClusterListener;
 
 
@@ -509,13 +504,13 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    private class MyClusterRenderer extends DefaultClusterRenderer<MyCluster> {
+    private class MyClusterRenderer extends DefaultClusterRenderer<SiteShotCluster> {
         public MyClusterRenderer() {
             super(getActivity(), mapFragment.getMap(), mClusterManager);
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(MyCluster cluster, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(SiteShotCluster cluster, MarkerOptions markerOptions) {
             double latitude = cluster.getPosition().latitude;
             double longitude = cluster.getPosition().longitude;
             ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
@@ -540,7 +535,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
 
         @Override
-        protected void onBeforeClusterRendered(Cluster<MyCluster> cluster, MarkerOptions markerOptions) {
+        protected void onBeforeClusterRendered(Cluster<SiteShotCluster> cluster, MarkerOptions markerOptions) {
         }
 
         @Override
@@ -551,13 +546,13 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     }
 
     private class ClusterListener implements
-            ClusterManager.OnClusterInfoWindowClickListener<MyCluster>,
-            ClusterManager.OnClusterClickListener<MyCluster>,
-            ClusterManager.OnClusterItemClickListener<MyCluster>,
-            ClusterManager.OnClusterItemInfoWindowClickListener<MyCluster> {
+            ClusterManager.OnClusterInfoWindowClickListener<SiteShotCluster>,
+            ClusterManager.OnClusterClickListener<SiteShotCluster>,
+            ClusterManager.OnClusterItemClickListener<SiteShotCluster>,
+            ClusterManager.OnClusterItemInfoWindowClickListener<SiteShotCluster> {
 
         @Override
-        public boolean onClusterClick(Cluster<MyCluster> cluster) {
+        public boolean onClusterClick(Cluster<SiteShotCluster> cluster) {
             Log.d(TAG, "cluster click");
             // Show a toast with some info when the cluster is clicked.
             //String firstName = cluster.getItems().iterator().next().name;
@@ -566,19 +561,19 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
 
         @Override
-        public void onClusterInfoWindowClick(Cluster<MyCluster> cluster) {
+        public void onClusterInfoWindowClick(Cluster<SiteShotCluster> cluster) {
             Log.d(TAG, "cluster info window click");
         }
 
         @Override
-        public boolean onClusterItemClick(MyCluster item) {
+        public boolean onClusterItemClick(SiteShotCluster item) {
             Log.d(TAG, "cluster item click");
             // Does nothing, but you could go into the user's profile page, for example.
             return false;
         }
 
         @Override
-        public void onClusterItemInfoWindowClick(MyCluster item) {
+        public void onClusterItemInfoWindowClick(SiteShotCluster item) {
             Log.d(TAG, "cluster item info window click");
             // Does nothing, but you could go into the user's profile page, for example.
         }
@@ -590,7 +585,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
-        mClusterManager = new ClusterManager<MyCluster>(getActivity(), mapFragment.getMap());
+        mClusterManager = new ClusterManager<SiteShotCluster>(getActivity(), mapFragment.getMap());
         mClusterManager.setRenderer(new MyClusterRenderer());
 
         // Set listeners.
@@ -630,7 +625,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         Set<String> toKeep = new HashSet<String>();
         // Loop through the results of the search
         for (UserPhoto photo : objects) {
-            MyCluster offsetItem = new MyCluster(
+            SiteShotCluster offsetItem = new SiteShotCluster(
                     photo.getLocation().getLatitude(),
                     photo.getLocation().getLongitude());
 
