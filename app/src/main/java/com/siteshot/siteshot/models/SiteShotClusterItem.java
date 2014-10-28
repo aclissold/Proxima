@@ -6,10 +6,10 @@ import com.google.maps.android.clustering.ClusterItem;
 /**
  * Created by Jon on 10/23/2014.
  */
-public class SiteShotCluster implements ClusterItem {
+public class SiteShotClusterItem implements ClusterItem {
     private final LatLng mPosition;
 
-    public SiteShotCluster(double lat, double lng) {
+    public SiteShotClusterItem(double lat, double lng) {
         mPosition = new LatLng(lat, lng);
     }
 
