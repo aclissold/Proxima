@@ -1,4 +1,4 @@
-package com.siteshot.siteshot;
+package com.siteshot.siteshot.models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseGeoPoint;

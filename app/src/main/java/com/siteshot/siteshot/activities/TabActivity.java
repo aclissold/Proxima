@@ -25,9 +25,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.MapFragment;
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
-import com.siteshot.siteshot.CameraFragment;
+import com.siteshot.siteshot.fragments.CameraFragment;
 import com.siteshot.siteshot.R;
-import com.siteshot.siteshot.SiteShotMapFragment;
+import com.siteshot.siteshot.fragments.SiteShotMapFragment;
 
 import java.util.Locale;
 

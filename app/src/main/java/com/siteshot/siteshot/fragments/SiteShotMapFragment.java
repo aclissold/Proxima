@@ -1,4 +1,4 @@
-package com.siteshot.siteshot;
+package com.siteshot.siteshot.fragments;
 
 import android.app.Fragment;
 import android.content.IntentSender;
@@ -35,6 +35,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
+import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.models.SiteShotCluster;
 import com.siteshot.siteshot.models.UserPhoto;
