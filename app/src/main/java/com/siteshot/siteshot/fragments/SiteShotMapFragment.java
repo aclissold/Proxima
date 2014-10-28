@@ -130,9 +130,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
      */
     private static final String ARG_SECTION_NUMBER = "Map";
 
-    // Adapter for the Parse query
-    //private ParseQueryAdapter<SiteShotMapData> postsQueryAdapter;
-
     /**
      * Returns a new instance of this fragment for the given section
      * number.

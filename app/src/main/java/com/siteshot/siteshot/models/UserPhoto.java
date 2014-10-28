@@ -7,9 +7,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-
 /**
- * Created by rachel on 10/9/14.
+ * Created by rachel on 10/9/14. Data model for a post.
  */
 @ParseClassName("UserPhoto")
 public class UserPhoto extends ParseObject {
@@ -35,6 +34,14 @@ public class UserPhoto extends ParseObject {
 
     public void setPhoto (ParseFile value) {
         put("photo", value);
+    }
+
+    public String getText() {
+        return getString("text");
+    }
+
+    public void setText(String value) {
+        put("text", value);
     }
 
     public static ParseQuery<UserPhoto> getQuery() {
