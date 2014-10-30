@@ -1,18 +1,14 @@
-package com.siteshot.siteshot;
+package com.siteshot.siteshot.fragments;
 
 import android.app.Fragment;
 import android.content.IntentSender;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -34,14 +30,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.algo.Algorithm;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import com.google.maps.android.ui.IconGenerator;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
+import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.activities.TabActivity;
+import com.siteshot.siteshot.models.SiteShotClusterItem;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
@@ -64,7 +60,7 @@ import java.util.Set;
  */
 public class SiteShotMapFragment extends Fragment implements LocationListener,
         GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener{
+        GooglePlayServicesClient.OnConnectionFailedListener {
 
     private final String TAG = TabActivity.class.getName();
 
@@ -93,7 +89,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     // Fields for helping process map and location changes
     private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
-    private final Map<Marker, UserPhoto> markerPhotos = new HashMap<Marker, UserPhoto>();
     private int mostRecentMapUpdate;
     private boolean hasSetUpInitialLocation;
     private String selectedPostObjectId;
@@ -124,7 +119,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     // Maximum post search radius for map in kilometers
     private static final int MAX_POST_SEARCH_DISTANCE = 100;
 
-    private ClusterManager<MyCluster> mClusterManager;
+    private ClusterManager<SiteShotClusterItem> mClusterManager;
+    private ClusterListener mClusterListener;
 
 
     /**
@@ -132,9 +128,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "Map";
-
-    // Adapter for the Parse query
-    //private ParseQueryAdapter<SiteShotMapData> postsQueryAdapter;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -166,63 +159,20 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         mapFragment.onCreate(savedInstanceState);
         mapFragment.onResume();
 
-        // Enable the current location "blue dot"
-        mapFragment.getMap().setMyLocationEnabled(true);
-        // Set up the camera change handler
-        mapFragment.getMap().setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+        // Configure the map.
+        GoogleMap googleMap = mapFragment.getMap();
+
+        // Enable the current location "blue dot".
+        googleMap.setMyLocationEnabled(true);
+        // Set up the camera change handler.
+        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
-                // When the camera changes, update the query
-                doMapQuery();
+                // When the camera changes, reconfigure the map.
+                setUpClusterer();
             }
         });
 
-        mapFragment.getMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                double latitude = marker.getPosition().latitude;
-                double longitude = marker.getPosition().longitude;
-                ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
-                ParseGeoPoint myPoint = geoPointFromLocation(currentLocation);
-
-                // Unlock the marker if it's within range.
-                if (markerPoint.distanceInKilometersTo(myPoint) <= radius * METERS_PER_FEET
-                    / METERS_PER_KILOMETER) {
-
-                    UserPhoto phoot = markerPhotos.get(marker);
-                    String username = ParseUser.getCurrentUser().getUsername();
-                    ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
-
-                    // TODO: re-query UserPhoto in case it changed in the meantime.
-
-                    // TODO: remove this check once unlock and cluster branches are merged.
-                    if (unlocked == null) { unlocked = new ArrayList<String>(); }
-
-                    if (!unlocked.contains(username)) {
-                        // Persist the unlocked state.
-                        unlocked.add(username);
-                        phoot.put("unlocked", unlocked);
-                        phoot.saveInBackground();
-
-                        // Configure the marker as unlocked.
-                        marker.setTitle("Just Unlocked");
-                        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-
-                        // Modify the List of UserPhotos to contain the new unlocked state so doMapQuery
-                        // will know about it without having to wait for network conditions.
-                        List<UserPhoto> photos = PhotoUtils.getInstance().getUserPhotos();
-                        for (UserPhoto photo : photos) {
-                            if (photo.getObjectId().equals(phoot.getObjectId())) {
-                                photo.put("unlocked", unlocked);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // Center on the tapped marker and show its info window.
-                return false;
-            }
-        });
+        setUpClusterer();
 
         return rootView;
     }
@@ -242,15 +192,13 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 }
             };
 
-
-
     public Location getCurrentLocation() {
         return currentLocation;
     }
 
     /*
- * Called when the Activity is no longer visible at all. Stop updates and disconnect.
- */
+     * Called when the Activity is no longer visible at all. Stop updates and disconnect.
+     */
     @Override
     public void onStop() {
         // If the client is connected
@@ -336,8 +284,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
         // Update map radius indicator
         updateCircle(myLatLng);
-        doMapQuery();
-        //doListQuery();
+        setUpClusterer();
     }
 
     private boolean servicesConnected() {
@@ -467,186 +414,42 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         return builder.build();
     }
 
- /*
- * Set up the query to update the map view
- */
-    public void doMapQuery() {
-        /*final int myUpdateNumber = ++mostRecentMapUpdate;
-        Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
-        // If location info isn't available, clean up any existing markers
-        if (myLoc == null) {
-            cleanUpMarkers(new HashSet<String>());
-            return;
-        }
-
-        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
-        List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
-        if (myUpdateNumber != mostRecentMapUpdate) {
-            return;
-        }*/
-
-        /*// Posts to show on the map
-        Set<String> toKeep = new HashSet<String>();
-        // Loop through the results of the search
-        for (UserPhoto photo : objects) {
-            // Add this post to the list of map pins to keep
-            toKeep.add(photo.getObjectId());
-            // Check for an existing marker for this post
-            Marker oldMarker = mapMarkers.get(photo.getObjectId());
-            // Set up the map marker's location
-            MarkerOptions markerOpts =
-                    new MarkerOptions().position(new LatLng(photo.getLocation().getLatitude(), photo
-                            .getLocation().getLongitude()));
-            // Set up the marker properties based on if it is within the search radius
-            if (photo.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
-                    / METERS_PER_KILOMETER) {
-                // Check for an existing out of range marker
-                if (oldMarker != null) {
-                    if (oldMarker.getSnippet() == null) {
-                        // Out of range marker already exists, skip adding it
-                        continue;
-                    } else {
-                        // Marker now out of range, needs to be refreshed
-                        oldMarker.remove();
-                    }
-                }
-                // Display a red marker with a predefined title and no snippet
-                markerOpts =
-                        markerOpts.title(getResources().getString(R.string.post_out_of_range)).icon(
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
-            } else {
-                // Check for an existing in range marker
-                if (oldMarker != null) {
-                    if (oldMarker.getSnippet() != null) {
-                        // In range marker already exists, skip adding it
-                        continue;
-                    } else {
-                        // Marker now in range, needs to be refreshed
-                        oldMarker.remove();
-                    }
-                }
-                // Display a green marker with the post information
-                markerOpts =
-                        markerOpts.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-            }
-
-            // Set unlocked markers to green.
-            ArrayList<String> unlocked = (ArrayList) photo.getList("unlocked");
-            String username = ParseUser.getCurrentUser().getUsername();
-            if (unlocked != null && unlocked.contains(username)) {
-                markerOpts =
-                        markerOpts.title("Unlocked")
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            }
-
-            // Add a new marker
-            Marker marker = mapFragment.getMap().addMarker(markerOpts);
-            mapMarkers.put(photo.getObjectId(), marker);
-            markerPhotos.put(marker, photo);
-            if (photo.getObjectId().equals(selectedPostObjectId)) {
-                marker.showInfoWindow();
-                selectedPostObjectId = null;
-            }
-        }
-        // Clean up old markers.
-        cleanUpMarkers(toKeep);
-        for (UserPhoto photo : objects) {
-        }*/
-
-            setUpClusterer();
-
-    }
-
-    /*
-     * Helper method to clean up old markers
-     */
-    private void cleanUpMarkers(Set<String> markersToKeep) {
-        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
-            if (!markersToKeep.contains(objId)) {
-                Marker marker = mapMarkers.get(objId);
-                marker.remove();
-                mapMarkers.get(objId).remove();
-                mapMarkers.remove(objId);
-            }
-        }
-    }
-
-    private class MyClusterRenderer extends DefaultClusterRenderer<MyCluster> {
-        /*private final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
-        private final IconGenerator mClusterIconGenerator = new IconGenerator(getApplicationContext());
-        private final ImageView mImageView;
-        private final ImageView mClusterImageView;
-        private final int mDimension;
-*/
+    private class MyClusterRenderer extends DefaultClusterRenderer<SiteShotClusterItem> {
         public MyClusterRenderer() {
             super(getActivity(), mapFragment.getMap(), mClusterManager);
-
-            /*View multiProfile = getLayoutInflater().inflate(R.layout.multi_profile, null);
-            mClusterIconGenerator.setContentView(multiProfile);
-            mClusterImageView = (ImageView) multiProfile.findViewById(R.id.image);
-
-            mImageView = new ImageView(getApplicationContext());
-            mDimension = (int) getResources().getDimension(R.dimen.custom_profile_image);
-            mImageView.setLayoutParams(new ViewGroup.LayoutParams(mDimension, mDimension));
-            int padding = (int) getResources().getDimension(R.dimen.custom_profile_padding);
-            mImageView.setPadding(padding, padding, padding, padding);
-            mIconGenerator.setContentView(mImageView);*/
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(MyCluster cluster, MarkerOptions markerOptions) {
-            double latitude = cluster.getPosition().latitude;
-            double longitude = cluster.getPosition().longitude;
+        protected void onBeforeClusterItemRendered(SiteShotClusterItem item, MarkerOptions markerOptions) {
+            double latitude = item.getPosition().latitude;
+            double longitude = item.getPosition().longitude;
             ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
 
             Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
             final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
 
-            if (markerPoint.distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+            UserPhoto photo = item.getUserPhoto();
+            ArrayList<String> unlocked = (ArrayList) photo.getList("unlocked");
+            String username = ParseUser.getCurrentUser().getUsername();
+            if (unlocked != null && unlocked.contains(username)) {
+                    markerOptions.title("Unlocked")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            } else if (markerPoint.distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
                     / METERS_PER_KILOMETER) {
-                // Display a red marker with a predefined title and no snippet
-                markerOptions =
-                        markerOptions.title(getResources().getString(R.string.post_out_of_range)).icon(
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+                // Display a gray marker with a predefined title and no snippet.
+                markerOptions.title(getResources().getString(R.string.post_out_of_range)).icon(
+                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+                // TODO: change cyan to gray after implementing custom marker icons
             } else {
-
-                // Display a green marker with the post information
-                markerOptions =
-                        markerOptions.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-
+                // Display a green marker with the post information.
+                markerOptions.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
             }
-            /*
-            // Draw a single person.
-            // Set the info window to show their name.
-            mImageView.setImageResource(cluster.profilePhoto);
-            Bitmap icon = mIconGenerator.makeIcon();
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(cluster.name);*/
+
         }
 
         @Override
-        protected void onBeforeClusterRendered(Cluster<MyCluster> cluster, MarkerOptions markerOptions) {
-            /*
-            // Draw multiple people.
-            // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
-            List<Drawable> profilePhotos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
-            int width = mDimension;
-            int height = mDimension;
-
-            for (MyCluster p : cluster.getItems()) {
-                // Draw 4 at most.
-                if (profilePhotos.size() == 4) break;
-                Drawable drawable = getResources().getDrawable(p.profilePhoto);
-                drawable.setBounds(0, 0, width, height);
-                profilePhotos.add(drawable);
-            }
-            /*MultiDrawable multiDrawable = new MultiDrawable(profilePhotos);
-            multiDrawable.setBounds(0, 0, width, height);
-
-            mClusterImageView.setImageDrawable(multiDrawable);
-            Bitmap icon = mClusterIconGenerator.makeIcon(String.valueOf(cluster.getSize()));
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));*/
+        protected void onBeforeClusterRendered(Cluster<SiteShotClusterItem> cluster, MarkerOptions markerOptions) {
         }
 
         @Override
@@ -656,78 +459,120 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    //@Override
-    public boolean onClusterClick(Cluster<MyCluster> cluster) {
-        // Show a toast with some info when the cluster is clicked.
-        //String firstName = cluster.getItems().iterator().next().name;
-        //Toast.makeText(this, cluster.getSize() + " (including " + firstName + ")", Toast.LENGTH_SHORT).show();
-        return true;
+    private class ClusterListener implements
+            ClusterManager.OnClusterInfoWindowClickListener<SiteShotClusterItem>,
+            ClusterManager.OnClusterClickListener<SiteShotClusterItem>,
+            ClusterManager.OnClusterItemClickListener<SiteShotClusterItem>,
+            ClusterManager.OnClusterItemInfoWindowClickListener<SiteShotClusterItem> {
+
+        @Override
+        public boolean onClusterClick(Cluster<SiteShotClusterItem> cluster) {
+            return false;
+        }
+
+        @Override
+        public void onClusterInfoWindowClick(Cluster<SiteShotClusterItem> cluster) {
+        }
+
+        @Override
+        public boolean onClusterItemClick(SiteShotClusterItem item) {
+            double latitude = item.getPosition().latitude;
+            double longitude = item.getPosition().longitude;
+            ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
+            ParseGeoPoint myPoint = geoPointFromLocation(currentLocation);
+
+            // Unlock the marker if it's within range.
+            if (markerPoint.distanceInKilometersTo(myPoint) <= radius * METERS_PER_FEET
+                    / METERS_PER_KILOMETER) {
+
+                UserPhoto phoot = item.getUserPhoto();
+                String username = ParseUser.getCurrentUser().getUsername();
+                ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
+
+                // TODO: re-query UserPhoto in case it changed in the meantime.
+
+                if (!unlocked.contains(username)) {
+                    // Persist the unlocked state.
+                    unlocked.add(username);
+                    phoot.put("unlocked", unlocked);
+                    phoot.saveInBackground();
+                    item.setUserPhoto(phoot);
+
+                    // Update it locally for setUpClusterer()
+                    UserPhoto photoToRemove = null;
+                    List<UserPhoto> photos = PhotoUtils.getInstance().getUserPhotos();
+                    for (UserPhoto photo : photos) {
+                        if (photo.getObjectId().equals(phoot.getObjectId())) {
+                            photoToRemove = photo;
+                        }
+                    }
+                    if (photoToRemove != null) {
+                        photos.remove(photoToRemove);
+                        photos.add(phoot);
+                    }
+
+                    // Re-draw the cluster items.
+                    setUpClusterer();
+                }
+            }
+
+            // Center on the tapped marker and show its info window.
+            return false;
+        }
+
+        @Override
+        public void onClusterItemInfoWindowClick(SiteShotClusterItem item) {
+            // Does nothing, but you could go into the user's profile page, for example.
+        }
+
     }
 
-
-    public void onClusterInfoWindowClick(Cluster<MyCluster> cluster) {
-        // Does nothing, but you could go to a list of the users.
-    }
-
-
-    public boolean onClusterItemClick(MyCluster item) {
-        // Does nothing, but you could go into the user's profile page, for example.
-        return false;
-    }
-
-
-    public void onClusterItemInfoWindowClick(MyCluster item) {
-        // Does nothing, but you could go into the user's profile page, for example.
-    }
-
-    private void setUpClusterer() {
+    public void setUpClusterer() {
         // Declare a variable for the cluster manager.
-        //ClusterManager<MyCluster> mClusterManager;
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
-        mClusterManager = new ClusterManager<MyCluster>(getActivity(), mapFragment.getMap());
+        mClusterManager = new ClusterManager<SiteShotClusterItem>(getActivity(), mapFragment.getMap());
         mClusterManager.setRenderer(new MyClusterRenderer());
+
+        // Set listeners.
+        mClusterListener = new ClusterListener();
+        mClusterManager.setOnClusterClickListener(mClusterListener);
+        mClusterManager.setOnClusterInfoWindowClickListener(mClusterListener);
+        mClusterManager.setOnClusterItemClickListener(mClusterListener);
+        mClusterManager.setOnClusterItemInfoWindowClickListener(mClusterListener);
 
         // Point the map's listeners at the listeners implemented by the cluster
         // manager.
         mapFragment.getMap().setOnCameraChangeListener(mClusterManager);
         mapFragment.getMap().setOnMarkerClickListener(mClusterManager);
 
-
-
         // Add cluster items (markers) to the cluster manager.
         addItems();
     }
 
     private void addItems() {
-
         final int myUpdateNumber = ++mostRecentMapUpdate;
         Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
         // If location info isn't available, clean up any existing markers
         if (myLoc == null) {
-            cleanUpMarkers(new HashSet<String>());
             return;
         }
 
-        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
         List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
 
         if (myUpdateNumber != mostRecentMapUpdate) {
             return;
         }
 
-        // Posts to show on the map
-        Set<String> toKeep = new HashSet<String>();
         // Loop through the results of the search
         for (UserPhoto photo : objects) {
-            MyCluster offsetItem = new MyCluster(photo.getLocation().getLatitude(), photo.getLocation().getLongitude());
+            SiteShotClusterItem offsetItem = new SiteShotClusterItem(
+                    photo.getLocation().getLatitude(),
+                    photo.getLocation().getLongitude(),
+                    photo);
 
             mClusterManager.addItem(offsetItem);
-
-
         }
-        cleanUpMarkers(toKeep);
-
     }
 }

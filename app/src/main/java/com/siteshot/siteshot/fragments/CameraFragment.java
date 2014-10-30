@@ -1,4 +1,4 @@
-package com.siteshot.siteshot;
+package com.siteshot.siteshot.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.activities.ConfirmationActivity;
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.utils.PhotoUtils;
