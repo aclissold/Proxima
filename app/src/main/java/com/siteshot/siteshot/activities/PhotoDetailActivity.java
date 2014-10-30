@@ -22,6 +22,7 @@ public class PhotoDetailActivity extends Activity {
 
     ImageView mImagePhoto;
     TextView mDescription;
+    TextView mPostedBy;
     private final String TAG = getClass().getName();
 
     @Override
@@ -31,10 +32,14 @@ public class PhotoDetailActivity extends Activity {
 
         mImagePhoto = (ImageView) findViewById(R.id.image_photo);
         mDescription = (TextView) findViewById(R.id.text_description);
+        mPostedBy = (TextView) findViewById(R.id.text_posted_by);
+
         Bundle extras = getIntent().getExtras();
         ParseProxyObject ppo = (ParseProxyObject) extras.getSerializable("userPhotoObject");
         byte[] data = ppo.getParseFile("photo");
         mDescription.setText(ppo.getString("description"));
+        mPostedBy.setText("Posted by: " + ppo.getString("createdBy"));
+
 
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         mImagePhoto.setImageBitmap(bitmap);
