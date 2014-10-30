@@ -9,15 +9,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.siteshot.siteshot.R;
+import com.siteshot.siteshot.utils.ParseProxyObject;
+import com.siteshot.siteshot.utils.PhotoUtils;
 
 public class PhotoDetailActivity extends Activity {
 
     ImageView mImagePhoto;
+    TextView mDescription;
+    private final String TAG = getClass().getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +30,13 @@ public class PhotoDetailActivity extends Activity {
         setContentView(R.layout.activity_photo_detail);
 
         mImagePhoto = (ImageView) findViewById(R.id.image_photo);
+        mDescription = (TextView) findViewById(R.id.text_description);
         Bundle extras = getIntent().getExtras();
-        Bitmap bitmap = (Bitmap) extras.get("userPhoto");
+        ParseProxyObject ppo = (ParseProxyObject) extras.getSerializable("userPhotoObject");
+        byte[] data = ppo.getParseFile("photo");
+        mDescription.setText(ppo.getString("description"));
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         mImagePhoto.setImageBitmap(bitmap);
 
     }

@@ -17,6 +17,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.siteshot.siteshot.activities.PhotoDetailActivity;
+import com.siteshot.siteshot.utils.ParseProxyObject;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
 import java.io.Serializable;
@@ -86,17 +87,17 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     class ImageOnClickListener implements View.OnClickListener {
-        private ParseObject userPhoto;
+        private ParseProxyObject ppo;
 
         public ImageOnClickListener(ParseObject userPhoto)
         {
-            this.userPhoto = userPhoto;
+            ppo = new ParseProxyObject(userPhoto);
         }
 
         public void onClick(View v)
         {
             Intent photoDetailIntent = new Intent(v.getContext(), PhotoDetailActivity.class);
-            //photoDetailIntent.putExtra("userPhoto", userPhoto);
+            photoDetailIntent.putExtra("userPhotoObject", ppo);
             v.getContext().startActivity(photoDetailIntent);
         }
     }
