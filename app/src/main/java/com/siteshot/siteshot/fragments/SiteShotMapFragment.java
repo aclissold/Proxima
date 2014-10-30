@@ -476,6 +476,13 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         @Override
         public boolean onClusterItemClick(SiteShotClusterItem item) {
+            unlockItemIfNeeded(item);
+
+            // Center on the tapped marker and show its info window.
+            return false;
+        }
+
+        private void unlockItemIfNeeded(SiteShotClusterItem item) {
             double latitude = item.getPosition().latitude;
             double longitude = item.getPosition().longitude;
             ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
@@ -515,9 +522,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                     setUpClusterer();
                 }
             }
-
-            // Center on the tapped marker and show its info window.
-            return false;
         }
 
         @Override
