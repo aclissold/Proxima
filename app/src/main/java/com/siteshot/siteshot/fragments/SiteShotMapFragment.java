@@ -2,6 +2,8 @@ package com.siteshot.siteshot.fragments;
 
 import android.app.Fragment;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -31,6 +34,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -41,6 +45,7 @@ import com.siteshot.siteshot.models.SiteShotClusterItem;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +70,16 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     private final String TAG = TabActivity.class.getName();
 
     MapView mapFragment;
+
+    // For cluster item adapters.
+    public Cluster<SiteShotClusterItem> mClickedCluster;
+    public SiteShotClusterItem mClickedClusterItem;
+
+    public boolean singleMark;
+    public boolean clusterMark;
+
+    public boolean unlockFlag;
+
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -161,6 +176,56 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         // Configure the map.
         GoogleMap googleMap = mapFragment.getMap();
+
+
+        // sets up the thumbnail preview for a clicked single item
+        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+                                           // Use default InfoWindow frame
+                                           @Override
+                                           public View getInfoWindow(Marker arg0) {
+                                               return null;
+                                           }
+
+                                           // Defines the contents of the InfoWindow
+                                           @Override
+                                           public View getInfoContents(Marker arg0) {
+
+                                               // Getting view from the layout file info_window_layout
+                                               View v = getActivity().getLayoutInflater().inflate(R.layout.info_window, null);
+
+                                               if (singleMark && unlockFlag) {
+                                                   ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
+                                                   ParseFile file = mClickedClusterItem.getUserPhoto().getPhoto();
+                                                   Bitmap bitmap = null;
+                                                   try {
+                                                       byte[] data = file.getData();
+                                                       bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                                   } catch (com.parse.ParseException e) {
+                                                       Log.e(TAG, "error getting user photo bytes");
+                                                       e.printStackTrace();
+                                                   }
+                                                   if (bitmap != null) {
+                                                       imageView.setImageBitmap(bitmap);
+                                                   }
+                                               }
+                                               else if (singleMark && !unlockFlag){
+                                                   ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
+                                                   imageView.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.locked));
+                                               }
+                                               else if (clusterMark){
+                                                   ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
+                                                   imageView.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.test));
+                                               }
+                                               // Returning the view containing InfoWindow contents
+                                               singleMark = false;
+                                               clusterMark = false;
+                                               unlockFlag = false;
+                                               return v;
+
+                                           }
+                                       });
+
 
         // Enable the current location "blue dot".
         googleMap.setMyLocationEnabled(true);
@@ -450,6 +515,25 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         @Override
         protected void onBeforeClusterRendered(Cluster<SiteShotClusterItem> cluster, MarkerOptions markerOptions) {
+            double latitude = cluster.getPosition().latitude;
+            double longitude = cluster.getPosition().longitude;
+            ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
+
+            Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
+            final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+
+            if (markerPoint.distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+                    / METERS_PER_KILOMETER) {
+                // Display a gray marker with a predefined title and no snippet.
+                markerOptions.title(getResources().getString(R.string.post_out_of_range)).icon(
+                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+                // TODO: change cyan to gray after implementing custom marker icons
+            } else {
+                // Display a green marker with the post information.
+                markerOptions.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            }
+
         }
 
         @Override
@@ -467,6 +551,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         @Override
         public boolean onClusterClick(Cluster<SiteShotClusterItem> cluster) {
+            clusterMark = true;
+            mClickedCluster = cluster;
             return false;
         }
 
@@ -476,10 +562,25 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         @Override
         public boolean onClusterItemClick(SiteShotClusterItem item) {
+            singleMark = true;
+            mClickedClusterItem = item;
             unlockItemIfNeeded(item);
+            displayItem(item);
 
             // Center on the tapped marker and show its info window.
             return false;
+        }
+        private void displayItem(SiteShotClusterItem item) {
+            UserPhoto phoot = item.getUserPhoto();
+            String username = ParseUser.getCurrentUser().getUsername();
+            ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
+
+            if (unlocked.contains(username)) {
+                unlockFlag = true;
+            }
+            else if (unlocked.contains(username)){
+                unlockFlag = false;
+            }
         }
 
         private void unlockItemIfNeeded(SiteShotClusterItem item) {
@@ -518,11 +619,17 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                         photos.add(phoot);
                     }
 
+                    unlockFlag = true;
                     // Re-draw the cluster items.
                     setUpClusterer();
                 }
             }
+            else {
+                unlockFlag = false;
+            }
         }
+
+
 
         @Override
         public void onClusterItemInfoWindowClick(SiteShotClusterItem item) {
