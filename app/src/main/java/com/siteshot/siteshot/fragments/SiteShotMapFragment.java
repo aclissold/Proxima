@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -74,6 +75,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     // For cluster item adapters.
     public Cluster<SiteShotClusterItem> mClickedCluster;
     public SiteShotClusterItem mClickedClusterItem;
+
+    public int mClusterSize;
 
     public boolean singleMark;
     public boolean clusterMark;
@@ -216,6 +219,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                                                else if (clusterMark){
                                                    ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
                                                    imageView.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.test));
+                                                   TextView txtV = (TextView) v.findViewById(R.id.textView);
+                                                   txtV.setText("Number of Photos:" + mClusterSize);
                                                }
                                                // Returning the view containing InfoWindow contents
                                                singleMark = false;
@@ -553,6 +558,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         public boolean onClusterClick(Cluster<SiteShotClusterItem> cluster) {
             clusterMark = true;
             mClickedCluster = cluster;
+            mClusterSize = cluster.getSize();
             return false;
         }
 
