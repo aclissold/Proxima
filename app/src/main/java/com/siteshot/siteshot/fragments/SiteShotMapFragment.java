@@ -46,10 +46,12 @@ import com.siteshot.siteshot.models.SiteShotClusterItem;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -559,6 +561,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             clusterMark = true;
             mClickedCluster = cluster;
             mClusterSize = cluster.getSize();
+            unlockClusterIfNeeded(cluster);
             return false;
         }
 
@@ -586,6 +589,57 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             }
             else if (unlocked.contains(username)){
                 unlockFlag = false;
+            }
+        }
+
+        private void unlockClusterIfNeeded(Cluster<SiteShotClusterItem> cluster){
+
+            Iterator itr;
+            itr = cluster.getItems().iterator();
+            while (itr.hasNext()){
+                Object element = itr.next();
+                SiteShotClusterItem temp = (SiteShotClusterItem) element;
+
+
+                double latitude = temp.getPosition().latitude;
+                double longitude = temp.getPosition().longitude;
+                ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
+                ParseGeoPoint myPoint = geoPointFromLocation(currentLocation);
+                UserPhoto phoot = temp.getUserPhoto();
+                String username = ParseUser.getCurrentUser().getUsername();
+                ArrayList<String> unlocked = (ArrayList) phoot.getList("unlocked");
+
+                // TODO: re-query UserPhoto in case it changed in the meantime.
+                if (markerPoint.distanceInKilometersTo(myPoint) <= radius * METERS_PER_FEET
+                        / METERS_PER_KILOMETER) {
+                if (!unlocked.contains(username)) {
+                    // Persist the unlocked state.
+                    unlocked.add(username);
+                    phoot.put("unlocked", unlocked);
+                    phoot.saveInBackground();
+                    cluster.getItems().iterator().next().setUserPhoto(phoot);
+
+                    // Update it locally for setUpClusterer()
+                    UserPhoto photoToRemove = null;
+                    List<UserPhoto> photos = PhotoUtils.getInstance().getUserPhotos();
+                    for (UserPhoto photo : photos) {
+                        if (photo.getObjectId().equals(phoot.getObjectId())) {
+                            photoToRemove = photo;
+                        }
+                    }
+                    if (photoToRemove != null) {
+                        photos.remove(photoToRemove);
+                        photos.add(phoot);
+                    }
+
+                    unlockFlag = true;
+                    // Re-draw the cluster items.
+                    setUpClusterer();
+                }
+            }
+            else {
+                unlockFlag = false;
+            }
             }
         }
 
