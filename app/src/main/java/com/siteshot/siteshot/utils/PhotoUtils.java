@@ -35,6 +35,7 @@ public class PhotoUtils {
     private static PhotoUtils mInstance = null;
 
     private List<UserPhoto> mUserPhotos;
+    private List<UserPhoto> mClusterPhotos;
     private String mCurrentPhotoPath;
 
     private PhotoUtils() {}
@@ -62,8 +63,29 @@ public class PhotoUtils {
         });
     }
 
+    public void downloadClusterPhotos(ArrayList<String> cluster) {
+        ParseQuery<UserPhoto> clusterQuery = UserPhoto.getQuery().whereContainedIn("objectId", cluster);
+        // TODO: make this an ordered query
+        clusterQuery.findInBackground(new FindCallback<UserPhoto>() {
+            @Override
+            public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
+                if (e == null) {
+                    mUserPhotos = resultUserPhotos;
+                } else {
+                    Log.e(TAG, "error retrieving user photos:");
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     public List<UserPhoto> getUserPhotos() {
         return mUserPhotos;
+    }
+
+    public List<UserPhoto> getClusterPhotos(ArrayList<String> cluster) {
+        downloadClusterPhotos(cluster);
+        return mClusterPhotos;
     }
 
     public List<UserPhoto> updateUserPhotos() {

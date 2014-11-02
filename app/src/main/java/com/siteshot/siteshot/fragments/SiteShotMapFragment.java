@@ -1,6 +1,7 @@
 package com.siteshot.siteshot.fragments;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,6 +42,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.siteshot.siteshot.R;
+import com.siteshot.siteshot.activities.ClusterViewActivity;
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.models.SiteShotClusterItem;
 import com.siteshot.siteshot.models.UserPhoto;
@@ -78,7 +80,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     public Cluster<SiteShotClusterItem> mClickedCluster;
     public SiteShotClusterItem mClickedClusterItem;
 
+    public ArrayList<String> clusterContents = new ArrayList<String>();
     public int mClusterSize;
+    public String objectID;
 
     public boolean singleMark;
     public boolean clusterMark;
@@ -561,12 +565,29 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             clusterMark = true;
             mClickedCluster = cluster;
             mClusterSize = cluster.getSize();
+
+
+            Iterator itr;
+            itr = cluster.getItems().iterator();
+            while (itr.hasNext()) {
+                Object element = itr.next();
+                SiteShotClusterItem temp = (SiteShotClusterItem) element;
+                UserPhoto clusterPhoot = temp.getUserPhoto();
+
+                objectID = clusterPhoot.getObjectId();
+                clusterContents.add(objectID);
+
+            }
             unlockClusterIfNeeded(cluster);
             return false;
         }
 
         @Override
         public void onClusterInfoWindowClick(Cluster<SiteShotClusterItem> cluster) {
+            Intent clusterViewIntent = new Intent(getActivity(), ClusterViewActivity.class);
+
+            clusterViewIntent.putExtra("cluster", clusterContents);
+            getActivity().startActivity(clusterViewIntent);
         }
 
         @Override
@@ -579,6 +600,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             // Center on the tapped marker and show its info window.
             return false;
         }
+
         private void displayItem(SiteShotClusterItem item) {
             UserPhoto phoot = item.getUserPhoto();
             String username = ParseUser.getCurrentUser().getUsername();
@@ -688,8 +710,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 unlockFlag = false;
             }
         }
-
-
 
         @Override
         public void onClusterItemInfoWindowClick(SiteShotClusterItem item) {
