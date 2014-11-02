@@ -62,7 +62,12 @@ public class ClusterImageAdapter extends BaseAdapter {
         }
 
         // Retrieve the photo data from the UserPhoto instance.
-        ParseObject object = PhotoUtils.getInstance().getClusterPhotos(count.pushArray()).get(position);
+        ParseObject object = null;
+        try {
+            object = PhotoUtils.getInstance().getClusterPhotos(count.pushArray()).get(position);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         ParseFile file = object.getParseFile("photo");
         byte[] data = new byte[0];
         try {

@@ -64,12 +64,14 @@ public class PhotoUtils {
         });
     }
 
-    public void downloadClusterPhotos(String[] cluster) {
+    public void downloadClusterPhotos(String[] cluster) throws ParseException {
         List<String> test = Arrays.asList(cluster);
-        ParseQuery<UserPhoto> clusterQuery = UserPhoto.getQuery().whereContainedIn("objectId", test);
+        ParseQuery<UserPhoto> clusterQuery = UserPhoto.getQuery();
+        clusterQuery = clusterQuery.whereContainedIn("objectId", test);
         // TODO: make this an ordered query
-        clusterQuery.findInBackground(new FindCallback<UserPhoto>() {
-            @Override
+        mClusterPhotos = clusterQuery.find();
+
+/*            @Override
             public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
                 if (e == null) {
                     mClusterPhotos = resultUserPhotos;
@@ -78,14 +80,14 @@ public class PhotoUtils {
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
     }
 
     public List<UserPhoto> getUserPhotos() {
         return mUserPhotos;
     }
 
-    public List<UserPhoto> getClusterPhotos(String[] cluster) {
+    public List<UserPhoto> getClusterPhotos(String[] cluster) throws ParseException {
         downloadClusterPhotos(cluster);
         return mClusterPhotos;
     }
