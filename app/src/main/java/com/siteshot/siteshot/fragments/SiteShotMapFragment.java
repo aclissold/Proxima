@@ -188,63 +188,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // Configure the map.
         GoogleMap googleMap = mapFragment.getMap();
 
-
-        // sets up the thumbnail preview for a clicked single item
-
-
-
-
-        /*
-        {
-
-                                           // Use default InfoWindow frame
-                                           @Override
-                                           public View getInfoWindow(Marker arg0) {
-                                               return null;
-                                           }
-
-                                           // Defines the contents of the InfoWindow
-                                           @Override
-                                           public View getInfoContents(Marker arg0) {
-
-                                               // Getting view from the layout file info_window_layout
-                                               View v = getActivity().getLayoutInflater().inflate(R.layout.info_window, null);
-
-                                               if (singleMark && unlockFlag) {
-                                                   ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
-                                                   ParseFile file = mClickedClusterItem.getUserPhoto().getPhoto();
-                                                   Bitmap bitmap = null;
-                                                   try {
-                                                       byte[] data = file.getData();
-                                                       bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                   } catch (com.parse.ParseException e) {
-                                                       Log.e(TAG, "error getting user photo bytes");
-                                                       e.printStackTrace();
-                                                   }
-                                                   if (bitmap != null) {
-                                                       imageView.setImageBitmap(bitmap);
-                                                   }
-                                               }
-                                               else if (singleMark && !unlockFlag){
-                                                   ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
-                                                   imageView.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.locked));
-                                               }
-                                               else if (clusterMark){
-                                                   ImageView imageView = (ImageView) v.findViewById(R.id.imageView2);
-                                                   imageView.setImageBitmap(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.test));
-                                                   TextView txtV = (TextView) v.findViewById(R.id.textView);
-                                                   txtV.setText("Number of Photos:" + mClusterSize);
-                                               }
-                                               // Returning the view containing InfoWindow contents
-                                               singleMark = false;
-                                               clusterMark = false;
-                                               unlockFlag = false;
-                                               return v;
-
-                                           }
-                                       });
-
-*/
         // Enable the current location "blue dot".
         googleMap.setMyLocationEnabled(true);
         // Set up the camera change handler.
