@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -63,14 +64,15 @@ public class PhotoUtils {
         });
     }
 
-    public void downloadClusterPhotos(ArrayList<String> cluster) {
-        ParseQuery<UserPhoto> clusterQuery = UserPhoto.getQuery().whereContainedIn("objectId", cluster);
+    public void downloadClusterPhotos(String[] cluster) {
+        List<String> test = Arrays.asList(cluster);
+        ParseQuery<UserPhoto> clusterQuery = UserPhoto.getQuery().whereContainedIn("objectId", test);
         // TODO: make this an ordered query
         clusterQuery.findInBackground(new FindCallback<UserPhoto>() {
             @Override
             public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
                 if (e == null) {
-                    mUserPhotos = resultUserPhotos;
+                    mClusterPhotos = resultUserPhotos;
                 } else {
                     Log.e(TAG, "error retrieving user photos:");
                     e.printStackTrace();
@@ -83,7 +85,7 @@ public class PhotoUtils {
         return mUserPhotos;
     }
 
-    public List<UserPhoto> getClusterPhotos(ArrayList<String> cluster) {
+    public List<UserPhoto> getClusterPhotos(String[] cluster) {
         downloadClusterPhotos(cluster);
         return mClusterPhotos;
     }

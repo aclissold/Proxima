@@ -9,6 +9,7 @@ import com.siteshot.siteshot.adapters.ClusterImageAdapter;
 import com.siteshot.siteshot.adapters.ImageAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Jonathan on 11/2/2014.
@@ -16,19 +17,20 @@ import java.util.ArrayList;
 public class ClusterViewActivity extends Activity {
 
     int count;
+    String[] clusterArr;
     ArrayList<String> clusterContents;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // get extras containing photo data and rotate flag
+
         Bundle extras = getIntent().getExtras();
 
-        clusterContents = extras.getStringArrayList("cluster");
+        clusterArr = extras.getStringArray("cluster");
+        clusterContents = new ArrayList<String>(Arrays.asList(clusterArr));
         count = clusterContents.size();
-
         setContentView(R.layout.activity_cluster_view);
         GridView photoGrid = (GridView) findViewById(R.id.cluster_photo_grid);
-        photoGrid.setAdapter(new ClusterImageAdapter(this));
+        photoGrid.setAdapter(new ClusterImageAdapter(this, this));
 
     }
 
@@ -36,7 +38,7 @@ public class ClusterViewActivity extends Activity {
         return count;
     }
 
-    public ArrayList<String> pushArray(){
-        return clusterContents;
+    public String[] pushArray(){
+        return clusterArr;
     }
 }

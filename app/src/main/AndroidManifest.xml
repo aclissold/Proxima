@@ -52,6 +52,10 @@
             android:name=".activities.ConfirmationActivity"
             android:label="@string/title_activity_confirmation" >
         </activity>
+        <activity
+            android:name=".activities.ClusterViewActivity"
+            android:label="@string/title_activity_clusterView" >
+        </activity>
     </application>
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->

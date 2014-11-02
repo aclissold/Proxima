@@ -24,17 +24,19 @@ public class ClusterImageAdapter extends BaseAdapter {
     private int mWidth, mHeight;
     private static final float SIZE_DP = 90.0f;
     private Context mContext;
-    private ClusterViewActivity count = new ClusterViewActivity();
-    public ClusterImageAdapter(Context c) {
+    private ClusterViewActivity count;
+    public ClusterImageAdapter(Context c, ClusterViewActivity counter) {
         mContext = c;
         final float scale = c.getResources().getDisplayMetrics().density;
 
         // Adjust the width and height "constants" based on screen density.
         mWidth = (int) (SIZE_DP * scale + 0.5f);
         mHeight = mWidth;
+        this.count = counter;
     }
 
     public int getCount() {
+        int watch = count.getCount();
 
         return count.getCount();
     }

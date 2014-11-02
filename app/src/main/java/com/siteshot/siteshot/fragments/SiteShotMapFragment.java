@@ -44,6 +44,8 @@ import com.parse.ParseUser;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.activities.ClusterViewActivity;
 import com.siteshot.siteshot.activities.TabActivity;
+import com.siteshot.siteshot.adapters.CustomAdapterForClusters;
+import com.siteshot.siteshot.adapters.CustomAdapterForItems;
 import com.siteshot.siteshot.models.SiteShotClusterItem;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
@@ -188,7 +190,12 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
 
         // sets up the thumbnail preview for a clicked single item
-        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+
+
+
+        /*
+        {
 
                                            // Use default InfoWindow frame
                                            @Override
@@ -237,7 +244,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                                            }
                                        });
 
-
+*/
         // Enable the current location "blue dot".
         googleMap.setMyLocationEnabled(true);
         // Set up the camera change handler.
@@ -578,6 +585,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 clusterContents.add(objectID);
 
             }
+
             unlockClusterIfNeeded(cluster);
             return false;
         }
@@ -586,7 +594,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         public void onClusterInfoWindowClick(Cluster<SiteShotClusterItem> cluster) {
             Intent clusterViewIntent = new Intent(getActivity(), ClusterViewActivity.class);
 
-            clusterViewIntent.putExtra("cluster", clusterContents);
+            String[] clusterArr = new String[clusterContents.size()];
+            clusterArr = clusterContents.toArray(clusterArr);
+            clusterViewIntent.putExtra("cluster",clusterArr);
             getActivity().startActivity(clusterViewIntent);
         }
 
@@ -714,6 +724,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         @Override
         public void onClusterItemInfoWindowClick(SiteShotClusterItem item) {
             // Does nothing, but you could go into the user's profile page, for example.
+
         }
 
     }
@@ -725,6 +736,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // (Activity extends context, so we can pass 'this' in the constructor.)
         mClusterManager = new ClusterManager<SiteShotClusterItem>(getActivity(), mapFragment.getMap());
         mClusterManager.setRenderer(new MyClusterRenderer());
+        mapFragment.getMap().setInfoWindowAdapter(mClusterManager.getMarkerManager());
+        mClusterManager.getClusterMarkerCollection().setOnInfoWindowAdapter(new CustomAdapterForClusters(this));
+        mClusterManager.getMarkerCollection().setOnInfoWindowAdapter(new CustomAdapterForItems(this));
 
         // Set listeners.
         mClusterListener = new ClusterListener();
@@ -737,6 +751,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // manager.
         mapFragment.getMap().setOnCameraChangeListener(mClusterManager);
         mapFragment.getMap().setOnMarkerClickListener(mClusterManager);
+        mapFragment.getMap().setOnInfoWindowClickListener(mClusterManager);
+
 
         // Add cluster items (markers) to the cluster manager.
         addItems();
@@ -765,5 +781,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
             mClusterManager.addItem(offsetItem);
         }
+    }
+
+    public int getClusterSize(){
+        return mClusterSize;
     }
 }

@@ -10,6 +10,7 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="Capture">Capture</string>
     <string name="title_activity_confirmation">ConfirmationActivity</string>
+    <string name="title_activity_clusterView">ClusterContents</string>
     <string name="post_out_of_range">Can\'t view marker! Get closer.</string>
     <string name="error_photo_upload_failed">An error occured and your photo has not been uploaded.</string>
 
