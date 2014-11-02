@@ -148,7 +148,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Set up location services.
+        int statusCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
+        String statusMsg = GooglePlayServicesUtil.getErrorString(statusCode);
+        Log.d(TAG, "Google Play Services status: " + statusMsg);
 
         View rootView = inflater.inflate(R.layout.siteshot_map_fragment, container, false);
 
