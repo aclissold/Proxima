@@ -148,6 +148,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     private ClusterManager<SiteShotClusterItem> mClusterManager;
     private ClusterListener mClusterListener;
 
+    GoogleMap googleMap;
 
     /**
      * The fragment argument representing the section number for this
@@ -186,7 +187,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         mapFragment.onResume();
 
         // Configure the map.
-        GoogleMap googleMap = mapFragment.getMap();
+        googleMap = mapFragment.getMap();
 
         // Enable the current location "blue dot".
         googleMap.setMyLocationEnabled(true);
@@ -194,7 +195,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
                 // When the camera changes, reconfigure the map.
-                setUpClusterer();
+                reDoMarkers();
             }
         });
 
@@ -516,6 +517,12 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             mClickedCluster = cluster;
             mClusterSize = cluster.getSize();
 
+            unlockClusterIfNeeded(cluster);
+            return false;
+        }
+
+        @Override
+        public void onClusterInfoWindowClick(Cluster<SiteShotClusterItem> cluster) {
 
             Iterator itr;
             itr = cluster.getItems().iterator();
@@ -529,12 +536,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
             }
 
-            unlockClusterIfNeeded(cluster);
-            return false;
-        }
-
-        @Override
-        public void onClusterInfoWindowClick(Cluster<SiteShotClusterItem> cluster) {
             Intent clusterViewIntent = new Intent(getActivity(), ClusterViewActivity.class);
 
             String[] clusterArr = new String[clusterContents.size()];
@@ -693,13 +694,22 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         // Point the map's listeners at the listeners implemented by the cluster
         // manager.
-        mapFragment.getMap().setOnCameraChangeListener(mClusterManager);
-        mapFragment.getMap().setOnMarkerClickListener(mClusterManager);
-        mapFragment.getMap().setOnInfoWindowClickListener(mClusterManager);
+        googleMap.setOnCameraChangeListener(mClusterManager);
+        googleMap.setOnMarkerClickListener(mClusterManager);
+        googleMap.setOnInfoWindowClickListener(mClusterManager);
+
 
 
         // Add cluster items (markers) to the cluster manager.
+        mClusterManager.clearItems();
         addItems();
+        mClusterManager.cluster();
+    }
+
+    public void reDoMarkers() {
+        mClusterManager.clearItems();
+        addItems();
+        mClusterManager.cluster();
     }
 
     private void addItems() {

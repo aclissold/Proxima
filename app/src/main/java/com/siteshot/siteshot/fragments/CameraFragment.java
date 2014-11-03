@@ -210,6 +210,9 @@ public class CameraFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        TabActivity activity = (TabActivity) getActivity();
+        activity.refreshMark();
+
         View newView = getActivity().findViewById(R.id.camera_preview);
         if (pauseFlag){
             safeCameraOpenInView(newView);
@@ -510,7 +513,6 @@ public class CameraFragment extends Fragment {
                 fos.close();
             // Restart the camera preview.
                 safeCameraOpenInView(mCameraView);
-                activity.refreshMark();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
