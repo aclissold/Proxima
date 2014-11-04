@@ -3,8 +3,6 @@ package com.siteshot.siteshot.fragments;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -12,8 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -36,7 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import com.parse.ParseFile;
+
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -50,17 +46,11 @@ import com.siteshot.siteshot.models.SiteShotClusterItem;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
-import java.lang.reflect.Field;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-//import java.text.ParseException;
 
 /**
  * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/12/14.
@@ -78,20 +68,27 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     MapView mapFragment;
 
-    // For cluster item adapters.
+
+    /*
+     * For cluster item adapters
+     */
     public Cluster<SiteShotClusterItem> mClickedCluster;
     public SiteShotClusterItem mClickedClusterItem;
 
+    // ArrayList containing objectId's of UserPhotos in a cluster
     public ArrayList<String> clusterContents = new ArrayList<String>();
+    // Amount of UserPhotos in a cluster
     public int mClusterSize;
+    // The objectId of a UserPhoto to be added to clusterContents
     public String objectID;
 
-    public boolean singleMark;
-    public boolean clusterMark;
-
+    // Flag to determine if a marker should be unlocked
     public boolean unlockFlag;
 
 
+    /*
+     * Google Play services connection variables
+     */
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
     private static final int MILLISECONDS_PER_SECOND = 1000;
@@ -106,6 +103,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
             * UPDATE_INTERVAL_IN_SECONDS;
 
+    /*
+     * Variables for handling Google Map functions
+     */
     // Represents the circle around a map
     private Circle mapCircle;
 
@@ -125,8 +125,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     private LocationClient locationClient;
 
     /*
- * Constants for handling location results
- */
+     * Constants for handling location results
+     */
     // Conversion from feet to meters
     private static final float METERS_PER_FEET = 0.3048f;
 
@@ -191,6 +191,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         // Enable the current location "blue dot".
         googleMap.setMyLocationEnabled(true);
+
         // Set up the camera change handler.
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
@@ -199,12 +200,14 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             }
         });
 
+        //set up the clustering system
         setUpClusterer();
 
         return rootView;
     }
 
     // Set up a customized query
+    // TODO determine if this is necessary
     ParseQueryAdapter.QueryFactory<UserPhoto> factory =
             new ParseQueryAdapter.QueryFactory<UserPhoto>() {
                 public ParseQuery<UserPhoto> create() {
@@ -219,6 +222,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 }
             };
 
+    /*
+     * Returns the user's current location.
+     */
     public Location getCurrentLocation() {
         return currentLocation;
     }
@@ -294,6 +300,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
+    /*
+     * Called when the user's location is changed, will update markers and update map radius indicator.
+     */
     public void onLocationChanged(Location location) {
         currentLocation = location;
         if (lastLocation != null
@@ -311,9 +320,15 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
         // Update map radius indicator
         updateCircle(myLatLng);
-        setUpClusterer();
+
+        // Refresh markers/clusters
+        reDoMarkers();
     }
 
+    /*
+     * Called on connection with Google Play services if connection is good allow activity to
+     * continue with GooglePlay services.
+     */
     private boolean servicesConnected() {
         // Check that Google Play services is available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
@@ -329,13 +344,16 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
+    /*
+     * Returns the current location as a Parse GeoPoint
+     */
     private ParseGeoPoint geoPointFromLocation(Location loc) {
         return new ParseGeoPoint(loc.getLatitude(), loc.getLongitude());
     }
 
     /*
-   * Displays a circle on the map representing the search radius
-   */
+     * Displays a circle on the map representing the search radius
+     */
     private void updateCircle(LatLng myLatLng) {
         if (mapCircle == null) {
             mapCircle =
@@ -441,11 +459,24 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         return builder.build();
     }
 
-    private class MyClusterRenderer extends DefaultClusterRenderer<SiteShotClusterItem> {
+    /*
+     * Renderer for marker clustering
+     */
+    private class MyClusterRenderer extends DefaultClusterRenderer<SiteShotClusterItem> implements GoogleMap.OnCameraChangeListener{
         public MyClusterRenderer() {
             super(getActivity(), mapFragment.getMap(), mClusterManager);
         }
 
+        // TODO see if this works
+        public void onCameraChange(CameraPosition position) {
+            // When the camera changes, reconfigure the map.
+            reDoMarkers();
+        }
+
+        /*
+         * Called before an individual marker is created, set color options based on range and
+         * unlock status
+         */
         @Override
         protected void onBeforeClusterItemRendered(SiteShotClusterItem item, MarkerOptions markerOptions) {
             double latitude = item.getPosition().latitude;
@@ -475,6 +506,10 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
         }
 
+        /*
+         * Called before an cluster of markers is created, set color options based on range and
+         * unlock status
+         */
         @Override
         protected void onBeforeClusterRendered(Cluster<SiteShotClusterItem> cluster, MarkerOptions markerOptions) {
             double latitude = cluster.getPosition().latitude;
@@ -505,25 +540,36 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
     }
 
+    /*
+     * Listeners for marker and cluster clicks, marker and cluster info window clicks
+     */
     private class ClusterListener implements
             ClusterManager.OnClusterInfoWindowClickListener<SiteShotClusterItem>,
             ClusterManager.OnClusterClickListener<SiteShotClusterItem>,
             ClusterManager.OnClusterItemClickListener<SiteShotClusterItem>,
             ClusterManager.OnClusterItemInfoWindowClickListener<SiteShotClusterItem> {
 
+        /*
+         * Called on a cluster click
+         */
         @Override
         public boolean onClusterClick(Cluster<SiteShotClusterItem> cluster) {
-            clusterMark = true;
+            // get the clicked cluster
             mClickedCluster = cluster;
+            // get the size of the cluster
             mClusterSize = cluster.getSize();
-
+            // unlock any markers in the cluster
             unlockClusterIfNeeded(cluster);
+            // Center on the tapped marker and show its info window.
             return false;
         }
 
+        /*
+         * Called when a cluster's info window is clicked
+         */
         @Override
         public void onClusterInfoWindowClick(Cluster<SiteShotClusterItem> cluster) {
-
+            // Pull the objectIds of all the UserPhotos in the clicked cluster
             Iterator itr;
             itr = cluster.getItems().iterator();
             while (itr.hasNext()) {
@@ -531,33 +577,59 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 SiteShotClusterItem temp = (SiteShotClusterItem) element;
                 UserPhoto clusterPhoot = temp.getUserPhoto();
 
+                // Add the objectIds to clusterContents
                 objectID = clusterPhoot.getObjectId();
                 clusterContents.add(objectID);
-
             }
 
+            // Prep the cluster viewer
             Intent clusterViewIntent = new Intent(getActivity(), ClusterViewActivity.class);
 
+            // get the current user for extras
             String currentUser = ParseUser.getCurrentUser().getUsername();
+            // place clusterContents into String[] for extras
             String[] clusterArr = new String[clusterContents.size()];
             clusterArr = clusterContents.toArray(clusterArr);
+
+            // bundle the extras for use in cluster viewer
             clusterViewIntent.putExtra("cluster",clusterArr);
             clusterViewIntent.putExtra("currentUser",currentUser);
+
+            // clear the clusterContents for use in next clicked cluster
             clusterContents.clear();
+
+            // start the cluster view activity
             getActivity().startActivity(clusterViewIntent);
         }
 
+        /*
+         * Called on a single marker click
+         */
         @Override
         public boolean onClusterItemClick(SiteShotClusterItem item) {
-            singleMark = true;
+            // get the clicked marker
             mClickedClusterItem = item;
+            // unlock the marker
             unlockItemIfNeeded(item);
+            // determine if a marker should be displayed
+            // TODO determine if this method does anything
             displayItem(item);
 
             // Center on the tapped marker and show its info window.
             return false;
         }
 
+        /*
+         * called on info window click for a single marker
+         * brings up a photo/comment view of the marker
+         */
+        @Override
+        public void onClusterItemInfoWindowClick(SiteShotClusterItem item) {
+            // Does nothing, but you could go into the user's profile page, for example.
+
+        }
+
+        // TODO determine if this does anything
         private void displayItem(SiteShotClusterItem item) {
             UserPhoto phoot = item.getUserPhoto();
             String username = ParseUser.getCurrentUser().getUsername();
@@ -571,6 +643,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             }
         }
 
+        /*
+         * Unlock all the individual markers in cluster if necessary
+         */
         private void unlockClusterIfNeeded(Cluster<SiteShotClusterItem> cluster){
 
             Iterator itr;
@@ -622,6 +697,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             }
         }
 
+        /*
+         * Unlock a single marker if necessary
+         */
         private void unlockItemIfNeeded(SiteShotClusterItem item) {
             double latitude = item.getPosition().latitude;
             double longitude = item.getPosition().longitude;
@@ -667,18 +745,13 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 unlockFlag = false;
             }
         }
-
-        @Override
-        public void onClusterItemInfoWindowClick(SiteShotClusterItem item) {
-            // Does nothing, but you could go into the user's profile page, for example.
-
-        }
-
     }
 
+    /*
+     * Sets up the clusterer to cluster the markers if necessary
+     */
     public void setUpClusterer() {
         // Declare a variable for the cluster manager.
-
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
         mClusterManager = new ClusterManager<SiteShotClusterItem>(getActivity(), mapFragment.getMap());
@@ -700,20 +773,24 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         googleMap.setOnMarkerClickListener(mClusterManager);
         googleMap.setOnInfoWindowClickListener(mClusterManager);
 
-
-
         // Add cluster items (markers) to the cluster manager.
         mClusterManager.clearItems();
         addItems();
         mClusterManager.cluster();
     }
 
+    /*
+     * clear the markers, redraw markers, and recluster markers
+     */
     public void reDoMarkers() {
         mClusterManager.clearItems();
         addItems();
         mClusterManager.cluster();
     }
 
+    /*
+     * add markers to the map
+     */
     private void addItems() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
         Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;
@@ -737,9 +814,5 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
             mClusterManager.addItem(offsetItem);
         }
-    }
-
-    public int getClusterSize(){
-        return mClusterSize;
     }
 }
