@@ -613,7 +613,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
                     unlockFlag = true;
                     // Re-draw the cluster items.
-                    setUpClusterer();
+                    reDoMarkers();
                 }
             }
             else {
@@ -660,7 +660,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
                     unlockFlag = true;
                     // Re-draw the cluster items.
-                    setUpClusterer();
+                    reDoMarkers();
                 }
             }
             else {
