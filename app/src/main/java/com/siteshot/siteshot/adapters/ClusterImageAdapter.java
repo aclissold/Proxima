@@ -12,8 +12,11 @@ import android.widget.ImageView;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.activities.ClusterViewActivity;
 import com.siteshot.siteshot.utils.PhotoUtils;
+
+import java.util.List;
 
 /**
  * Adapts PhotoUtils' List of UserPhotos.
@@ -53,6 +56,11 @@ public class ClusterImageAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
+        String currentUser;
+        List<String> unlockedUser;
+        int unlockedSize;
+        boolean unlockedFlag = false;
+
         if (convertView == null) {
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(mWidth, mHeight));
@@ -68,19 +76,35 @@ public class ClusterImageAdapter extends BaseAdapter {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        ParseFile file = object.getParseFile("photo");
-        byte[] data = new byte[0];
-        try {
-            data = file.getData();
-        } catch (ParseException e) {
-            Log.e(TAG, "could not get data from ParseFile:");
-            e.printStackTrace();
+        currentUser = count.getUser();
+        unlockedUser = object.getList("unlocked");
+        unlockedSize = unlockedUser.size();
+
+        for(String s : unlockedUser){
+
+            if (currentUser.equals(s)) {
+                unlockedFlag = true;
+            }
         }
-        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        if (unlockedFlag) {
+            ParseFile file = object.getParseFile("photo");
+            byte[] data = new byte[0];
+            try {
+                data = file.getData();
+            } catch (ParseException e) {
+                Log.e(TAG, "could not get data from ParseFile:");
+                e.printStackTrace();
+            }
+            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
-        imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, mWidth, mHeight, false));
+            imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, mWidth, mHeight, false));
 
-        imageView.setImageBitmap(bitmap);
+            imageView.setImageBitmap(bitmap);
+        }
+        else {
+            Bitmap bitmap = BitmapFactory.decodeResource(this.mContext.getResources(), R.drawable.locked_photo);;
+            imageView.setImageBitmap(bitmap);
+        }
 
         return imageView;
     }

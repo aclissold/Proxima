@@ -17,6 +17,7 @@ import java.util.Arrays;
 public class ClusterViewActivity extends Activity {
 
     int count;
+    String currentUser;
     String[] clusterArr;
     ArrayList<String> clusterContents;
 
@@ -24,7 +25,7 @@ public class ClusterViewActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         Bundle extras = getIntent().getExtras();
-
+        currentUser = extras.getString("currentUser");
         clusterArr = extras.getStringArray("cluster");
         clusterContents = new ArrayList<String>(Arrays.asList(clusterArr));
         count = clusterContents.size();
@@ -36,6 +37,10 @@ public class ClusterViewActivity extends Activity {
 
     public int getCount(){
         return count;
+    }
+
+    public String getUser(){
+        return currentUser;
     }
 
     public String[] pushArray(){

@@ -538,9 +538,11 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
             Intent clusterViewIntent = new Intent(getActivity(), ClusterViewActivity.class);
 
+            String currentUser = ParseUser.getCurrentUser().getUsername();
             String[] clusterArr = new String[clusterContents.size()];
             clusterArr = clusterContents.toArray(clusterArr);
             clusterViewIntent.putExtra("cluster",clusterArr);
+            clusterViewIntent.putExtra("currentUser",currentUser);
             clusterContents.clear();
             getActivity().startActivity(clusterViewIntent);
         }
