@@ -107,7 +107,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
 
     public void refreshMark() {
         SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(2);
-        test.setUpClusterer();
+        test.reDoMarkers();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {

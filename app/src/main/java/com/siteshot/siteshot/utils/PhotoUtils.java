@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class PhotoUtils {
     private static PhotoUtils mInstance = null;
 
     private List<UserPhoto> mUserPhotos;
+    private List<UserPhoto> mClusterPhotos;
     private String mCurrentPhotoPath;
 
     private PhotoUtils() {}
@@ -62,8 +64,32 @@ public class PhotoUtils {
         });
     }
 
+    public void downloadClusterPhotos(String[] cluster) throws ParseException {
+        List<String> test = Arrays.asList(cluster);
+        ParseQuery<UserPhoto> clusterQuery = UserPhoto.getQuery();
+        clusterQuery = clusterQuery.whereContainedIn("objectId", test);
+        // TODO: make this an ordered query
+        mClusterPhotos = clusterQuery.find();
+
+/*            @Override
+            public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
+                if (e == null) {
+                    mClusterPhotos = resultUserPhotos;
+                } else {
+                    Log.e(TAG, "error retrieving user photos:");
+                    e.printStackTrace();
+                }
+            }
+        });*/
+    }
+
     public List<UserPhoto> getUserPhotos() {
         return mUserPhotos;
+    }
+
+    public List<UserPhoto> getClusterPhotos(String[] cluster) throws ParseException {
+        downloadClusterPhotos(cluster);
+        return mClusterPhotos;
     }
 
     public List<UserPhoto> updateUserPhotos() {

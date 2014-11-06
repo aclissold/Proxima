@@ -35,6 +35,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
+        int watch = PhotoUtils.getInstance().getUserPhotos().size();
         return PhotoUtils.getInstance().getUserPhotos().size();
     }
 

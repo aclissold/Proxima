@@ -36,6 +36,10 @@ public class UserPhoto extends ParseObject {
         put("photo", value);
     }
 
+    public String getClusterId () {
+        return getString("ClusterId");
+    }
+
     public String getText() {
         return getString("text");
     }
@@ -44,7 +48,7 @@ public class UserPhoto extends ParseObject {
         put("text", value);
     }
 
-    public static ParseQuery<UserPhoto> getQuery() {
+      public static ParseQuery<UserPhoto> getQuery() {
         return ParseQuery.getQuery(UserPhoto.class);
     }
 
