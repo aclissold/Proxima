@@ -164,6 +164,7 @@ public class CameraFragment extends Fragment {
         boolean qOpened = false;
         // make sure camera is availiable
         releaseCameraAndPreview();
+        Log.d("HELLO", "onCreate");
         // get a camera object
         mCamera = getCameraInstance();
         // set the camera orientation to portrait

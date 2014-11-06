@@ -1,17 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.siteshot.siteshot.activities.ProfileActivity" >
 
     <!-- Return menu item, goes back to tab activity -->
     <item android:id="@+id/action_return"
         android:title="Return"
         android:orderInCategory="99"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
 
     <!-- Logout menu item -->
     <item android:id="@+id/action_logout"
         android:title="Logout"
         android:orderInCategory="100"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
 
 </menu>

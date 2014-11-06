@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- ScootShoot -->
     <string name="app_name">SiteShot</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">map</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+
+    <!-- Activity titles -->
     <string name="title_activity_profile">ProfileActivity</string>
-    <string name="Capture">Capture</string>
     <string name="title_activity_confirmation">ConfirmationActivity</string>
     <string name="title_activity_clusterView">ClusterContents</string>
+
+    <!-- Action bar menu item titles -->
+    <string name="action_settings">Settings</string>
+    <string name="action_profile">Profile</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_filter">Filter</string>
+
+    <!-- Various messages -->
     <string name="post_out_of_range">Can\'t view marker! Get closer.</string>
-    <string name="error_photo_upload_failed">An error occured and your photo has not been uploaded.</string>
+    <string name="error_photo_upload_failed">
+        An error occured and your photo has not been uploaded.
+    </string>
+
+    <!-- Temp -->
+    <string name="Capture">Capture</string> <!-- TODO: remove when a new capture button exists -->
 
 </resources>

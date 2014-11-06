@@ -192,11 +192,12 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
                 ParseUser.logOut();
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;
-
+            case R.id.action_filter:
+                Log.d(TAG, "should show filter popup");
+                return true;
             case R.id.action_profile:
                 startActivity(new Intent(this, ProfileActivity.class));
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
