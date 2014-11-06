@@ -8,6 +8,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -200,6 +202,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             }
         });
 
+        // Enable custom menu items.
+        setHasOptionsMenu(true);
+
         //set up the clustering system
         setUpClusterer();
 
@@ -262,6 +267,13 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         locationClient.connect();
 
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.map, menu);
+    }
+
 
     private void startPeriodicUpdates() {
         locationClient.requestLocationUpdates(locationRequest, this);
