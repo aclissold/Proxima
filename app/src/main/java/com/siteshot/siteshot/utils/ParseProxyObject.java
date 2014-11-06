@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class ParseProxyObject implements Serializable {
     private static final long serialVersionUID = 1L;
     private HashMap<String, Object> values = new HashMap<String, Object>();
-    private final String TAG = "WOW: ";
+    private final String TAG = "ParseProxyObject: ";
 
     public HashMap<String, Object> getValues() {
         return values;
@@ -35,7 +35,6 @@ public class ParseProxyObject implements Serializable {
                 ParseProxyObject parseUserObject = new ParseProxyObject((ParseObject)object.get(key));
                 values.put(key, parseUserObject);
             } else if(classType == ParseFile.class) {
-                Log.e(TAG, "Wow you're a file " + key);
                 ParseFile parseFile = object.getParseFile(key);
 
                 byte[] data = new byte[0];
@@ -101,10 +100,8 @@ public class ParseProxyObject implements Serializable {
 
     public byte[] getParseFile(String key) {
         if(has(key)) {
-            Log.e(TAG, "wowie" + key);
             return (byte[]) values.get(key);
         } else {
-            Log.e(TAG, "WHYYY");
             return null;
         }
     }
