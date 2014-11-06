@@ -15,13 +15,25 @@
     <string name="action_logout">Logout</string>
     <string name="action_filter">Filter</string>
 
+    <!-- Dialog titles -->
+    <string name="title_dialog_filter">Filter</string>
+
     <!-- Various messages -->
     <string name="post_out_of_range">Can\'t view marker! Get closer.</string>
     <string name="error_photo_upload_failed">
         An error occured and your photo has not been uploaded.
     </string>
 
-    <!-- Temp -->
-    <string name="Capture">Capture</string> <!-- TODO: remove when a new capture button exists -->
+    <!-- For the Filter dialog on the Map fragment -->
+    <string-array name="filter_fields">
+        <item>Undiscovered</item>
+        <item>Discovered</item>
+        <item>All</item>
+    </string-array>
+
+    <!-- Miscellaneous -->
+    <string name="capture">Capture</string> <!-- TODO: remove when a new capture button exists -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

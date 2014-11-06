@@ -23,6 +23,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.MapFragment;
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
+import com.siteshot.siteshot.FilterDialog;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.fragments.CameraFragment;
 import com.siteshot.siteshot.fragments.SiteShotMapFragment;
@@ -186,7 +187,8 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;
             case R.id.action_filter:
-                Log.d(TAG, "should show filter popup");
+                FilterDialog dialog = new FilterDialog();
+                dialog.show(getFragmentManager(), "hello1e");
                 return true;
             case R.id.action_profile:
                 startActivity(new Intent(this, ProfileActivity.class));
