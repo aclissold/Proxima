@@ -477,7 +477,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // TODO see if this works
         public void onCameraChange(CameraPosition position) {
             // When the camera changes, reconfigure the map.
-            reDoMarkers();
+            refreshMarkers();
         }
 
         /*
@@ -800,6 +800,15 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         mClusterManager.clearItems();
         addItems();
         mClusterManager.cluster();
+    }
+
+    /*
+     * clear the markers, redraw markers, and recluster markers
+     */
+    public void refreshMarkers() {
+        mClusterManager.clearItems();
+        addItems();
+        //mClusterManager.cluster();
     }
 
     /*
