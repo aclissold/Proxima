@@ -77,11 +77,16 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     // ArrayList containing objectId's of UserPhotos in a cluster
     public ArrayList<String> clusterContents = new ArrayList<String>();
+
+    // ArrayList containing objectId's of newly discovered UserPhotos in a cluster
+    public ArrayList<String> newlyDiscovered = new ArrayList<String>();
+
     // Amount of UserPhotos in a cluster
     public int mClusterSize;
     // The objectId of a UserPhoto to be added to clusterContents
     public String objectID;
 
+    public String discoveredObjectId;
     // Flag to determine if a marker should be unlocked
     public boolean unlockFlag;
 
@@ -591,12 +596,16 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             String[] clusterArr = new String[clusterContents.size()];
             clusterArr = clusterContents.toArray(clusterArr);
 
+            String[] discoveredArr = new String[newlyDiscovered.size()];
+            discoveredArr = newlyDiscovered.toArray(discoveredArr);
             // bundle the extras for use in cluster viewer
             clusterViewIntent.putExtra("cluster",clusterArr);
+            clusterViewIntent.putExtra("discovered",discoveredArr);
             clusterViewIntent.putExtra("currentUser",currentUser);
 
             // clear the clusterContents for use in next clicked cluster
             clusterContents.clear();
+            newlyDiscovered.clear();
 
             // start the cluster view activity
             getActivity().startActivity(clusterViewIntent);
@@ -685,8 +694,10 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                         photos.remove(photoToRemove);
                         photos.add(phoot);
                     }
-
+                    discoveredObjectId = phoot.getObjectId();
+                    newlyDiscovered.add(discoveredObjectId);
                     unlockFlag = true;
+
                     // Re-draw the cluster items.
                     reDoMarkers();
                 }
@@ -737,6 +748,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                     }
 
                     unlockFlag = true;
+
                     // Re-draw the cluster items.
                     reDoMarkers();
                 }

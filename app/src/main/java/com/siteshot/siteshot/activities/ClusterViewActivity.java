@@ -3,6 +3,7 @@ package com.siteshot.siteshot.activities;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.GridView;
+import android.widget.ImageView;
 
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.adapters.ClusterImageAdapter;
@@ -19,7 +20,9 @@ public class ClusterViewActivity extends Activity {
     int count;
     String currentUser;
     String[] clusterArr;
+    String[] discoveredArr;
     ArrayList<String> clusterContents;
+    ArrayList<String> newlyDiscovered;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,11 +30,16 @@ public class ClusterViewActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         currentUser = extras.getString("currentUser");
         clusterArr = extras.getStringArray("cluster");
+        discoveredArr = extras.getStringArray("discovered");
         clusterContents = new ArrayList<String>(Arrays.asList(clusterArr));
+        newlyDiscovered = new ArrayList<String>(Arrays.asList(discoveredArr));
         count = clusterContents.size();
         setContentView(R.layout.activity_cluster_view);
         GridView photoGrid = (GridView) findViewById(R.id.cluster_photo_grid);
         photoGrid.setAdapter(new ClusterImageAdapter(this, this));
+
+
+
 
     }
 
@@ -45,5 +53,9 @@ public class ClusterViewActivity extends Activity {
 
     public String[] pushArray(){
         return clusterArr;
+    }
+
+    public String[] pushDiscovered(){
+        return discoveredArr;
     }
 }

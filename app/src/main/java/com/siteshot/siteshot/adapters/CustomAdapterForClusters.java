@@ -2,20 +2,17 @@ package com.siteshot.siteshot.adapters;
 
 import com.google.android.gms.maps.GoogleMap;
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.fragments.SiteShotMapFragment;
+
 /**
+ * Custom Info Window Adapter for Clusters
  * Created by Jonathan on 11/2/2014.
  */
 public class CustomAdapterForClusters implements GoogleMap.InfoWindowAdapter{
@@ -27,7 +24,7 @@ public class CustomAdapterForClusters implements GoogleMap.InfoWindowAdapter{
     }
     @Override
     public View getInfoWindow(Marker marker) {
-// Use the default frame.
+        // Use the default frame.
         return null;
     }
     @Override
@@ -41,6 +38,4 @@ public class CustomAdapterForClusters implements GoogleMap.InfoWindowAdapter{
 
         return view;
     }
-
-
 }

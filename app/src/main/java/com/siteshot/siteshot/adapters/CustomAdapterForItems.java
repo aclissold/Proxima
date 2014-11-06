@@ -14,6 +14,7 @@ import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.fragments.SiteShotMapFragment;
 
 /**
+ * Custom Info Window Adapter for markers
  * Created by Jonathan on 11/2/2014.
  */
 public class CustomAdapterForItems implements GoogleMap.InfoWindowAdapter {
@@ -24,7 +25,7 @@ public class CustomAdapterForItems implements GoogleMap.InfoWindowAdapter {
     }
     @Override
     public View getInfoWindow(Marker marker) {
-// Use the default frame.
+        // Use the default frame.
         return null;
     }
     @Override
