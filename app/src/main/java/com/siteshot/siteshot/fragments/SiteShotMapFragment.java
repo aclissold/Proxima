@@ -70,6 +70,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     MapView mapFragment;
 
+    private int mSelectedFilterIndex = -1;
 
     /*
      * For cluster item adapters
@@ -482,9 +483,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == R.integer.FILTER_REQUEST && resultCode == getActivity().RESULT_OK) {
-            int clicked = data.getExtras().getInt(getString(R.string.extra_filter_field));
-            Log.d(TAG, "clicked " + clicked);
-            // TODO: re-query here
+            mSelectedFilterIndex = data.getExtras().getInt(getString(R.string.extra_filter_field));
+            reDoMarkers();
         }
     }
 
@@ -833,8 +833,18 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             return;
         }
 
+        // Prepare filter variables.
+        String username = ParseUser.getCurrentUser().getUsername();
+        boolean shouldOnlyShowUndiscovered = mSelectedFilterIndex == 0;
+        boolean shouldOnlyShowDiscovered = mSelectedFilterIndex == 1;
+
         // Loop through the results of the search
         for (UserPhoto photo : objects) {
+            // Apply filter.
+            boolean isUnlocked = photo.getList("unlocked").contains(username);
+            if (shouldOnlyShowDiscovered && !isUnlocked)  { continue; }
+            if (shouldOnlyShowUndiscovered && isUnlocked)  { continue; }
+
             SiteShotClusterItem offsetItem = new SiteShotClusterItem(
                     photo.getLocation().getLatitude(),
                     photo.getLocation().getLongitude(),

@@ -188,7 +188,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
                 SiteShotMapFragment map =
                         (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
                 dialog.setTargetFragment(map, R.integer.FILTER_REQUEST);
-                dialog.show(getFragmentManager(), "hello1e");
+                dialog.show(getFragmentManager(), null);
                 return true;
             case R.id.action_profile:
                 startActivity(new Intent(this, ProfileActivity.class));
