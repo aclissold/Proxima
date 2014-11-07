@@ -175,6 +175,10 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     public SiteShotMapFragment() {
     }
 
+    public int getSelectedFilterIndex() {
+        return mSelectedFilterIndex;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

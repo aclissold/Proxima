@@ -184,9 +184,10 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;
             case R.id.action_filter:
-                FilterDialog dialog = new FilterDialog();
                 SiteShotMapFragment map =
                         (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
+                int selectedIndex = map.getSelectedFilterIndex();
+                FilterDialog dialog = new FilterDialog(selectedIndex);
                 dialog.setTargetFragment(map, R.integer.FILTER_REQUEST);
                 dialog.show(getFragmentManager(), null);
                 return true;
