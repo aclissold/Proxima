@@ -11,6 +11,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -95,6 +97,9 @@ public class CameraFragment extends Fragment {
         // Create our Preview view and set it as the content of our activity.
         View view = inflater.inflate(R.layout.camera_fragment, container, false);
 
+        // Show the action bar options menu.
+        setHasOptionsMenu(true);
+
         // Find the total number of cameras available
         mNumberOfCameras = Camera.getNumberOfCameras();
 
@@ -164,6 +169,7 @@ public class CameraFragment extends Fragment {
         boolean qOpened = false;
         // make sure camera is availiable
         releaseCameraAndPreview();
+        Log.d("HELLO", "onCreate");
         // get a camera object
         mCamera = getCameraInstance();
         // set the camera orientation to portrait
@@ -226,6 +232,11 @@ public class CameraFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         releaseCameraAndPreview();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.camera, menu);
     }
 
     /**

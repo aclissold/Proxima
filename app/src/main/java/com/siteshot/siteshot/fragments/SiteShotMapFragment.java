@@ -8,6 +8,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -68,6 +70,7 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
 
     MapView mapFragment;
 
+    private int mSelectedFilterIndex = -1;
 
     /*
      * For cluster item adapters
@@ -177,6 +180,10 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
     public SiteShotMapFragment() {
     }
 
+    public int getSelectedFilterIndex() {
+        return mSelectedFilterIndex;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -206,6 +213,9 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
                 reDoMarkers();
             }
         });
+
+        // Enable custom menu items.
+        setHasOptionsMenu(true);
 
         //set up the clustering system
         setUpClusterer();
@@ -269,6 +279,13 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         locationClient.connect();
 
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.map, menu);
+    }
+
 
     private void startPeriodicUpdates() {
         locationClient.requestLocationUpdates(locationRequest, this);
@@ -466,6 +483,22 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         return builder.build();
     }
 
+    /**
+     * Called from the FilterDialog instance when OK is tapped in order to kick off a filtered
+     * re-query.
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data contains the selected radio button index (0-2)
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == R.integer.FILTER_REQUEST && resultCode == getActivity().RESULT_OK) {
+            mSelectedFilterIndex = data.getExtras().getInt(getString(R.string.extra_filter_field));
+            reDoMarkers();
+        }
+    }
+
     /*
      * Renderer for marker clustering
      */
@@ -637,7 +670,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         @Override
         public void onClusterItemInfoWindowClick(SiteShotClusterItem item) {
             // Does nothing, but you could go into the user's profile page, for example.
-
         }
 
         // TODO determine if this does anything
@@ -819,8 +851,18 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             return;
         }
 
+        // Prepare filter variables.
+        String username = ParseUser.getCurrentUser().getUsername();
+        boolean shouldOnlyShowUndiscovered = mSelectedFilterIndex == 0;
+        boolean shouldOnlyShowDiscovered = mSelectedFilterIndex == 1;
+
         // Loop through the results of the search
         for (UserPhoto photo : objects) {
+            // Apply filter.
+            boolean isUnlocked = photo.getList("unlocked").contains(username);
+            if (shouldOnlyShowDiscovered && !isUnlocked)  { continue; }
+            if (shouldOnlyShowUndiscovered && isUnlocked)  { continue; }
+
             SiteShotClusterItem offsetItem = new SiteShotClusterItem(
                     photo.getLocation().getLatitude(),
                     photo.getLocation().getLongitude(),

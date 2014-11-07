@@ -14,19 +14,16 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.MapFragment;
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
-import com.siteshot.siteshot.fragments.CameraFragment;
+import com.siteshot.siteshot.FilterDialog;
 import com.siteshot.siteshot.R;
+import com.siteshot.siteshot.fragments.CameraFragment;
 import com.siteshot.siteshot.fragments.SiteShotMapFragment;
 
 import java.util.Locale;
@@ -39,7 +36,6 @@ import java.util.Locale;
 public class TabActivity extends Activity implements ActionBar.TabListener {
 
     public static Context c;
-    private MapFragment mapFragment;
 
     private final String TAG = TabActivity.class.getName();
     private Boolean didPerformInitialLogin = false;
@@ -100,13 +96,13 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
     ViewPager mViewPager;
 
     public Location getCurrentLocation() {
-        SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(2);
+        SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
         currentLocation = test.getCurrentLocation();
         return currentLocation;
     }
 
     public void refreshMark() {
-        SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(2);
+        SiteShotMapFragment test = (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
         test.reDoMarkers();
     }
     @Override
@@ -153,7 +149,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
-        mViewPager.setCurrentItem(2);
+        mViewPager.setCurrentItem(0);
     }
 
     @Override
@@ -175,13 +171,6 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.tab, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -194,11 +183,17 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
                 ParseUser.logOut();
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;
-
+            case R.id.action_filter:
+                SiteShotMapFragment map =
+                        (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
+                int selectedIndex = map.getSelectedFilterIndex();
+                FilterDialog dialog = new FilterDialog(selectedIndex);
+                dialog.setTargetFragment(map, R.integer.FILTER_REQUEST);
+                dialog.show(getFragmentManager(), null);
+                return true;
             case R.id.action_profile:
                 startActivity(new Intent(this, ProfileActivity.class));
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -236,22 +231,19 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
 
             switch (index) {
                 case 0:
-                    // Feed activity
-                    return new CameraFragment().newInstance(0);
+                    // Map fragment
+                    return new SiteShotMapFragment().newInstance(0);
                 case 1:
-                    // Camera activity
-                    return new FeedFragment().newInstance(1);
-                case 2:
-                    // Maps activity
-                    return new SiteShotMapFragment().newInstance(2);
+                    // Camera fragment
+                    return new CameraFragment().newInstance(1);
             }
 
             return null;
         }
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            // Show 2 total pages.
+            return 2;
         }
 
         @Override
@@ -259,48 +251,11 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return "Cam";
-                case 1:
-                    return "Feed";
-                case 2:
                     return "Map";
+                case 1:
+                    return "Cam";
             }
             return null;
         }
-    }
-
-    /**
-     * A placeholder fragment containing the feed view.
-     */
-    public static class FeedFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "feed";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static FeedFragment newInstance(int sectionNumber) {
-            FeedFragment fragment = new FeedFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-
-            return fragment;
-        }
-
-        public FeedFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.feed_fragment, container, false);
-            return rootView;
-        }
-
     }
 }

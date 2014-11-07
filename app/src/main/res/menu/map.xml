@@ -1,17 +1,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.siteshot.siteshot.activities.ProfileActivity" >
+    tools:context=".TabActivity" >
 
-    <!-- Return menu item, goes back to map activity -->
-    <item android:id="@+id/action_return"
-        android:title="Return"
+    <!-- Profile menu item -->
+    <item android:id="@+id/action_profile"
+        android:title="@+string/action_profile"
         android:orderInCategory="99"
+        app:showAsAction="never" />
+
+    <!-- Filter menu item -->
+    <item android:id="@+id/action_filter"
+        android:title="@+string/action_filter"
+        android:orderInCategory="100"
         app:showAsAction="never" />
 
     <!-- Logout menu item -->
     <item android:id="@+id/action_logout"
-        android:title="Logout"
+        android:title="@+string/action_logout"
         android:orderInCategory="100"
         app:showAsAction="never" />
 
