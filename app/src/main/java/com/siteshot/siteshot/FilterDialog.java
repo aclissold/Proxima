@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -29,7 +30,10 @@ public class FilterDialog extends DialogFragment {
                         })
                 .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Log.d(TAG, "should re-query map here");
+                        Intent intent = new Intent();
+                        intent.putExtra(getString(R.string.extra_filter_field), mSelectedItem);
+                        getTargetFragment().onActivityResult(R.integer.FILTER_REQUEST,
+                                getActivity().RESULT_OK, intent);
                     }
                 })
                 .setNegativeButton(getString(R.string.cancel), null);

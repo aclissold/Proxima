@@ -14,13 +14,11 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.MapFragment;
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
 import com.siteshot.siteshot.FilterDialog;
@@ -38,7 +36,6 @@ import java.util.Locale;
 public class TabActivity extends Activity implements ActionBar.TabListener {
 
     public static Context c;
-    private MapFragment mapFragment;
 
     private final String TAG = TabActivity.class.getName();
     private Boolean didPerformInitialLogin = false;
@@ -188,6 +185,9 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
                 return true;
             case R.id.action_filter:
                 FilterDialog dialog = new FilterDialog();
+                SiteShotMapFragment map =
+                        (SiteShotMapFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
+                dialog.setTargetFragment(map, R.integer.FILTER_REQUEST);
                 dialog.show(getFragmentManager(), "hello1e");
                 return true;
             case R.id.action_profile:

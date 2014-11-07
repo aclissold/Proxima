@@ -471,6 +471,23 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         return builder.build();
     }
 
+    /**
+     * Called from the FilterDialog instance when OK is tapped in order to kick off a filtered
+     * re-query.
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data contains the selected radio button index (0-2)
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == R.integer.FILTER_REQUEST && resultCode == getActivity().RESULT_OK) {
+            int clicked = data.getExtras().getInt(getString(R.string.extra_filter_field));
+            Log.d(TAG, "clicked " + clicked);
+            // TODO: re-query here
+        }
+    }
+
     /*
      * Renderer for marker clustering
      */
@@ -638,7 +655,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         @Override
         public void onClusterItemInfoWindowClick(SiteShotClusterItem item) {
             // Does nothing, but you could go into the user's profile page, for example.
-
         }
 
         // TODO determine if this does anything
