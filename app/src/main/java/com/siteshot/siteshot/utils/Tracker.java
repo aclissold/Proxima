@@ -23,7 +23,7 @@ public class Tracker {
         return mInstance;
     }
 
-    public void trackAppOpened(Intent intent) {
+    public void trackAppOpen(Intent intent) {
         ParseAnalytics.trackAppOpened(intent);
     }
 

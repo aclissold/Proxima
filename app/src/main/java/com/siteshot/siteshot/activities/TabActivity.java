@@ -109,7 +109,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Tracker.getInstance().trackAppOpened(getIntent());
+        Tracker.getInstance().trackAppOpen(getIntent());
 
         setContentView(R.layout.activity_tab);
 
