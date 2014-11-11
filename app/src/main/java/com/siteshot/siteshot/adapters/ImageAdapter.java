@@ -79,8 +79,6 @@ public class ImageAdapter extends BaseAdapter {
 
         imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, mWidth, mHeight, false));
 
-        imageView.setImageBitmap(bitmap);
-
         imageView.setOnClickListener(new ImageOnClickListener(object));
 
         return imageView;

@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.adapters.ListAdapter;
 import com.siteshot.siteshot.models.UserComment;
@@ -29,6 +33,11 @@ public class PhotoDetailActivity extends Activity {
     TextView mDescription;
     TextView mPostedBy;
     ListView mCommentList;
+    Button mPostButton;
+    EditText mEditComment;
+    ArrayList<UserComment> commentList = new ArrayList<UserComment>();
+    ListAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,20 +48,21 @@ public class PhotoDetailActivity extends Activity {
         mDescription = (TextView) findViewById(R.id.text_description);
         mPostedBy = (TextView) findViewById(R.id.text_posted_by);
         mCommentList = (ListView) findViewById(R.id.comment_list);
+        mPostButton = (Button) findViewById(R.id.button_post_comment);
+        mEditComment = (EditText) findViewById(R.id.edit_comment);
 
-        ArrayList<UserComment> commentList = new ArrayList<UserComment>();
-        UserComment test = new UserComment();
-        test.setComment("WOWIE");
-        test.setCreatedBy("ME");
+//        UserComment test = new UserComment();
+//        test.setComment("WOWIE");
+//        test.setCreatedBy("ME");
+//
+//        commentList.add(0, test);
+//        commentList.add(1, test);
+//        commentList.add(2, test);
+//        commentList.add(3, test);
+//        commentList.add(4, test);
 
-        commentList.add(0, test);
-        commentList.add(1, test);
-        commentList.add(2, test);
-        commentList.add(3, test);
-        commentList.add(4, test);
 
-
-        ListAdapter adapter = new ListAdapter(this, commentList);
+        adapter = new ListAdapter(this, commentList);
 
         mCommentList.setAdapter(adapter);
 
@@ -65,8 +75,33 @@ public class PhotoDetailActivity extends Activity {
 
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         mImagePhoto.setImageBitmap(bitmap);
+
+        mPostButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                String commentBody = mEditComment.getText().toString();
+                ParseUser user = ParseUser.getCurrentUser();
+                String createdBy = user.getUsername();
+                ParseFile file = (ParseFile) user.get("icon");
+
+                UserComment newComment = new UserComment();
+                newComment.setComment(commentBody);
+                newComment.setCreatedBy(createdBy);
+                if (file != null) {
+                    newComment.setIcon(file);
+                }
+                addComments(v, newComment);
+                mEditComment.setText("");
+            }
+        });
+
+
     }
 
+    public void addComments(View v, UserComment comment) {
+        commentList.add(comment);
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

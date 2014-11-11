@@ -1,6 +1,9 @@
 package com.siteshot.siteshot.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +11,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.models.UserComment;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 /**
@@ -19,10 +27,19 @@ import java.util.List;
 public class ListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private List<UserComment> mCommentList;
+    private int mWidth, mHeight;
+    private static final float SIZE_DP = 50.0f;
+    private static final String TAG = "WOW: ";
 
     public ListAdapter(Context context, List<UserComment> comments) {
         mInflater = LayoutInflater.from(context);
         mCommentList = comments;
+
+        final float scale = context.getResources().getDisplayMetrics().density;
+
+        // Adjust the width and height "constants" based on screen density.
+        mWidth = (int) (SIZE_DP * scale + 0.5f);
+        mHeight = mWidth;
     }
 
     @Override
@@ -44,6 +61,7 @@ public class ListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         ViewHolder holder;
+        Bitmap bitmap;
         
         if(convertView == null) {
             view = mInflater.inflate(R.layout.comment_list, parent, false);
@@ -58,9 +76,30 @@ public class ListAdapter extends BaseAdapter {
         }
 
         UserComment userComment = mCommentList.get(position);
-        //holder.icon.setImageBitmap(Bit);
-        holder.commenter.setText("TESTING");
-        holder.comment.setText("WOW");
+        holder.commenter.setText(userComment.getCreatedBy());
+        holder.comment.setText(userComment.getComment());
+
+        byte[] data = new byte[0];
+        try {
+            if ((userComment.getIcon() != null)) {
+                data = userComment.getIcon().getData();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (data.length != 0) {
+            BitmapFactory.Options options=new BitmapFactory.Options();
+            options.inPurgeable = true;
+            bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            holder.icon.setImageBitmap(Bitmap.createScaledBitmap(bitmap, mWidth, mHeight, false));
+        } else {
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+            bitmap = Bitmap.createBitmap(mWidth, mHeight, conf);
+            holder.icon.setImageBitmap(bitmap);
+        }
+
+        uploadComment(userComment.getCreatedBy(), userComment.getComment(), bitmap);
 
         return view;
     }
@@ -69,4 +108,27 @@ public class ListAdapter extends BaseAdapter {
         public ImageView icon;
         public TextView commenter, comment;
     }
+
+    private void uploadComment(String username, String comment, Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] data = stream.toByteArray();
+        ParseFile file = new ParseFile("userIcon.jpg", data);
+
+        ParseObject object = ParseObject.create("UserComment");
+        object.put("createdBy", username);
+        object.put("comment", comment);
+        object.put("userIcon", file);
+        object.saveInBackground(new SaveCallback() {
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d(TAG,"nice");
+                } else {
+                    Log.d(TAG,"less nice", e);
+
+                }
+            }
+        });
+    }
+
 }

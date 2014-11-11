@@ -11,7 +11,7 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_height="160dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:gravity="top"
@@ -46,8 +46,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/comment_list"
-        android:layout_below="@+id/text_posted_by"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="39dp" />
+        android:layout_below="@+id/button_post_comment" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post"
+        android:id="@+id/button_post_comment"
+        android:layout_below="@+id/text_posted_by"
+        android:layout_alignEnd="@+id/comment_list" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_comment"
+        android:layout_above="@+id/comment_list"
+        android:layout_alignParentStart="true"
+        android:hint="Tap to add a comment..."
+        android:layout_toStartOf="@+id/button_post_comment" />
 
 </RelativeLayout>
