@@ -5,6 +5,8 @@ import android.widget.Toast;
 
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.PushService;
+import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.models.UserPhoto;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
@@ -22,6 +24,7 @@ public class SiteShotApplication extends Application {
                 "KO9ARhyVQm4qlknXlnvXQsMGl2oKlCurGZxgPvQp");
 
         PhotoUtils.getInstance().downloadUserPhotos();
+        PushService.setDefaultPushCallback(this, TabActivity.class);
     }
 
     public void showShortToast(String msg) {
