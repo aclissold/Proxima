@@ -7,7 +7,7 @@ Parse.Cloud.afterSave("UserComment", function(installationId, master, object, us
 Parse.Cloud.afterSave("UserPhoto", function(request, response) {
     var userQuery = new Parse.Query(Parse.User);
     userQuery.withinKilometers("location", request.object.get("location"), 0.5);
-    userQuery.notEqualTo("username", request.user.username);
+    userQuery.notEqualTo("username", request.user.getUsername());
 
     var pushQuery = new Parse.Query(Parse.Installation);
     pushQuery.matchesQuery("user", userQuery);
