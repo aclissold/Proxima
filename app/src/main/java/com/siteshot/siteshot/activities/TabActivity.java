@@ -19,12 +19,12 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
-import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
 import com.siteshot.siteshot.FilterDialog;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.fragments.CameraFragment;
 import com.siteshot.siteshot.fragments.SiteShotMapFragment;
+import com.siteshot.siteshot.utils.Tracker;
 
 import java.util.Locale;
 
@@ -109,7 +109,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ParseAnalytics.trackAppOpened(getIntent());
+        Tracker.getInstance().trackAppOpened(getIntent());
 
         setContentView(R.layout.activity_tab);
 
@@ -180,6 +180,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
         switch (id) {
             case R.id.action_logout:
                 // Log user out of current account and create a new login activity
+                Tracker.getInstance().trackLogout(ParseUser.getCurrentUser().getUsername());
                 ParseUser.logOut();
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;

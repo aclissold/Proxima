@@ -155,6 +155,8 @@ public class PhotoUtils {
         if (description != null) { object.put("description", description); }
         object.saveInBackground();
 
+        Tracker.getInstance().trackPhotoUpload(username);
+
         return rotatedBitmap;
     }
 
@@ -182,6 +184,8 @@ public class PhotoUtils {
         object.put("unlocked", unlocked);
         object.saveInBackground(callback);
 
+        Tracker.getInstance().trackPhotoUpload(username);
+
         return rotatedBitmap;
     }
 
@@ -203,6 +207,8 @@ public class PhotoUtils {
         ParseUser user = ParseUser.getCurrentUser();
         user.put("icon", file);
         user.saveInBackground();
+
+        Tracker.getInstance().trackProfilePhotoUpload(ParseUser.getCurrentUser().getUsername());
 
         return rotatedBitmap;
     }
