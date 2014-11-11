@@ -1,7 +1,23 @@
 Parse.Cloud.afterSave("UserComment", function(installationId, master, object, user) {
-    var createdBy = object.get("createdBy");
+    var createdBy = object.createdBy;
     push("New comment from " + createdBy);
     response.success();
+});
+
+Parse.Cloud.afterSave("UserPhoto", function(request, response) {
+    var userQuery = new Parse.Query(Parse.User);
+    userQuery.withinKilometers("location", request.object.get("location"), 0.5);
+    userQuery.notEqualTo("username", request.user.username);
+
+    var pushQuery = new Parse.Query(Parse.Installation);
+    pushQuery.matchesQuery("user", userQuery);
+
+    Parse.Push.send({
+        where: pushQuery,
+        data: {
+            alert: "hello, nearby user"
+        }
+    });
 });
 
 var push = function(alert) {
