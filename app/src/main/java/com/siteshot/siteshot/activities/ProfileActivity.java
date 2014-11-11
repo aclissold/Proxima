@@ -23,6 +23,7 @@ import com.parse.ParseUser;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.adapters.ImageAdapter;
 import com.siteshot.siteshot.utils.PhotoUtils;
+import com.siteshot.siteshot.utils.Tracker;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,6 +126,7 @@ public class ProfileActivity extends Activity {
             // logout the user and redirect to login activity. finishes profile activity
             // so the user will not have previous user's profile info displayed
             case R.id.action_logout:
+                Tracker.getInstance().trackLogout(ParseUser.getCurrentUser().getUsername());
                 ParseUser.logOut();
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();

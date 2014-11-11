@@ -21,6 +21,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.siteshot.siteshot.R;
+import com.siteshot.siteshot.utils.Tracker;
 
 
 /**
@@ -103,6 +104,7 @@ public class LoginActivity extends Activity {
                 public void done(ParseUser user, ParseException e) {
                     if (e == null && user != null) {
                         showProgress(false);
+                        Tracker.getInstance().trackLogin(username);
                         finish();
                     } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
                         // don't call showProgress(false) yet
@@ -118,7 +120,7 @@ public class LoginActivity extends Activity {
         }
     }
 
-    private void attemptSignUp(String username, String password) {
+    private void attemptSignUp(final String username, String password) {
         ParseUser user = new ParseUser();
         user.setUsername(username);
         user.setPassword(password);
@@ -127,6 +129,7 @@ public class LoginActivity extends Activity {
             public void done(ParseException e) {
                 showProgress(false);
                 if (e == null) {
+                    Tracker.getInstance().trackSignup(username);
                     finish();
                 } else if (e.getCode() == ParseException.USERNAME_TAKEN) {
                     mUsernameView.setError(getString(R.string.error_username_taken));
