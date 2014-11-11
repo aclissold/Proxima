@@ -4,7 +4,9 @@ import android.app.Application;
 import android.widget.Toast;
 
 import com.parse.Parse;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.parse.PushService;
 import com.siteshot.siteshot.activities.TabActivity;
 import com.siteshot.siteshot.models.UserPhoto;
@@ -25,6 +27,12 @@ public class SiteShotApplication extends Application {
 
         PhotoUtils.getInstance().downloadUserPhotos();
         PushService.setDefaultPushCallback(this, TabActivity.class);
+        ParseUser user = ParseUser.getCurrentUser();
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        if (user != null && installation.get("user") == null) {
+            installation.put("user", user);
+            installation.saveInBackground();
+        }
     }
 
     public void showShortToast(String msg) {
