@@ -336,6 +336,11 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         }
         lastLocation = location;
 
+        // get current user's location
+        ParseUser user = ParseUser.getCurrentUser();
+        user.put("location", geoPointFromLocation(lastLocation));
+        user.saveInBackground();
+
         LatLng myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
         if (!hasSetUpInitialLocation) {
             // Zoom to the current location.
