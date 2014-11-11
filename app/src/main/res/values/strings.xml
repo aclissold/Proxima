@@ -8,6 +8,7 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_confirmation">ConfirmationActivity</string>
     <string name="title_activity_clusterView">ClusterContents</string>
+    <string name="title_activity_photo_detail">Photo Details</string>
 
     <!-- Action bar menu item titles -->
     <string name="action_settings">Settings</string>

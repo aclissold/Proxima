@@ -1,19 +1,26 @@
 package com.siteshot.siteshot.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.siteshot.siteshot.activities.PhotoDetailActivity;
+import com.siteshot.siteshot.utils.ParseProxyObject;
 import com.siteshot.siteshot.utils.PhotoUtils;
+
+import java.io.Serializable;
 
 /**
  * Adapts PhotoUtils' List of UserPhotos.
@@ -73,9 +80,26 @@ public class ImageAdapter extends BaseAdapter {
 
         imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, mWidth, mHeight, false));
 
-        imageView.setImageBitmap(bitmap);
+        imageView.setOnClickListener(new ImageOnClickListener(object));
 
         return imageView;
     }
+
+    class ImageOnClickListener implements View.OnClickListener {
+        private ParseProxyObject ppo;
+
+        public ImageOnClickListener(ParseObject userPhoto)
+        {
+            ppo = new ParseProxyObject(userPhoto);
+        }
+
+        public void onClick(View v)
+        {
+            Intent photoDetailIntent = new Intent(v.getContext(), PhotoDetailActivity.class);
+            photoDetailIntent.putExtra("userPhotoObject", ppo);
+            v.getContext().startActivity(photoDetailIntent);
+        }
+    }
+
 
 }

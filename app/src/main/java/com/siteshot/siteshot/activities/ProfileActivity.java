@@ -36,10 +36,18 @@ public class ProfileActivity extends Activity {
     public TextView mUsernameView;
     public ImageView mUserIcon;
     private final String TAG = ProfileActivity.class.getName();
+    private int mWidth, mHeight;
+    private static final float SIZE_DP = 90.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final float scale = this.getResources().getDisplayMetrics().density;
+
+        // Adjust the width and height "constants" based on screen density.
+        mWidth = (int) (SIZE_DP * scale + 0.5f);
+        mHeight = mWidth;
 
         setContentView(R.layout.activity_profile);
 
@@ -89,7 +97,7 @@ public class ProfileActivity extends Activity {
         if (resultCode == RESULT_OK) {
             String photoPath = PhotoUtils.getInstance().getCurrentPhotoPath();
             Bitmap bitmap = BitmapFactory.decodeFile(photoPath, new BitmapFactory.Options());
-            Bitmap rotatedBitmap = PhotoUtils.getInstance().uploadProfilePhoto(bitmap, profileRotate);
+            Bitmap rotatedBitmap = PhotoUtils.getInstance().uploadProfilePhoto(Bitmap.createScaledBitmap(bitmap, mWidth, mHeight, false), profileRotate);
             mUserIcon.setImageBitmap(rotatedBitmap);
         }
     }

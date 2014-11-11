@@ -50,7 +50,8 @@ public class PhotoUtils {
 
     public void downloadUserPhotos() {
         ParseQuery<UserPhoto> query = UserPhoto.getQuery();
-        // TODO: make this an ordered query
+        query.whereEqualTo("createdBy", ParseUser.getCurrentUser().getUsername());
+        query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<UserPhoto>() {
             @Override
             public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
@@ -149,6 +150,7 @@ public class PhotoUtils {
         ParseObject object = ParseObject.create("UserPhoto");
         object.put("photo", file);
         object.put("location", geoPoint);
+        object.put("createdBy", username);
         object.put("unlocked", unlocked);
         if (description != null) { object.put("description", description); }
         object.saveInBackground();
@@ -175,6 +177,7 @@ public class PhotoUtils {
         ParseObject object = ParseObject.create("UserPhoto");
         object.put("photo", file);
         object.put("location", geoPoint);
+        object.put("createdBy", username);
         object.put("description", description);
         object.put("unlocked", unlocked);
         object.saveInBackground(callback);

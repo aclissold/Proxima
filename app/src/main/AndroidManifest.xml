@@ -95,6 +95,10 @@
         </receiver>
         <!-- /push -->
 
+        <activity
+            android:name=".activities.PhotoDetailActivity"
+            android:label="@string/title_activity_photo_detail" >
+        </activity>
     </application>
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
