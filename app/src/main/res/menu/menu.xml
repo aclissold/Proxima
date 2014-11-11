@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action4"
+        android:title="test title"
+        android:orderInCategory="100"
+        app:showAsAction="never">
+
+        <menu>
+            <group android:checkableBehavior="all" >
+                <item android:id="@+id/action4_sub1"
+                    android:title="test1"
+                    android:orderInCategory="100"
+                    app:showAsAction="never" />
+
+                <item android:id="@+id/action4_sub2"
+                    android:title="test2"
+                    android:orderInCategory="100"
+                    app:showAsAction="never" />
+
+                <item android:id="@+id/action4_sub3"
+                    android:title="test3"
+                    android:orderInCategory="100"
+                    app:showAsAction="never" />
+            </group>
+        </menu>
+
+    </item>
+</menu>

@@ -19,7 +19,7 @@
         android:layout_width="89dp"
         android:layout_height="56dp"
         android:onClick="snapIt"
-        android:text="@string/Capture"
+        android:text="@string/capture"
         android:id="@+id/button_capture"
         android:layout_gravity="center_horizontal|bottom"
         android:clickable="false"
