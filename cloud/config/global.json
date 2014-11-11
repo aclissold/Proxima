@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "SiteShot": {
+            "applicationId": "1v3hMSVlhYla6NduIkhn76wlZKqH2nHJCLBNSoI0",
+            "masterKey": "QppCrISWAB6zO49NytegKuJHODnvuok2uyBqLVgW"
+        },
+        "_default": {
+            "link": "SiteShot"
+        }
+    },
+    "global": {
+        "parseVersion": "1.3.1"
+    }
+}
