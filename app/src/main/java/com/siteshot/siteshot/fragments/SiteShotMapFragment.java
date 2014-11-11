@@ -206,6 +206,8 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         // Enable the current location "blue dot".
         googleMap.setMyLocationEnabled(true);
 
+        setUpClusterer();
+
         // Set up the camera change handler.
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
@@ -218,7 +220,6 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
         setHasOptionsMenu(true);
 
         //set up the clustering system
-        setUpClusterer();
 
         return rootView;
     }
@@ -859,8 +860,11 @@ public class SiteShotMapFragment extends Fragment implements LocationListener,
             return;
         }
 
-        List<UserPhoto> objects = PhotoUtils.getInstance().updateUserPhotos();
-
+        List<UserPhoto> objects = PhotoUtils.getInstance().updateMarkerPhotos();
+        if (objects == null){
+            //do nothing until oncamerachange is called again
+            return;
+        }
         if (myUpdateNumber != mostRecentMapUpdate) {
             return;
         }

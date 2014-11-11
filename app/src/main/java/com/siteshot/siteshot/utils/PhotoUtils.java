@@ -36,6 +36,7 @@ public class PhotoUtils {
     private static PhotoUtils mInstance = null;
 
     private List<UserPhoto> mUserPhotos;
+    private List<UserPhoto> mMarkerPhotos;
     private List<UserPhoto> mClusterPhotos;
     private String mCurrentPhotoPath;
 
@@ -65,6 +66,23 @@ public class PhotoUtils {
         });
     }
 
+    public void downloadMarkerPhotos() {
+        ParseQuery<UserPhoto> query = UserPhoto.getQuery();
+        query.orderByDescending("createdAt");
+        query.findInBackground(new FindCallback<UserPhoto>() {
+            @Override
+            public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
+                if (e == null) {
+                    mMarkerPhotos = resultUserPhotos;
+                } else {
+                    Log.e(TAG, "error retrieving user photos:");
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+
     public void downloadClusterPhotos(String[] cluster) throws ParseException {
         List<String> test = Arrays.asList(cluster);
         ParseQuery<UserPhoto> clusterQuery = UserPhoto.getQuery();
@@ -93,9 +111,9 @@ public class PhotoUtils {
         return mClusterPhotos;
     }
 
-    public List<UserPhoto> updateUserPhotos() {
-        downloadUserPhotos();
-        return mUserPhotos;
+    public List<UserPhoto> updateMarkerPhotos() {
+        downloadMarkerPhotos();
+        return mMarkerPhotos;
     }
 
     public String getCurrentPhotoPath() {
