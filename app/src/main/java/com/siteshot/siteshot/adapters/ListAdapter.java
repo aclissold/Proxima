@@ -99,7 +99,6 @@ public class ListAdapter extends BaseAdapter {
             holder.icon.setImageBitmap(bitmap);
         }
 
-        uploadComment(userComment.getCreatedBy(), userComment.getComment(), bitmap);
 
         return view;
     }
@@ -109,26 +108,5 @@ public class ListAdapter extends BaseAdapter {
         public TextView commenter, comment;
     }
 
-    private void uploadComment(String username, String comment, Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] data = stream.toByteArray();
-        ParseFile file = new ParseFile("userIcon.jpg", data);
-
-        ParseObject object = ParseObject.create("UserComment");
-        object.put("createdBy", username);
-        object.put("comment", comment);
-        object.put("userIcon", file);
-        object.saveInBackground(new SaveCallback() {
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d(TAG,"nice");
-                } else {
-                    Log.d(TAG,"less nice", e);
-
-                }
-            }
-        });
-    }
 
 }

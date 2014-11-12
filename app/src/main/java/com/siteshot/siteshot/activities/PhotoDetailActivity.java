@@ -19,12 +19,14 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.siteshot.siteshot.R;
 import com.siteshot.siteshot.adapters.ListAdapter;
 import com.siteshot.siteshot.models.UserComment;
 import com.siteshot.siteshot.utils.ParseProxyObject;
 import com.siteshot.siteshot.utils.PhotoUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class PhotoDetailActivity extends Activity {
@@ -37,6 +39,8 @@ public class PhotoDetailActivity extends Activity {
     EditText mEditComment;
     ArrayList<UserComment> commentList = new ArrayList<UserComment>();
     ListAdapter adapter;
+    private static final String TAG = "WOW: ";
+
 
 
     @Override
@@ -77,6 +81,8 @@ public class PhotoDetailActivity extends Activity {
         mImagePhoto.setImageBitmap(bitmap);
 
         mPostButton.setOnClickListener(new View.OnClickListener(){
+            Bitmap bitmap;
+
             @Override
             public void onClick(View v) {
                 String commentBody = mEditComment.getText().toString();
@@ -92,11 +98,56 @@ public class PhotoDetailActivity extends Activity {
                 }
                 addComments(v, newComment);
                 mEditComment.setText("");
+
+                byte[] data = new byte[0];
+                try {
+                    if ((newComment.getIcon() != null)) {
+                        data = newComment.getIcon().getData();
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (data.length != 0) {
+                    BitmapFactory.Options options=new BitmapFactory.Options();
+                    options.inPurgeable = true;
+                    bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    } else {
+                    Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+                    bitmap =BitmapFactory.decodeByteArray(data, 0, data.length);
+
+                }
+
+                uploadComment(createdBy, commentBody, bitmap);
+
             }
         });
 
 
     }
+
+    private void uploadComment(String username, String comment, Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] data = stream.toByteArray();
+        ParseFile file = new ParseFile("userIcon.jpg", data);
+
+        ParseObject object = ParseObject.create("UserComment");
+        object.put("createdBy", username);
+        object.put("comment", comment);
+        object.put("userIcon", file);
+        object.saveInBackground(new SaveCallback() {
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d(TAG,"nice");
+                } else {
+                    Log.d(TAG,"less nice", e);
+
+                }
+            }
+        });
+    }
+
 
     public void addComments(View v, UserComment comment) {
         commentList.add(comment);
