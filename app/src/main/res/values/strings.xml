@@ -2,7 +2,7 @@
 <resources>
 
     <!-- ScootShoot -->
-    <string name="app_name">SiteShot</string>
+    <string name="app_name">Proxima</string>
 
     <!-- Activity titles -->
     <string name="title_activity_profile">ProfileActivity</string>
