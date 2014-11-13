@@ -28,6 +28,7 @@ public class ImageAdapter extends BaseAdapter {
     private static final float SIZE_DP = 90.0f;
     private Context mContext;
 
+
     public ImageAdapter(Context c) {
         mContext = c;
         final float scale = c.getResources().getDisplayMetrics().density;
@@ -83,16 +84,20 @@ public class ImageAdapter extends BaseAdapter {
 
     class ImageOnClickListener implements View.OnClickListener {
         private ParseProxyObject ppo;
+        private String selectedUserPhoto;
 
         public ImageOnClickListener(ParseObject userPhoto)
         {
             ppo = new ParseProxyObject(userPhoto);
+            selectedUserPhoto = userPhoto.getObjectId();
+
         }
 
         public void onClick(View v)
         {
             Intent photoDetailIntent = new Intent(v.getContext(), PhotoDetailActivity.class);
             photoDetailIntent.putExtra("userPhotoObject", ppo);
+            photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
             v.getContext().startActivity(photoDetailIntent);
         }
     }

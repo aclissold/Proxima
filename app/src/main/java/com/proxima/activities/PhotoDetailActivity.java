@@ -14,9 +14,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.proxima.R;
@@ -26,6 +28,8 @@ import com.proxima.utils.ParseProxyObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PhotoDetailActivity extends Activity {
 
@@ -35,10 +39,14 @@ public class PhotoDetailActivity extends Activity {
     ListView mCommentList;
     Button mPostButton;
     EditText mEditComment;
+    List<String> commentId;
+    String commentIdPlaceholder;
     ArrayList<UserComment> commentList = new ArrayList<UserComment>();
+    ArrayList<UserComment> commentListTemp = new ArrayList<UserComment>();
     ListAdapter adapter;
     private static final String TAG = "WOW: ";
-
+    String currentPhoto;
+    ArrayList<String> id = new ArrayList<String>();
 
 
     @Override
@@ -73,10 +81,11 @@ public class PhotoDetailActivity extends Activity {
         byte[] data = ppo.getParseFile("photo");
         mDescription.setText(ppo.getString("description"));
         mPostedBy.setText("Posted by: " + ppo.getString("createdBy"));
-
-
+        currentPhoto = extras.getString("currentObjectId");
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         mImagePhoto.setImageBitmap(bitmap);
+
+        reloadAdapter();
 
         mPostButton.setOnClickListener(new View.OnClickListener(){
             Bitmap bitmap;
@@ -94,7 +103,7 @@ public class PhotoDetailActivity extends Activity {
                 if (file != null) {
                     newComment.setIcon(file);
                 }
-                addComments(v, newComment);
+
                 mEditComment.setText("");
 
                 byte[] data = new byte[0];
@@ -117,6 +126,7 @@ public class PhotoDetailActivity extends Activity {
                 }
 
                 uploadComment(createdBy, commentBody, bitmap);
+                addComments(v, newComment);
 
             }
         });
@@ -130,7 +140,7 @@ public class PhotoDetailActivity extends Activity {
         byte[] data = stream.toByteArray();
         ParseFile file = new ParseFile("userIcon.jpg", data);
 
-        ParseObject object = ParseObject.create("UserComment");
+        final ParseObject object = ParseObject.create("UserComment");
         object.put("createdBy", username);
         object.put("comment", comment);
         object.put("userIcon", file);
@@ -138,12 +148,36 @@ public class PhotoDetailActivity extends Activity {
             public void done(ParseException e) {
                 if (e == null) {
                     Log.d(TAG,"nice");
+                    commentIdPlaceholder = object.getObjectId();
+                    if (commentId != null) {
+                        commentId.add(commentIdPlaceholder);
+                    }
+                    ParseObject point = ParseObject.createWithoutData("UserPhoto", currentPhoto);
+                    try {
+                        point.fetch();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    if (commentId != null) {
+
+                        point.put("userComments", commentId);
+                        point.saveInBackground();
+                    }
+                    else if (commentId == null){
+                        List listA = new ArrayList<String>();
+                        listA.add(commentIdPlaceholder);
+                        point.put("userComments", listA);
+                        point.saveInBackground();
+                    }
+
+
                 } else {
                     Log.d(TAG,"less nice", e);
-
                 }
             }
         });
+
+
     }
 
 
@@ -169,5 +203,34 @@ public class PhotoDetailActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void reloadAdapter(){
+        ParseObject current = ParseObject.createWithoutData("UserPhoto", currentPhoto);
+        try {
+            current.fetch();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        commentId = current.getList("userComments");
+        if (commentId != null) {
+            //List<List<String>> test = Arrays.asList(commentId);
+            ParseQuery<UserComment> query = UserComment.getQuery();
+            query.whereContainedIn("objectId", commentId);
+            query.orderByAscending("createdAt");
+            query.findInBackground(new FindCallback<UserComment>() {
+                @Override
+                public void done(List<UserComment> resultUserComments, ParseException e) {
+                    if (e == null) {
+                        commentList.addAll(resultUserComments);
+                    } else {
+                        Log.e(TAG, "error retrieving user photos:");
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
     }
 }
