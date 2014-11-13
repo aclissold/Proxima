@@ -27,7 +27,9 @@ public class ProximaApplication extends Application {
         Parse.initialize(this, "1v3hMSVlhYla6NduIkhn76wlZKqH2nHJCLBNSoI0",
                 "KO9ARhyVQm4qlknXlnvXQsMGl2oKlCurGZxgPvQp");
 
-        PhotoUtils.getInstance().downloadUserPhotos();
+        if (ParseUser.getCurrentUser() != null) {
+            PhotoUtils.getInstance().downloadUserPhotos();
+        }
         PushService.setDefaultPushCallback(this, TabActivity.class);
         ParseUser user = ParseUser.getCurrentUser();
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
