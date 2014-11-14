@@ -338,6 +338,7 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
         // get current user's location
         ParseUser user = ParseUser.getCurrentUser();
+        if (user == null) return;
         user.put("location", geoPointFromLocation(lastLocation));
         user.saveInBackground();
 
