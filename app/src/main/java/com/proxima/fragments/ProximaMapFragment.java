@@ -40,11 +40,13 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.proxima.R;
 import com.proxima.activities.ClusterViewActivity;
+import com.proxima.activities.PhotoDetailActivity;
 import com.proxima.activities.TabActivity;
 import com.proxima.adapters.CustomAdapterForClusters;
 import com.proxima.adapters.CustomAdapterForItems;
 import com.proxima.models.ProximaClusterItem;
 import com.proxima.models.UserPhoto;
+import com.proxima.utils.ParseProxyObject;
 import com.proxima.utils.PhotoUtils;
 
 import java.util.ArrayList;
@@ -675,7 +677,17 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
          */
         @Override
         public void onClusterItemInfoWindowClick(ProximaClusterItem item) {
-            // Does nothing, but you could go into the user's profile page, for example.
+            ParseProxyObject ppo;
+            String selectedUserPhoto;
+           // Does nothing, but you could go into the user's profile page, for example.
+            UserPhoto phoot = item.getUserPhoto();
+            ppo = new ParseProxyObject(phoot);
+            selectedUserPhoto = phoot.getObjectId();
+
+            Intent photoDetailIntent = new Intent(getActivity(), PhotoDetailActivity.class);
+            photoDetailIntent.putExtra("userPhotoObject", ppo);
+            photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
+            getActivity().startActivity(photoDetailIntent);
         }
 
         // TODO determine if this does anything
@@ -726,6 +738,8 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
                     UserPhoto photoToRemove = null;
                     List<UserPhoto> photos = PhotoUtils.getInstance().getUserPhotos();
                     for (UserPhoto photo : photos) {
+                        while (photos == null){
+                        }
                         if (photo.getObjectId().equals(phoot.getObjectId())) {
                             photoToRemove = photo;
                         }
