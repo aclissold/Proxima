@@ -168,6 +168,7 @@ public class PhotoDetailActivity extends Activity {
                         listA.add(commentIdPlaceholder);
                         point.put("userComments", listA);
                         point.saveInBackground();
+                        commentId = listA;
                     }
 
 
