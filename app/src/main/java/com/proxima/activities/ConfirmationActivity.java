@@ -1,11 +1,11 @@
 package com.proxima.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +26,7 @@ import com.proxima.utils.PhotoUtils;
  * Upload Activity for the app, displays a preview of a taken photo, asks user to add comment,
  * and then allows user to post to Parse or cancel the post.
  */
-public class ConfirmationActivity extends Activity {
+public class ConfirmationActivity extends ActionBarActivity {
 
     Button mPostButton;
     Button mCancelButton;

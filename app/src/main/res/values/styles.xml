@@ -1,8 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="ProximaTheme" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/bunny_pink</item>
+        <item name="colorPrimaryDark">@color/dark_bunny_pink</item>
+        <item name="colorAccent">@color/eggshell</item>
+        <item name="android:textColorPrimary">@color/inverted_eggshell</item>
+        <item name="android:windowBackground">@color/eggshell</item>
     </style>
 
 </resources>

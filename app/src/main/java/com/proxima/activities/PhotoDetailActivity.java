@@ -1,9 +1,9 @@
 package com.proxima.activities;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +27,7 @@ import com.proxima.utils.ParseProxyObject;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
-public class PhotoDetailActivity extends Activity {
+public class PhotoDetailActivity extends ActionBarActivity {
 
     ImageView mImagePhoto;
     TextView mDescription;
