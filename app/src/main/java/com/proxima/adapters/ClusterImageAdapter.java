@@ -1,6 +1,7 @@
 package com.proxima.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -16,6 +17,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.proxima.R;
 import com.proxima.activities.ClusterViewActivity;
+import com.proxima.activities.PhotoDetailActivity;
+import com.proxima.utils.ParseProxyObject;
 import com.proxima.utils.PhotoUtils;
 
 import java.util.List;
@@ -164,7 +167,27 @@ public class ClusterImageAdapter extends BaseAdapter {
             imageView2.setImageBitmap(bitmap2);
         }
 
+        imageView.setOnClickListener(new ImageOnClickListener(object));
         return grid;
+    }
+    class ImageOnClickListener implements View.OnClickListener {
+        private ParseProxyObject ppo;
+        private String selectedUserPhoto;
+
+        public ImageOnClickListener(ParseObject userPhoto)
+        {
+            ppo = new ParseProxyObject(userPhoto);
+            selectedUserPhoto = userPhoto.getObjectId();
+
+        }
+
+        public void onClick(View v)
+        {
+            Intent photoDetailIntent = new Intent(v.getContext(), PhotoDetailActivity.class);
+            photoDetailIntent.putExtra("userPhotoObject", ppo);
+            photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
+            v.getContext().startActivity(photoDetailIntent);
+        }
     }
 
 }
