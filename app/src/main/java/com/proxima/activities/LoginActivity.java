@@ -3,9 +3,9 @@ package com.proxima.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -28,7 +28,7 @@ import com.proxima.utils.Tracker;
  * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/11/14.
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity {
+public class LoginActivity extends ActionBarActivity {
 
     private final String TAG = LoginActivity.class.getName();
 

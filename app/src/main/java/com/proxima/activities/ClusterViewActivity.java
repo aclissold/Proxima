@@ -1,7 +1,7 @@
 package com.proxima.activities;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.widget.GridView;
 
 import com.proxima.R;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 /**
  * Created by Jonathan on 11/2/2014.
  */
-public class ClusterViewActivity extends Activity {
+public class ClusterViewActivity extends ActionBarActivity {
 
     int count;
     String currentUser;

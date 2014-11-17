@@ -1,17 +1,18 @@
 package com.proxima.activities;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBar.Tab;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.MenuItem;
@@ -33,7 +34,7 @@ import java.util.Locale;
  * Main Activity for the app, creates three fragments for each of the three tabs. The three
  * tabs/fragments are feed, camera
  */
-public class TabActivity extends Activity implements ActionBar.TabListener {
+public class TabActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     public static Context c;
 
@@ -117,7 +118,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
 
 
         // Set up the action bar.
-        final ActionBar actionBar = getActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Create the adapter that will return a fragment for each of the three
@@ -209,11 +210,11 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
     }
 
     @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    public void onTabUnselected(Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
     @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    public void onTabReselected(Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
 

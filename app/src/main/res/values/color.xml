@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Temporary color palette -->
+    <color name="bunny_pink">#fec9f5</color>
+    <color name="dark_bunny_pink">#feb0f1</color>
+    <color name="eggshell">#ebebeb</color>
+    <color name="inverted_eggshell">#202020</color>
+</resources>

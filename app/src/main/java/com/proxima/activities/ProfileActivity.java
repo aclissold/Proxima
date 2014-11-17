@@ -1,12 +1,12 @@
 package com.proxima.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,7 +32,7 @@ import java.io.IOException;
  * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/25/14.
  * Activity that displays user profile, user album, user settings
  */
-public class ProfileActivity extends Activity {
+public class ProfileActivity extends ActionBarActivity {
 
     public TextView mUsernameView;
     public ImageView mUserIcon;
