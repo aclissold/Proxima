@@ -539,17 +539,17 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             String username = ParseUser.getCurrentUser().getUsername();
             if (unlocked != null && unlocked.contains(username)) {
                     markerOptions.title("Unlocked")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.d_photo_mark));
             } else if (markerPoint.distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
                     / METERS_PER_KILOMETER) {
                 // Display a gray marker with a predefined title and no snippet.
                 markerOptions.title(getResources().getString(R.string.post_out_of_range)).icon(
-                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+                        BitmapDescriptorFactory.fromResource(R.drawable.o_range_photo_mark));
                 // TODO: change cyan to gray after implementing custom marker icons
             } else {
                 // Display a green marker with the post information.
                 markerOptions.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ud_photo_mark));
             }
 
         }
@@ -571,12 +571,12 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
                     / METERS_PER_KILOMETER) {
                 // Display a gray marker with a predefined title and no snippet.
                 markerOptions.title(getResources().getString(R.string.post_out_of_range)).icon(
-                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+                        BitmapDescriptorFactory.fromResource(R.drawable.o_range_cluster_mark));
                 // TODO: change cyan to gray after implementing custom marker icons
             } else {
                 // Display a green marker with the post information.
                 markerOptions.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.d_cluster_mark));
             }
 
         }
