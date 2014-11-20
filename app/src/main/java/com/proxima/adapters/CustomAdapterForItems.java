@@ -31,18 +31,24 @@ public class CustomAdapterForItems implements GoogleMap.InfoWindowAdapter {
     @Override
     public View getInfoContents(Marker marker) {
         View view = owner.getActivity().getLayoutInflater().inflate(R.layout.info_window, null);
-        ImageView imageView = (ImageView) view.findViewById(R.id.imageView2);
-        ParseFile file = owner.mClickedClusterItem.getUserPhoto().getPhoto();
-        Bitmap bitmap = null;
-        try {
-            byte[] data = file.getData();
-            bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        } catch (ParseException e) {
-            Log.e(TAG, "error getting user photo bytes");
-            e.printStackTrace();
+        if (owner.unlockFlag) {
+            ImageView imageView = (ImageView) view.findViewById(R.id.imageView2);
+            ParseFile file = owner.mClickedClusterItem.getUserPhoto().getPhoto();
+            Bitmap bitmap = null;
+            try {
+                byte[] data = file.getData();
+                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            } catch (ParseException e) {
+                Log.e(TAG, "error getting user photo bytes");
+                e.printStackTrace();
+            }
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+            }
         }
-        if (bitmap != null) {
-            imageView.setImageBitmap(bitmap);
+        else {
+            ImageView imageView = (ImageView) view.findViewById(R.id.imageView2);
+            imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.drawable.locked));
         }
         return view;
     }

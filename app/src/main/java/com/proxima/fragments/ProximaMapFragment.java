@@ -699,7 +699,7 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             if (unlocked.contains(username)) {
                 unlockFlag = true;
             }
-            else if (unlocked.contains(username)){
+            else {
                 unlockFlag = false;
             }
         }
