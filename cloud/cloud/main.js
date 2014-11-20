@@ -8,8 +8,9 @@ Parse.Cloud.afterSave("UserPhoto", function(request, response) {
     if (request.object.existed()) { return; }
 
     var userQuery = new Parse.Query(Parse.User);
+    username = request.user.getUsername();
     userQuery.withinKilometers("location", request.object.get("location"), 0.5);
-    userQuery.notEqualTo("username", request.user.getUsername());
+    userQuery.notEqualTo("username", username);
 
     var pushQuery = new Parse.Query(Parse.Installation);
     pushQuery.matchesQuery("user", userQuery);
@@ -17,7 +18,7 @@ Parse.Cloud.afterSave("UserPhoto", function(request, response) {
     Parse.Push.send({
         where: pushQuery,
         data: {
-            alert: "hello, nearby user"
+            alert: username + " just posted a new photo near you!"
         }
     });
 });
