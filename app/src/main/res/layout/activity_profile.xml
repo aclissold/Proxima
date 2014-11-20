@@ -49,7 +49,7 @@
         android:numColumns="auto_fit"
         android:verticalSpacing="5dp"
         android:horizontalSpacing="5dp"
-        android:stretchMode="columnWidth"
+        android:stretchMode="spacingWidthUniform"
         android:gravity="center"
         android:textFilterEnabled="false"
         android:layout_below="@+id/profile_user_name"

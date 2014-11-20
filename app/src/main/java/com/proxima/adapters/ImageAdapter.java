@@ -5,15 +5,16 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.proxima.R;
 import com.proxima.activities.PhotoDetailActivity;
 import com.proxima.utils.ParseProxyObject;
 import com.proxima.utils.PhotoUtils;
@@ -54,14 +55,14 @@ public class ImageAdapter extends BaseAdapter {
     // create a new ImageView for each item referenced by the Adapter
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
         if (convertView == null) {
-            imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(mWidth, mHeight));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        } else {
-            imageView = (ImageView) convertView;
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View cardView = inflater.inflate(R.layout.grid_image, null, false);
+            convertView = cardView;
         }
+
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.image);
+//        imageView.setLayoutParams(new CardView.LayoutParams(mWidth, mHeight));
 
         // Retrieve the photo data from the UserPhoto instance.
         ParseObject object = PhotoUtils.getInstance().getUserPhotos().get(position);
@@ -79,7 +80,7 @@ public class ImageAdapter extends BaseAdapter {
 
         imageView.setOnClickListener(new ImageOnClickListener(object));
 
-        return imageView;
+        return convertView;
     }
 
     class ImageOnClickListener implements View.OnClickListener {
