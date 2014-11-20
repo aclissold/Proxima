@@ -109,7 +109,13 @@ public class LoginActivity extends ActionBarActivity {
                     } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
                         // don't call showProgress(false) yet
                         // Either username not found or password wrong; try creating a user
-                        attemptSignUp(username, password);
+                        if (TextUtils.isEmpty(mConfirmPasswordView.getText().toString())) {
+                            showProgress(false);
+                            mConfirmPasswordView.setError(getString(R.string.error_field_required));
+                            mConfirmPasswordView.requestFocus();
+                        } else {
+                            attemptSignUp(username, password);
+                        }
                     } else {
                         showProgress(false);
                         mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -164,11 +170,6 @@ public class LoginActivity extends ActionBarActivity {
         if (TextUtils.isEmpty(password)) {
             mPasswordView.setError(getString(R.string.error_field_required));
             mFocusView = mPasswordView;
-            return false;
-        }
-        if (TextUtils.isEmpty(confirmPassword)) {
-            mConfirmPasswordView.setError(getString(R.string.error_field_required));
-            mFocusView = mConfirmPasswordView;
             return false;
         }
 

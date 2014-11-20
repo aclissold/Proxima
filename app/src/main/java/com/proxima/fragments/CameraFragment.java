@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.parse.ParseUser;
 import com.proxima.R;
 import com.proxima.activities.ConfirmationActivity;
 import com.proxima.activities.TabActivity;
@@ -217,6 +218,13 @@ public class CameraFragment extends Fragment {
         super.onResume();
 
         TabActivity activity = (TabActivity) getActivity();
+        if (activity == null || ParseUser.getCurrentUser() == null) {
+            // The user got here by hitting back without being logged in; continue the expected
+            // behavior of finishing back to the launcher.
+            Log.d(TAG, "finishing activity due to unexpected onResume call");
+            getActivity().finish();
+            return;
+        }
         activity.refreshMark();
 
         View newView = getActivity().findViewById(R.id.camera_preview);
