@@ -94,6 +94,8 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
     // Flag to determine if a marker should be unlocked
     public boolean unlockFlag;
 
+    boolean cameraChangeFlag;
+
 
     /*
      * Google Play services connection variables
@@ -213,7 +215,12 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
                 // When the camera changes, reconfigure the map.
-                reDoMarkers();
+                if (cameraChangeFlag == false) {
+                    reDoMarkers();
+                }
+                if (cameraChangeFlag == true) {
+                    cameraChangeFlag = false;
+                }
             }
         });
 
@@ -518,7 +525,10 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         // TODO see if this works
         public void onCameraChange(CameraPosition position) {
             // When the camera changes, reconfigure the map.
-            refreshMarkers();
+            if (cameraChangeFlag == false) {
+                refreshMarkers();
+
+            }
         }
 
         /*
@@ -602,6 +612,7 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
          */
         @Override
         public boolean onClusterClick(Cluster<ProximaClusterItem> cluster) {
+            cameraChangeFlag = true;
             // get the clicked cluster
             mClickedCluster = cluster;
             // get the size of the cluster
@@ -659,6 +670,8 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
          */
         @Override
         public boolean onClusterItemClick(ProximaClusterItem item) {
+            // set cameraChange flag to true to prevent redraw on marker centering
+            cameraChangeFlag = true;
             // get the clicked marker
             mClickedClusterItem = item;
             // unlock the marker
@@ -679,18 +692,20 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         public void onClusterItemInfoWindowClick(ProximaClusterItem item) {
             ParseProxyObject ppo;
             String selectedUserPhoto;
-           // Does nothing, but you could go into the user's profile page, for example.
-            UserPhoto phoot = item.getUserPhoto();
-            ppo = new ParseProxyObject(phoot);
-            selectedUserPhoto = phoot.getObjectId();
+            // Does nothing, but you could go into the user's profile page, for example.
+            if (unlockFlag) {
+                UserPhoto phoot = item.getUserPhoto();
+                ppo = new ParseProxyObject(phoot);
+                selectedUserPhoto = phoot.getObjectId();
 
-            Intent photoDetailIntent = new Intent(getActivity(), PhotoDetailActivity.class);
-            photoDetailIntent.putExtra("userPhotoObject", ppo);
-            photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
-            getActivity().startActivity(photoDetailIntent);
+                Intent photoDetailIntent = new Intent(getActivity(), PhotoDetailActivity.class);
+                photoDetailIntent.putExtra("userPhotoObject", ppo);
+                photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
+                getActivity().startActivity(photoDetailIntent);
+            }
         }
 
-        // TODO determine if this does anything
+
         private void displayItem(ProximaClusterItem item) {
             UserPhoto phoot = item.getUserPhoto();
             String username = ParseUser.getCurrentUser().getUsername();
@@ -760,6 +775,7 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
                 unlockFlag = false;
             }
             }
+
         }
 
         /*
@@ -860,7 +876,7 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
     public void refreshMarkers() {
         mClusterManager.clearItems();
         addItems();
-        //mClusterManager.cluster();
+
     }
 
     /*

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -38,17 +39,22 @@ public class CustomAdapterForItems implements GoogleMap.InfoWindowAdapter {
             try {
                 byte[] data = file.getData();
                 bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                bitmap = Bitmap.createScaledBitmap(bitmap, 150, 200, false);
             } catch (ParseException e) {
                 Log.e(TAG, "error getting user photo bytes");
                 e.printStackTrace();
             }
             if (bitmap != null) {
                 imageView.setImageBitmap(bitmap);
+                TextView txtV = (TextView) view.findViewById(R.id.textView);
+                txtV.setText("Discovered");
             }
         }
         else {
             ImageView imageView = (ImageView) view.findViewById(R.id.imageView2);
             imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.drawable.locked));
+            TextView txtV = (TextView) view.findViewById(R.id.textView);
+            txtV.setText("Undiscovered");
         }
         return view;
     }
