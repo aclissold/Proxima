@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,7 @@ import java.io.IOException;
 public class ProfileActivity extends ActionBarActivity {
 
     public TextView mUsernameView;
+    public CardView mUserIconCard;
     public ImageView mUserIcon;
     private final String TAG = ProfileActivity.class.getName();
     private int mWidth, mHeight;
@@ -53,12 +55,13 @@ public class ProfileActivity extends ActionBarActivity {
         setContentView(R.layout.activity_profile);
 
         mUsernameView = (TextView) findViewById(R.id.profile_username);
+        mUserIconCard = (CardView) findViewById(R.id.profile_user_icon_card);
         mUserIcon = (ImageView) findViewById(R.id.profile_user_icon);
         mUsernameView.setText(ParseUser.getCurrentUser().getUsername());
         GridView photoGrid = (GridView) findViewById(R.id.profile_photo_grid);
         photoGrid.setAdapter(new ImageAdapter(this));
 
-        mUserIcon.setOnClickListener(new View.OnClickListener() {
+        mUserIconCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dispatchTakePictureIntent();
