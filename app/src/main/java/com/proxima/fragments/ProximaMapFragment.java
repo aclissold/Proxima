@@ -1,6 +1,7 @@
 package com.proxima.fragments;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -95,6 +97,8 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
     public boolean unlockFlag;
 
     boolean cameraChangeFlag;
+
+    boolean ignoreInfoWindow;
 
 
     /*
@@ -612,7 +616,10 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
          */
         @Override
         public boolean onClusterClick(Cluster<ProximaClusterItem> cluster) {
+
             cameraChangeFlag = true;
+
+            ignoreInfoWindow = false;
             // get the clicked cluster
             mClickedCluster = cluster;
             // get the size of the cluster
@@ -620,6 +627,15 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             // unlock any markers in the cluster
             unlockClusterIfNeeded(cluster);
             // Center on the tapped marker and show its info window.
+            if (ignoreInfoWindow){
+                Context context = getActivity();
+                CharSequence text = "You have discovered photos in this cluster";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                return true;
+            }
             return false;
         }
 
@@ -680,7 +696,16 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             // TODO determine if this method does anything
             displayItem(item);
 
-            // Center on the tapped marker and show its info window.
+            // Center on the tapped marker and show its info window if nothing was unlocked.
+            if (ignoreInfoWindow){
+                Context context = getActivity();
+                CharSequence text = "You have discovered a photo";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                return true;
+            }
             return false;
         }
 
@@ -725,6 +750,7 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         private void unlockClusterIfNeeded(Cluster<ProximaClusterItem> cluster){
 
             Iterator itr;
+
             itr = cluster.getItems().iterator();
             while (itr.hasNext()){
                 Object element = itr.next();
@@ -769,10 +795,12 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
                     // Re-draw the cluster items.
                     reDoMarkers();
+                    ignoreInfoWindow = true;
                 }
             }
             else {
                 unlockFlag = false;
+
             }
             }
 
@@ -782,6 +810,7 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
          * Unlock a single marker if necessary
          */
         private void unlockItemIfNeeded(ProximaClusterItem item) {
+            ignoreInfoWindow = false;
             double latitude = item.getPosition().latitude;
             double longitude = item.getPosition().longitude;
             ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
@@ -821,10 +850,12 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
                     // Re-draw the cluster items.
                     reDoMarkers();
+                    ignoreInfoWindow = true;
                 }
             }
             else {
                 unlockFlag = false;
+
             }
         }
     }
