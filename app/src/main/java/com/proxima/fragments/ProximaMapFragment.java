@@ -559,7 +559,6 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
                 // Display a gray marker with a predefined title and no snippet.
                 markerOptions.title(getResources().getString(R.string.post_out_of_range)).icon(
                         BitmapDescriptorFactory.fromResource(R.drawable.o_range_photo_mark));
-                // TODO: change cyan to gray after implementing custom marker icons
             } else {
                 // Display a green marker with the post information.
                 markerOptions.title("TODO: Image thumbnail")//.snippet(photo.getUser().getUsername())
