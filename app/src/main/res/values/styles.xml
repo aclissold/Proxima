@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="ProximaTheme" parent="Theme.AppCompat.Light">
-        <item name="colorPrimary">@color/bunny_pink</item>
-        <item name="colorPrimaryDark">@color/dark_bunny_pink</item>
-        <item name="colorAccent">@color/eggshell</item>
-        <item name="android:textColorPrimary">@color/inverted_eggshell</item>
-        <item name="android:windowBackground">@color/eggshell</item>
+    <style name="ProximaTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/light_blue</item>
+        <item name="colorPrimaryDark">@color/dark_light_blue</item>
+        <item name="colorAccent">@color/deep_orange</item>
+        <item name="android:windowBackground">@color/faint_light_blue</item>
     </style>
 
 </resources>
