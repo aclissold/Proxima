@@ -36,7 +36,6 @@
     <string name="extra_filter_field">FILTER_FIELD</string>
 
     <!-- Miscellaneous -->
-    <string name="capture">Capture</string> <!-- TODO: remove when a new capture button exists -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
