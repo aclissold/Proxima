@@ -5,9 +5,9 @@
     <string name="app_name">Proxima</string>
 
     <!-- Activity titles -->
-    <string name="title_activity_profile">ProfileActivity</string>
-    <string name="title_activity_confirmation">ConfirmationActivity</string>
-    <string name="title_activity_clusterView">ClusterContents</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="title_activity_confirmation">Add Comment</string>
+    <string name="title_activity_clusterView">Cluster Contents</string>
     <string name="title_activity_photo_detail">Photo Details</string>
 
     <!-- Action bar menu item titles -->
