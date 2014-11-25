@@ -18,6 +18,7 @@
     android:layout_height="match_parent"
      android:id="@+id/imageView2"
      android:layout_gravity="center_horizontal"
-     android:layout_weight="0.24" />
+     android:layout_weight="0.24"
+     android:layout_marginBottom="30dp"/>
 
 </LinearLayout>
