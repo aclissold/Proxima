@@ -12,20 +12,21 @@
         android:layout_row="1"
         android:layout_column="1">
 
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:onClick="snapIt"
-            android:id="@+id/button_capture"
-            android:layout_gravity="center_horizontal|bottom"
-            android:clickable="false"
-            android:foreground="@drawable/shutter"
-            android:background="@drawable/shutter"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="20dp" />
     </FrameLayout>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:onClick="snapIt"
+        android:id="@+id/button_capture"
+        android:layout_gravity="center_horizontal|bottom"
+        android:clickable="false"
+        android:foreground="@drawable/shutter"
+        android:background="@drawable/shutter"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
