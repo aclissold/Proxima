@@ -36,6 +36,8 @@
         android:foreground="@drawable/rotate"
         android:layout_gravity="left|bottom"
         android:layout_alignParentEnd="false"
-        android:layout_alignParentStart="false" />
+        android:layout_alignParentStart="false"
+        android:background="@drawable/proxima_flip_arrow"
+        android:layout_margin="10dp" />
 
 </RelativeLayout>
