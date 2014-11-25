@@ -52,7 +52,7 @@ public class CustomAdapterForItems implements GoogleMap.InfoWindowAdapter {
         }
         else {
             ImageView imageView = (ImageView) view.findViewById(R.id.imageView2);
-            imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.drawable.locked));
+            imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.drawable.proxima_cluster_undiscovered));
             TextView txtV = (TextView) view.findViewById(R.id.textView);
             txtV.setText("Undiscovered");
         }
