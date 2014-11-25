@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.proxima.R;
 import com.proxima.activities.ClusterViewActivity;
 import com.proxima.activities.PhotoDetailActivity;
@@ -170,7 +171,6 @@ public class ClusterImageAdapter extends BaseAdapter {
             imageView2 = (ImageView)grid.findViewById(R.id.badge);
             imageView2.setImageBitmap(bitmap2);
         }
-        unlocked = unlockedFlag;
 
         imageView.setOnClickListener(new ImageOnClickListener(object));
         return grid;
@@ -178,20 +178,35 @@ public class ClusterImageAdapter extends BaseAdapter {
     class ImageOnClickListener implements View.OnClickListener {
         private ParseProxyObject ppo;
         private String selectedUserPhoto;
+        private String currentUser;
+
+        private ParseObject unlockCheck;
+        List<String> unlockedUser;
+
 
         public ImageOnClickListener(ParseObject userPhoto)
         {
             ppo = new ParseProxyObject(userPhoto);
             selectedUserPhoto = userPhoto.getObjectId();
+            unlockCheck = userPhoto;
 
         }
 
         public void onClick(View v)
         {
+            currentUser = ParseUser.getCurrentUser().getUsername();
+            unlockedUser = unlockCheck.getList("unlocked");
+            for(String s : unlockedUser){
+                if (currentUser.equals(s)) {
+                    unlocked = true;
+                }
+            }
+
             if (unlocked) {
                 Intent photoDetailIntent = new Intent(v.getContext(), PhotoDetailActivity.class);
                 photoDetailIntent.putExtra("userPhotoObject", ppo);
                 photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
+                unlocked = false;
                 v.getContext().startActivity(photoDetailIntent);
             }
             else {

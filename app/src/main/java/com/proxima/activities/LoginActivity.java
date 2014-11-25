@@ -24,10 +24,11 @@ import com.proxima.R;
 import com.proxima.utils.Tracker;
 
 
-/**
- * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/11/14.
- * A login screen that offers login via email/password.
- */
+//
+// Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/11/14.
+// A login screen that offers login via email/password.
+//
+// Recent Version: 11/25/14
 public class LoginActivity extends ActionBarActivity {
 
     private final String TAG = LoginActivity.class.getName();
@@ -74,7 +75,7 @@ public class LoginActivity extends ActionBarActivity {
     }
 
     /**
-     * Attempts to sign in or register the account specified by the login form.
+     * Attempts to sign in the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
@@ -126,6 +127,11 @@ public class LoginActivity extends ActionBarActivity {
         }
     }
 
+    /**
+     * Attempts to register the account specified by the login form.
+     * If there are form errors (invalid email, missing fields, etc.), the
+     * errors are presented and no actual login attempt is made.
+     */
     private void attemptSignUp(final String username, String password) {
         ParseUser user = new ParseUser();
         user.setUsername(username);

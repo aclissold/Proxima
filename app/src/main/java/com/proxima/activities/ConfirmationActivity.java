@@ -21,39 +21,44 @@ import com.parse.SaveCallback;
 import com.proxima.R;
 import com.proxima.utils.PhotoUtils;
 
-/**
- * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/16/14.
- * Upload Activity for the app, displays a preview of a taken photo, asks user to add comment,
- * and then allows user to post to Parse or cancel the post.
- */
+//
+// Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/16/14.
+// Upload Activity for the app, displays a preview of a taken photo, asks user to add comment,
+// and then allows user to post to Parse or cancel the post.
+//
+// Recent Version: 11/25/14
 public class ConfirmationActivity extends ActionBarActivity {
 
+    // variables for UI interface
     Button mPostButton;
     Button mCancelButton;
     ImageView mImageView;
     EditText mDescriptionEditText;
+
     private final String TAG = getClass().getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // set UI
         setContentView(R.layout.activity_confirmation);
 
         mPostButton = (Button) findViewById(R.id.button_post);
         mCancelButton = (Button) findViewById(R.id.button_cancel);
         mDescriptionEditText = (EditText) findViewById(R.id.edit_text);
         mImageView = (ImageView) findViewById(R.id.imageView);
+
         // get extras containing photo data and rotate flag
         Bundle extras = getIntent().getExtras();
         byte[] photo = extras.getByteArray("data");
         Boolean rotateFlag = extras.getBoolean("rotateFlag");
+
         // convert photo data to bitmap rotate it and display it
         Bitmap previewPhoto = BitmapFactory.decodeByteArray(photo, 0, photo.length);
         previewPhoto = PhotoUtils.getInstance().rotatePreview(previewPhoto, rotateFlag);
         mImageView.setImageBitmap(previewPhoto);
 
-
-
+        // click listener for cancel button, exits the confirmation activity
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,6 +66,7 @@ public class ConfirmationActivity extends ActionBarActivity {
             }
         });
 
+        // click listener for the post button, posts the photo to Parse
         mPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,7 +80,7 @@ public class ConfirmationActivity extends ActionBarActivity {
                 byte[] data = extras.getByteArray("data");
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
 
-                // Upload the photo.
+                // Upload the photo
                 PhotoUtils.getInstance().uploadPhoto(data, geoPoint, description, rotateFlag,
                         new SaveCallback() {
                             @Override
@@ -94,7 +100,6 @@ public class ConfirmationActivity extends ActionBarActivity {
             }
         });
     }
-
 
 
     @Override

@@ -31,8 +31,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+//
+// Created by Andrew Clissold, Rachel Glomski, and Jonathan Wong on 11/2/2014.
+// Activity to view photos in a map cluster, sets a photo grid which is then
+// populated by the the photos in the cluster
+//
+// Recent Version: 11/25/14
 public class PhotoDetailActivity extends ActionBarActivity {
 
+    // UI references
     ImageView mImagePhoto;
     TextView mDescription;
     TextView mPostedBy;
@@ -52,6 +59,8 @@ public class PhotoDetailActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // set UI
         setContentView(R.layout.activity_photo_detail);
 
         mImagePhoto = (ImageView) findViewById(R.id.image_photo);
@@ -61,17 +70,7 @@ public class PhotoDetailActivity extends ActionBarActivity {
         mPostButton = (Button) findViewById(R.id.button_post_comment);
         mEditComment = (EditText) findViewById(R.id.edit_comment);
 
-//        UserComment test = new UserComment();
-//        test.setComment("WOWIE");
-//        test.setCreatedBy("ME");
-//
-//        commentList.add(0, test);
-//        commentList.add(1, test);
-//        commentList.add(2, test);
-//        commentList.add(3, test);
-//        commentList.add(4, test);
-
-
+        // set list adapter
         adapter = new ListAdapter(this, commentList);
 
         mCommentList.setAdapter(adapter);
@@ -90,6 +89,7 @@ public class PhotoDetailActivity extends ActionBarActivity {
         mPostButton.setOnClickListener(new View.OnClickListener(){
             Bitmap bitmap;
 
+            //
             @Override
             public void onClick(View v) {
                 String commentBody = mEditComment.getText().toString();
@@ -130,14 +130,13 @@ public class PhotoDetailActivity extends ActionBarActivity {
 
             }
         });
-
-
     }
 
     private void uploadComment(String username, String comment, Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] data = stream.toByteArray();
+
         ParseFile file = new ParseFile("userIcon.jpg", data);
 
         final ParseObject object = ParseObject.create("UserComment");
@@ -206,7 +205,9 @@ public class PhotoDetailActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // reload the comment data for the list adapter to update the comment list
     public void reloadAdapter(){
+        // get the current UserPhoto object
         ParseObject current = ParseObject.createWithoutData("UserPhoto", currentPhoto);
         try {
             current.fetch();
@@ -214,9 +215,12 @@ public class PhotoDetailActivity extends ActionBarActivity {
             e.printStackTrace();
         }
 
+        // get the list of user comments associated with the current UserPhoto
         commentId = current.getList("userComments");
+
+        // if the current list of comment id's is not null, retrieve the user comments
+        // from Parse and update the list of user comments used by the adapter with any new comments added
         if (commentId != null) {
-            //List<List<String>> test = Arrays.asList(commentId);
             ParseQuery<UserComment> query = UserComment.getQuery();
             query.whereContainedIn("objectId", commentId);
             query.orderByAscending("createdAt");
