@@ -727,6 +727,14 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
                 photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
                 getActivity().startActivity(photoDetailIntent);
             }
+            else{
+                Context context = getActivity();
+                CharSequence text = "Get closer to discover this photo";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
         }
 
 

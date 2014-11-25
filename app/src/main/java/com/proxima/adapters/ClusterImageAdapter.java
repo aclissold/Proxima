@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -23,6 +24,8 @@ import com.proxima.utils.PhotoUtils;
 
 import java.util.List;
 
+import static android.widget.Toast.LENGTH_SHORT;
+
 /**
  * Adapts PhotoUtils' List of UserPhotos.
  */
@@ -34,6 +37,7 @@ public class ClusterImageAdapter extends BaseAdapter {
     private Context mContext;
     private ClusterViewActivity count;
     private LayoutInflater layoutInflater;
+    private boolean unlocked;
 
     public ClusterImageAdapter(Context c, ClusterViewActivity counter) {
         mContext = c;
@@ -158,7 +162,7 @@ public class ClusterImageAdapter extends BaseAdapter {
 
         else {
             imageView = (ImageView)grid.findViewById(R.id.image);
-            Bitmap bitmap = BitmapFactory.decodeResource(this.mContext.getResources(), R.drawable.locked_photo);;
+            Bitmap bitmap = BitmapFactory.decodeResource(this.mContext.getResources(), R.drawable.undisc_thumb);;
             imageView.setImageBitmap(bitmap);
 
             Bitmap bitmap2 = BitmapFactory.decodeResource(this.mContext.getResources(), R.drawable.undiscover);
@@ -166,6 +170,7 @@ public class ClusterImageAdapter extends BaseAdapter {
             imageView2 = (ImageView)grid.findViewById(R.id.badge);
             imageView2.setImageBitmap(bitmap2);
         }
+        unlocked = unlockedFlag;
 
         imageView.setOnClickListener(new ImageOnClickListener(object));
         return grid;
@@ -183,10 +188,16 @@ public class ClusterImageAdapter extends BaseAdapter {
 
         public void onClick(View v)
         {
-            Intent photoDetailIntent = new Intent(v.getContext(), PhotoDetailActivity.class);
-            photoDetailIntent.putExtra("userPhotoObject", ppo);
-            photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
-            v.getContext().startActivity(photoDetailIntent);
+            if (unlocked) {
+                Intent photoDetailIntent = new Intent(v.getContext(), PhotoDetailActivity.class);
+                photoDetailIntent.putExtra("userPhotoObject", ppo);
+                photoDetailIntent.putExtra("currentObjectId", selectedUserPhoto);
+                v.getContext().startActivity(photoDetailIntent);
+            }
+            else {
+                Toast toast = Toast.makeText(mContext, "This photo has not been discovered yet", LENGTH_SHORT);
+                toast.show();
+            }
         }
     }
 
