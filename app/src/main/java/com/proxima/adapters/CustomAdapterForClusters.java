@@ -31,9 +31,9 @@ public class CustomAdapterForClusters implements GoogleMap.InfoWindowAdapter{
         View view = owner.getActivity().getLayoutInflater().inflate(R.layout.info_window, null);
 
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView2);
-        imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.drawable.cluster_thumb));
+        imageView.setImageBitmap(BitmapFactory.decodeResource(view.getResources(), R.drawable.proxima_cluster));
         TextView txtV = (TextView) view.findViewById(R.id.textView);
-        txtV.setText("Number of Photos:" + owner.mClusterSize);
+        txtV.setText("Number of Photos: " + owner.mClusterSize);
 
         return view;
     }

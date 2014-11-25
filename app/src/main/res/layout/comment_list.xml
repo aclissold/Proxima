@@ -16,7 +16,6 @@
             android:scaleType="fitCenter"
             android:layout_gravity="center_vertical"
             android:baselineAlignBottom="false"
-            android:src="@drawable/ic_launcher"
             android:layout_margin="10dp" />
         <TextView
             android:id="@+id/comment_username"
