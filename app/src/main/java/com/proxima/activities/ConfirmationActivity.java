@@ -52,10 +52,11 @@ public class ConfirmationActivity extends ActionBarActivity {
         Bundle extras = getIntent().getExtras();
         byte[] photo = extras.getByteArray("data");
         Boolean rotateFlag = extras.getBoolean("rotateFlag");
+        Boolean selfFlag = extras.getBoolean("selfFlag");
 
         // convert photo data to bitmap rotate it and display it
         Bitmap previewPhoto = BitmapFactory.decodeByteArray(photo, 0, photo.length);
-        previewPhoto = PhotoUtils.getInstance().rotatePreview(previewPhoto, rotateFlag);
+        previewPhoto = PhotoUtils.getInstance().rotatePreview(previewPhoto, rotateFlag, selfFlag);
         mImageView.setImageBitmap(previewPhoto);
 
         // click listener for cancel button, exits the confirmation activity
@@ -78,11 +79,12 @@ public class ConfirmationActivity extends ActionBarActivity {
                 Bundle extras = getIntent().getExtras();
                 Location location = (Location) extras.get("location");
                 Boolean rotateFlag = extras.getBoolean("rotateFlag");
+                Boolean selfFlag = extras.getBoolean("selfFlag");
                 byte[] data = extras.getByteArray("data");
                 ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
 
                 // Upload the photo
-                PhotoUtils.getInstance().uploadPhoto(data, geoPoint, description, rotateFlag,
+                PhotoUtils.getInstance().uploadPhoto(data, geoPoint, description, rotateFlag, selfFlag,
                         new SaveCallback() {
                             @Override
                             public void done(ParseException e) {

@@ -119,9 +119,9 @@ public class PhotoUtils {
 
     // method to upload a photo to Parse
     public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, String description,
-                              boolean rotateFlag, SaveCallback callback) {
+                              boolean rotateFlag, boolean selfFLag, SaveCallback callback) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        return uploadPhoto(bitmap, geoPoint, description, rotateFlag, callback);
+        return uploadPhoto(bitmap, geoPoint, description, rotateFlag, selfFLag, callback);
     }
 
     ///
@@ -134,9 +134,9 @@ public class PhotoUtils {
     // @return       the image converted to bitmap uploaded to Parse
     //
     ///
-    public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag) {
+    public Bitmap uploadPhoto(byte[] data, ParseGeoPoint geoPoint, boolean rotateFlag, boolean selfFlag) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        return uploadPhoto(bitmap, geoPoint, null, rotateFlag);
+        return uploadPhoto(bitmap, geoPoint, null, rotateFlag, selfFlag);
     }
 
     ///
@@ -149,9 +149,9 @@ public class PhotoUtils {
     //
     ///
     public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, String description,
-                              boolean rotateFlag) {
+                              boolean rotateFlag, boolean selfFlag) {
         // Prepare the image data.
-        Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
+        Bitmap rotatedBitmap = rotate(bitmap, rotateFlag, selfFlag);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] data = stream.toByteArray();
@@ -178,9 +178,9 @@ public class PhotoUtils {
 
     // Overloaded version of the above for when a callback is necessary.
     public Bitmap uploadPhoto(Bitmap bitmap, ParseGeoPoint geoPoint, String description,
-                              boolean rotateFlag, SaveCallback callback) {
+                              boolean rotateFlag, boolean selfFlag, SaveCallback callback) {
         // Prepare the image data.
-        Bitmap rotatedBitmap = rotate(bitmap, rotateFlag);
+        Bitmap rotatedBitmap = rotate(bitmap, rotateFlag, selfFlag);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] data = stream.toByteArray();
@@ -214,7 +214,8 @@ public class PhotoUtils {
     //
     ///
     public Bitmap uploadProfilePhoto(Bitmap bitmap, boolean profileRotate) {
-        Bitmap rotatedBitmap = rotate(bitmap, profileRotate);
+        boolean selfRotate = false;
+        Bitmap rotatedBitmap = rotate(bitmap, profileRotate, selfRotate);
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -229,18 +230,22 @@ public class PhotoUtils {
         return rotatedBitmap;
     }
 
-    public Bitmap rotatePreview(Bitmap bitmap, boolean shouldRotate){
-        return rotate (bitmap, shouldRotate);
+    public Bitmap rotatePreview(Bitmap bitmap, boolean shouldRotate, boolean selfRotate){
+        return rotate (bitmap, shouldRotate, selfRotate);
     }
 
     // method to rotate the bitmap for upload if necessary
-    private Bitmap rotate(Bitmap bitmap, boolean shouldRotate) {
+    private Bitmap rotate(Bitmap bitmap, boolean shouldRotate, boolean selfRotate) {
         boolean rotateFlag = shouldRotate;
+        boolean selfFlag = selfRotate;
         int iconOrientation;
         // portrait upload by forcing 90 degree rotation of the bitmap when uploading from the
         // embedded camera
         if (rotateFlag) {
             iconOrientation = 6;
+        }
+        else if(rotateFlag && selfFlag){
+            iconOrientation = 4;
         }
         else {
             iconOrientation = 1;
