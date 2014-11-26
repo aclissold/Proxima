@@ -112,6 +112,7 @@ public class LoginActivity extends ActionBarActivity {
                     if (e == null && user != null) {
                         showProgress(false);
                         Tracker.getInstance().trackLogin(username);
+                        PhotoUtils.getInstance().downloadUserPhotos();
                         finish();
                     } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
                         // don't call showProgress(false) yet
