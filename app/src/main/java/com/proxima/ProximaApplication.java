@@ -13,9 +13,12 @@ import com.proxima.models.UserComment;
 import com.proxima.models.UserPhoto;
 import com.proxima.utils.PhotoUtils;
 
-/**
- * Created by aclissold on 9/25/14.
- */
+///
+// Created by Andrew Clissold, Rachel Glomski, and Jon Wong on 9/25/14.
+// Proxima startup functions entailing subclass registers, Parse initialization,
+// Parse installations
+//
+// Recent Version: 11/26/14
 public class ProximaApplication extends Application {
 
     private final String TAG = getClass().getName();
