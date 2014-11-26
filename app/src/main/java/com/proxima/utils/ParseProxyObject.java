@@ -11,6 +11,11 @@ import com.parse.ParseUser;
 import java.io.Serializable;
 import java.util.HashMap;
 
+//
+// Created by Andrew Clissold, Rachel Glomski, and Jonathan Wong on 11/2/2014.
+// Utility to pass ParseObjects between activities as an extra
+//
+// Recent Version: 11/26/14
 public class ParseProxyObject implements Serializable {
     private static final long serialVersionUID = 1L;
     private HashMap<String, Object> values = new HashMap<String, Object>();
@@ -24,7 +29,7 @@ public class ParseProxyObject implements Serializable {
         this.values = values;
     }
     public ParseProxyObject(ParseObject object) {
-// Loop the keys in the ParseObject
+        // Loop the keys in the ParseObject
         for(String key : object.keySet()) {
             @SuppressWarnings("rawtypes")
             Class classType = object.get(key).getClass();

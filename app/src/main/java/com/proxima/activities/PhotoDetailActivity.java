@@ -33,8 +33,7 @@ import java.util.List;
 
 //
 // Created by Andrew Clissold, Rachel Glomski, and Jonathan Wong on 11/2/2014.
-// Activity to view photos in a map cluster, sets a photo grid which is then
-// populated by the the photos in the cluster
+// Activity to view photos and post comments on them
 //
 // Recent Version: 11/25/14
 public class PhotoDetailActivity extends ActionBarActivity {
@@ -93,7 +92,7 @@ public class PhotoDetailActivity extends ActionBarActivity {
         mPostButton.setOnClickListener(new View.OnClickListener(){
             Bitmap bitmap;
 
-            //
+            // on click retrieve appropriate data for comment and upload it to Parse
             @Override
             public void onClick(View v) {
                 String commentBody = mEditComment.getText().toString();
@@ -131,7 +130,6 @@ public class PhotoDetailActivity extends ActionBarActivity {
 
                 uploadComment(createdBy, commentBody, bitmap);
                 addComments(v, newComment);
-
             }
         });
     }

@@ -57,14 +57,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/12/14.
- * Fragment containing the map view. Will display a map centered around user's location. Will
- * display photos taken by the user as well as other Proxima users.
- *
- * Adapted from code from Parse.com AnyWall tutorial
- * https://parse.com/tutorials/anywall-android
- */
+//
+// Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/12/14.
+// Fragment containing the map view. Will display a map centered around user's location. Will
+// display photos taken by the user as well as other Proxima users.
+//
+// Adapted from code from Parse.com AnyWall tutorial
+// https://parse.com/tutorials/anywall-android
+//
+// Recent Version: 11/26/14
 public class ProximaMapFragment extends Fragment implements LocationListener,
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
@@ -75,9 +76,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
     private int mSelectedFilterIndex = -1;
 
-    /*
-     * For cluster item adapters
-     */
+    //
+    // For cluster item adapters
+    //
     public Cluster<ProximaClusterItem> mClickedCluster;
     public ProximaClusterItem mClickedClusterItem;
 
@@ -91,21 +92,18 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
     public int mClusterSize;
     // The objectId of a UserPhoto to be added to clusterContents
     public String objectID;
-
+    // The objectId of a newly discovered UserPhoto
     public String discoveredObjectId;
     // Flag to determine if a marker should be unlocked
     public boolean unlockFlag;
-
+    // Flags to determine if the info window should not be displayed
     boolean cameraChangeFlag;
-
     boolean ignoreInfoWindow;
 
-
-    /*
-     * Google Play services connection variables
-     */
+    //
+    // Google Play services connection variables
+    //
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-
     private static final int MILLISECONDS_PER_SECOND = 1000;
     // The update interval
     private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
@@ -118,9 +116,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = MILLISECONDS_PER_SECOND
             * UPDATE_INTERVAL_IN_SECONDS;
 
-    /*
-     * Variables for handling Google Map functions
-     */
+    //
+    // Variables for handling Google Map functions
+    //
     // Represents the circle around a map
     private Circle mapCircle;
 
@@ -139,9 +137,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
     private LocationRequest locationRequest;
     private LocationClient locationClient;
 
-    /*
-     * Constants for handling location results
-     */
+    //
+    // Constants for handling location results
+    //
     // Conversion from feet to meters
     private static final float METERS_PER_FEET = 0.3048f;
 
@@ -165,16 +163,16 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
     GoogleMap googleMap;
 
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
+    ///
+    // The fragment argument representing the section number for this
+    // fragment.
+    ///
     private static final String ARG_SECTION_NUMBER = "Map";
 
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
+    ///
+    // Returns a new instance of this fragment for the given section
+    // number.
+    ///
     public static ProximaMapFragment newInstance(int sectionNumber) {
         ProximaMapFragment fragment = new ProximaMapFragment();
         Bundle args = new Bundle();
@@ -187,6 +185,7 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
     public ProximaMapFragment() {
     }
 
+    // method to retrieve filter setting
     public int getSelectedFilterIndex() {
         return mSelectedFilterIndex;
     }
@@ -213,12 +212,14 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         // Enable the current location "blue dot".
         googleMap.setMyLocationEnabled(true);
 
+        // set up markers and marker clusterer
         setUpClusterer();
 
         // Set up the camera change handler.
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             public void onCameraChange(CameraPosition position) {
-                // When the camera changes, reconfigure the map.
+                // When the camera changes, reconfigure the map, unless user is centering on a
+                // marker.
                 if (cameraChangeFlag == false) {
                     reDoMarkers();
                 }
@@ -230,8 +231,6 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
         // Enable custom menu items.
         setHasOptionsMenu(true);
-
-        //set up the clustering system
 
         return rootView;
     }
@@ -252,16 +251,16 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
                 }
             };
 
-    /*
-     * Returns the user's current location.
-     */
+    ///
+    // Returns the user's current location.
+    ///
     public Location getCurrentLocation() {
         return currentLocation;
     }
 
-    /*
-     * Called when the Activity is no longer visible at all. Stop updates and disconnect.
-     */
+    ///
+    // Called when the Activity is no longer visible at all. Stop updates and disconnect.
+    ///
     @Override
     public void onStop() {
         // If the client is connected
@@ -275,9 +274,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         super.onStop();
     }
 
-    /*
-     * Called when the Activity is restarted, even before it becomes visible.
-     */
+    ///
+    // Called when the Activity is restarted, even before it becomes visible.
+    ///
     @Override
     public void onStart() {
         super.onStart();
@@ -337,9 +336,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    /*
-     * Called when the user's location is changed, will update markers and update map radius indicator.
-     */
+    ///
+    // Called when the user's location is changed, will update markers and update map radius indicator.
+    ///
     public void onLocationChanged(Location location) {
         currentLocation = location;
         if (lastLocation != null
@@ -368,10 +367,10 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         reDoMarkers();
     }
 
-    /*
-     * Called on connection with Google Play services if connection is good allow activity to
-     * continue with GooglePlay services.
-     */
+    ///
+    // Called on connection with Google Play services if connection is good allow activity to
+    // continue with GooglePlay services.
+    ///
     private boolean servicesConnected() {
         // Check that Google Play services is available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
@@ -387,16 +386,16 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    /*
-     * Returns the current location as a Parse GeoPoint
-     */
+    ///
+    // Returns the current location as a Parse GeoPoint
+    ///
     private ParseGeoPoint geoPointFromLocation(Location loc) {
         return new ParseGeoPoint(loc.getLatitude(), loc.getLongitude());
     }
 
-    /*
-     * Displays a circle on the map representing the search radius
-     */
+    ///
+    // Displays a circle on the map representing the search radius
+    ///
     private void updateCircle(LatLng myLatLng) {
         if (mapCircle == null) {
             mapCircle =
@@ -412,9 +411,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         mapCircle.setRadius(radius * METERS_PER_FEET); // Convert radius in feet to meters.
     }
 
-    /*
-     * Zooms the map to show the area of interest based on the search radius
-     */
+    ///
+    // Zooms the map to show the area of interest based on the search radius
+    ///
     private void updateZoom(LatLng myLatLng) {
         // Get the bounds to zoom to
         LatLngBounds bounds = calculateBoundsWithCenter(myLatLng);
@@ -429,9 +428,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
     }
 
-    /*
-     * Helper method to calculate the offset for the bounds used in map zooming
-     */
+    ///
+    // Helper method to calculate the offset for the bounds used in map zooming
+    ///
     private double calculateLatLngOffset(LatLng myLatLng, boolean bLatOffset) {
         // The return offset, initialized to the default difference
         double latLngOffset = OFFSET_CALCULATION_INIT_DIFF;
@@ -476,9 +475,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         return latLngOffset;
     }
 
-    /*
-     * Helper method to calculate the bounds for map zooming
-     */
+    ///
+    // Helper method to calculate the bounds for map zooming
+    ///
     LatLngBounds calculateBoundsWithCenter(LatLng myLatLng) {
         // Create a bounds
         LatLngBounds.Builder builder = LatLngBounds.builder();
@@ -502,14 +501,14 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         return builder.build();
     }
 
-    /**
-     * Called from the FilterDialog instance when OK is tapped in order to kick off a filtered
-     * re-query.
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data contains the selected radio button index (0-2)
-     */
+    ///
+    // Called from the FilterDialog instance when OK is tapped in order to kick off a filtered
+    // re-query.
+    //
+    // @param requestCode
+    // @param resultCode
+    // @param data contains the selected radio button index (0-2)
+    ///
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == R.integer.FILTER_REQUEST && resultCode == getActivity().RESULT_OK) {
@@ -518,9 +517,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    /*
-     * Renderer for marker clustering
-     */
+    ///
+    // Renderer for marker clustering
+    ///
     private class MyClusterRenderer extends DefaultClusterRenderer<ProximaClusterItem> implements GoogleMap.OnCameraChangeListener{
         public MyClusterRenderer() {
             super(getActivity(), mapFragment.getMap(), mClusterManager);
@@ -535,12 +534,13 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             }
         }
 
-        /*
-         * Called before an individual marker is created, set color options based on range and
-         * unlock status
-         */
+        ///
+        // Called before an individual marker is created, set color options based on range and
+        // unlock status
+        ///
         @Override
         protected void onBeforeClusterItemRendered(ProximaClusterItem item, MarkerOptions markerOptions) {
+
             double latitude = item.getPosition().latitude;
             double longitude = item.getPosition().longitude;
             ParseGeoPoint markerPoint = new ParseGeoPoint(latitude, longitude);
@@ -567,10 +567,10 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
         }
 
-        /*
-         * Called before an cluster of markers is created, set color options based on range and
-         * unlock status
-         */
+        ///
+        // Called before an cluster of markers is created, set color options based on range and
+        // unlock status
+        ///
         @Override
         protected void onBeforeClusterRendered(Cluster<ProximaClusterItem> cluster, MarkerOptions markerOptions) {
             double latitude = cluster.getPosition().latitude;
@@ -601,18 +601,18 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    /*
-     * Listeners for marker and cluster clicks, marker and cluster info window clicks
-     */
+    ///
+    // Listeners for marker and cluster clicks, marker and cluster info window clicks
+    ///
     private class ClusterListener implements
             ClusterManager.OnClusterInfoWindowClickListener<ProximaClusterItem>,
             ClusterManager.OnClusterClickListener<ProximaClusterItem>,
             ClusterManager.OnClusterItemClickListener<ProximaClusterItem>,
             ClusterManager.OnClusterItemInfoWindowClickListener<ProximaClusterItem> {
 
-        /*
-         * Called on a cluster click
-         */
+        ///
+        // Called on a cluster click
+        ///
         @Override
         public boolean onClusterClick(Cluster<ProximaClusterItem> cluster) {
 
@@ -638,9 +638,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             return false;
         }
 
-        /*
-         * Called when a cluster's info window is clicked
-         */
+        ///
+        // Called when a cluster's info window is clicked
+        ///
         @Override
         public void onClusterInfoWindowClick(Cluster<ProximaClusterItem> cluster) {
             // Pull the objectIds of all the UserPhotos in the clicked cluster
@@ -680,9 +680,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             getActivity().startActivity(clusterViewIntent);
         }
 
-        /*
-         * Called on a single marker click
-         */
+        ///
+        // Called on a single marker click
+        ///
         @Override
         public boolean onClusterItemClick(ProximaClusterItem item) {
             // set cameraChange flag to true to prevent redraw on marker centering
@@ -708,10 +708,10 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             return false;
         }
 
-        /*
-         * called on info window click for a single marker
-         * brings up a photo/comment view of the marker
-         */
+        ///
+        // called on info window click for a single marker
+        // brings up a photo/comment view of the marker
+        ///
         @Override
         public void onClusterItemInfoWindowClick(ProximaClusterItem item) {
             ParseProxyObject ppo;
@@ -737,7 +737,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             }
         }
 
-
+        ///
+        // determine if a photo thumbnail should be displayed
+        ///
         private void displayItem(ProximaClusterItem item) {
             UserPhoto phoot = item.getUserPhoto();
             String username = ParseUser.getCurrentUser().getUsername();
@@ -751,9 +753,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
             }
         }
 
-        /*
-         * Unlock all the individual markers in cluster if necessary
-         */
+        ///
+        // Unlock all the individual markers in cluster if necessary
+        ///
         private void unlockClusterIfNeeded(Cluster<ProximaClusterItem> cluster){
 
             Iterator itr;
@@ -813,9 +815,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
 
         }
 
-        /*
-         * Unlock a single marker if necessary
-         */
+        ///
+        // Unlock a single marker if necessary
+        ///
         private void unlockItemIfNeeded(ProximaClusterItem item) {
             ignoreInfoWindow = false;
             double latitude = item.getPosition().latitude;
@@ -867,9 +869,9 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         }
     }
 
-    /*
-     * Sets up the clusterer to cluster the markers if necessary
-     */
+    ///
+    // Sets up the clusterer to cluster the markers if necessary
+    ///
     public void setUpClusterer() {
         // Declare a variable for the cluster manager.
         // Initialize the manager with the context and the map.
@@ -899,27 +901,27 @@ public class ProximaMapFragment extends Fragment implements LocationListener,
         mClusterManager.cluster();
     }
 
-    /*
-     * clear the markers, redraw markers, and recluster markers
-     */
+    ///
+    // clear the markers, redraw markers, and recluster markers
+    ///
     public void reDoMarkers() {
         mClusterManager.clearItems();
         addItems();
         mClusterManager.cluster();
     }
 
-    /*
-     * clear the markers, redraw markers, and recluster markers
-     */
+    ///
+    // clear the markers, redraw markers, and recluster markers
+    ///
     public void refreshMarkers() {
         mClusterManager.clearItems();
         addItems();
 
     }
 
-    /*
-     * add markers to the map
-     */
+    ///
+    // add markers to the map
+    ///
     private void addItems() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
         Location myLoc = (currentLocation == null) ? lastLocation : currentLocation;

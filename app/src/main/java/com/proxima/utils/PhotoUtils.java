@@ -89,17 +89,6 @@ public class PhotoUtils {
         clusterQuery = clusterQuery.whereContainedIn("objectId", test);
         // TODO: make this an ordered query
         mClusterPhotos = clusterQuery.find();
-
-/*            @Override
-            public void done(List<UserPhoto> resultUserPhotos, ParseException e) {
-                if (e == null) {
-                    mClusterPhotos = resultUserPhotos;
-                } else {
-                    Log.e(TAG, "error retrieving user photos:");
-                    e.printStackTrace();
-                }
-            }
-        });*/
     }
 
     public List<UserPhoto> getUserPhotos() {

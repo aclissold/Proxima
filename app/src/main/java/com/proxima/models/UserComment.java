@@ -6,10 +6,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-/**
- * Created by rachel on 10/30/14.
- */
-
+///
+// Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/30/14.
+// Model for a UserComment ParseClass
+//
+// Recent Version: 11/26/14
 @ParseClassName("UserComment")
 public class UserComment extends ParseObject {
 

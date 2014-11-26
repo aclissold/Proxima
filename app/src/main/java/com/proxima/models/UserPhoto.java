@@ -7,9 +7,11 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-/**
- * Created by rachel on 10/9/14. Data model for a post.
- */
+///
+// Created by Andrew Clissold, Rachel Glomski, Jon Wong on 10/9/14.
+// Data model for a post.
+//
+// Recent Version: 11/26/14
 @ParseClassName("UserPhoto")
 public class UserPhoto extends ParseObject {
     public ParseGeoPoint getLocation() {
