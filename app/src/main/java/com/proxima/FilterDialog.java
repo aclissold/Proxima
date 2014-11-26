@@ -7,9 +7,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-/**
- * Created by aclissold on 11/6/14.
- */
+///
+// Created by Andrew Clissold, Rachel Glomski, and Jon Wong on 11/6/14.
+// Dialog containing filter options for the map markers. Filter options
+// include discovered, undiscovered, and all markers
+//
+// Recent Version: 11/26/14
 public class FilterDialog extends DialogFragment {
     private final String TAG = getClass().getName();
 

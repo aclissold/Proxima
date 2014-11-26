@@ -40,6 +40,10 @@ public class ProximaApplication extends Application {
             installation.put("user", user);
             installation.saveInBackground();
         }
+        else if (user != null && installation.get("user") != null) {
+            installation.put("user", user);
+            installation.saveInBackground();
+        }
     }
 
     public void showShortToast(String msg) {

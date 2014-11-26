@@ -70,6 +70,7 @@ public class ConfirmationActivity extends ActionBarActivity {
         mPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mPostButton.setEnabled(false);
                 // Get the entered description.
                 String description = mDescriptionEditText.getText().toString();
 
@@ -87,6 +88,7 @@ public class ConfirmationActivity extends ActionBarActivity {
                             public void done(ParseException e) {
                                 if (e == null) {
                                     // Upload succeeded; dismiss activity.
+                                    PhotoUtils.getInstance().downloadUserPhotos();
                                     finish();
                                 } else {
                                     // Error occurred; display it and don't dismiss.
