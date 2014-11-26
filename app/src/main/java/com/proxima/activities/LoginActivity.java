@@ -3,6 +3,8 @@ package com.proxima.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -18,10 +20,14 @@ import android.widget.TextView;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.proxima.R;
+import com.proxima.utils.PhotoUtils;
 import com.proxima.utils.Tracker;
+
+import java.io.ByteArrayOutputStream;
 
 
 //
@@ -133,7 +139,7 @@ public class LoginActivity extends ActionBarActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptSignUp(final String username, String password) {
-        ParseUser user = new ParseUser();
+        final ParseUser user = new ParseUser();
         user.setUsername(username);
         user.setPassword(password);
         user.signUpInBackground(new SignUpCallback() {
@@ -142,6 +148,15 @@ public class LoginActivity extends ActionBarActivity {
                 showProgress(false);
                 if (e == null) {
                     Tracker.getInstance().trackSignup(username);
+                    Bitmap data = BitmapFactory.decodeResource(getResources(), R.drawable.proxima_logo);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    data.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    ParseFile file = new ParseFile("userIcon.jpg", byteArray);
+                    user.put("icon", file);
+                    user.saveInBackground();
+                    PhotoUtils.getInstance().downloadUserPhotos();
+
                     finish();
                 } else if (e.getCode() == ParseException.USERNAME_TAKEN) {
                     mUsernameView.setError(getString(R.string.error_username_taken));

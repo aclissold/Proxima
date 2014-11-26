@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -96,40 +98,42 @@ public class PhotoDetailActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 String commentBody = mEditComment.getText().toString();
-                ParseUser user = ParseUser.getCurrentUser();
-                String createdBy = user.getUsername();
-                ParseFile file = (ParseFile) user.get("icon");
+                if (!TextUtils.isEmpty(commentBody)) {
+                    ParseUser user = ParseUser.getCurrentUser();
+                    String createdBy = user.getUsername();
+                    ParseFile file = (ParseFile) user.get("icon");
 
-                UserComment newComment = new UserComment();
-                newComment.setComment(commentBody);
-                newComment.setCreatedBy(createdBy);
-                if (file != null) {
-                    newComment.setIcon(file);
-                }
-
-                mEditComment.setText("");
-
-                byte[] data = new byte[0];
-                try {
-                    if ((newComment.getIcon() != null)) {
-                        data = newComment.getIcon().getData();
+                    UserComment newComment = new UserComment();
+                    newComment.setComment(commentBody);
+                    newComment.setCreatedBy(createdBy);
+                    if (file != null) {
+                        newComment.setIcon(file);
                     }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
 
-                if (data.length != 0) {
-                    BitmapFactory.Options options=new BitmapFactory.Options();
-                    options.inPurgeable = true;
-                    bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    mEditComment.setText("");
+
+                    byte[] data = new byte[0];
+                    try {
+                        if ((newComment.getIcon() != null)) {
+                            data = newComment.getIcon().getData();
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (data.length != 0) {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inPurgeable = true;
+                        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                     } else {
-                    Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-                    bitmap =BitmapFactory.decodeByteArray(data, 0, data.length);
+                        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+                        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
+                    }
+
+                    uploadComment(createdBy, commentBody, bitmap);
+                    addComments(v, newComment);
                 }
-
-                uploadComment(createdBy, commentBody, bitmap);
-                addComments(v, newComment);
             }
         });
     }
