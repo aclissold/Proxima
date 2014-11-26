@@ -46,15 +46,19 @@ public class PhotoDetailActivity extends ActionBarActivity {
     ListView mCommentList;
     Button mPostButton;
     EditText mEditComment;
+
+    // List holding the objectIDs of comments to be displayed
     List<String> commentId;
+    // references to for comment operations
     String commentIdPlaceholder;
     ArrayList<UserComment> commentList = new ArrayList<UserComment>();
-    ArrayList<UserComment> commentListTemp = new ArrayList<UserComment>();
-    ListAdapter adapter;
-    private static final String TAG = "WOW: ";
-    String currentPhoto;
-    ArrayList<String> id = new ArrayList<String>();
 
+    ListAdapter adapter;
+
+    // ObjectId of the currently selected photo
+    String currentPhoto;
+
+    private static final String TAG = "WOW: ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,36 +136,50 @@ public class PhotoDetailActivity extends ActionBarActivity {
         });
     }
 
+    // method to upload a comment to Parse
     private void uploadComment(String username, String comment, Bitmap bitmap) {
+        // retrieve user's icon
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] data = stream.toByteArray();
 
+        // create a new ParseFile containing user's icon
         ParseFile file = new ParseFile("userIcon.jpg", data);
 
+        // create a UserComment ParseObject
         final ParseObject object = ParseObject.create("UserComment");
+        // assign appropriate data to UserComment
         object.put("createdBy", username);
         object.put("comment", comment);
         object.put("userIcon", file);
+        // attempt to save UserComment to Parse
         object.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {
+                // if save is successful
                 if (e == null) {
                     Log.d(TAG,"nice");
+                    // retrieve the objectId of the UserComment
                     commentIdPlaceholder = object.getObjectId();
+                    // if there are already comments associated with this photo add the new comment
+                    // to the list of comments for the photo to be displayed
                     if (commentId != null) {
                         commentId.add(commentIdPlaceholder);
                     }
+                    // retrieve the current UserPhoto to add the objectID of the UserComment to
+                    // the UserPhoto's comments list
                     ParseObject point = ParseObject.createWithoutData("UserPhoto", currentPhoto);
                     try {
                         point.fetch();
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
+                    // if the UserPhoto has existing comments add UserComment to it's list
                     if (commentId != null) {
-
                         point.put("userComments", commentId);
                         point.saveInBackground();
                     }
+                    // if the UserPhoto does not have any comments yet, create a new list, add
+                    // the current comment to the list and save the list to the current UserPhoto
                     else if (commentId == null){
                         List listA = new ArrayList<String>();
                         listA.add(commentIdPlaceholder);
@@ -169,19 +187,16 @@ public class PhotoDetailActivity extends ActionBarActivity {
                         point.saveInBackground();
                         commentId = listA;
                     }
-
-
                 } else {
                     Log.d(TAG,"less nice", e);
                 }
             }
         });
-
-
     }
 
-
+    // method to update the listview adapter
     public void addComments(View v, UserComment comment) {
+        // add a new comment to the list of comments to be displayed
         commentList.add(comment);
         adapter.notifyDataSetChanged();
     }
@@ -236,6 +251,5 @@ public class PhotoDetailActivity extends ActionBarActivity {
                 }
             });
         }
-
     }
 }

@@ -29,12 +29,13 @@ import com.proxima.utils.Tracker;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/25/14.
- * Activity that displays user profile, user album, user settings
- */
+//
+// Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/25/14.
+// Activity that displays user profile, user album
+//
+// Recent Version: 11/26/14
 public class ProfileActivity extends ActionBarActivity {
-
+    // references for the UI
     public TextView mUsernameView;
     public CardView mUserIconCard;
     public ImageView mUserIcon;
@@ -52,6 +53,7 @@ public class ProfileActivity extends ActionBarActivity {
         mWidth = (int) (SIZE_DP * scale + 0.5f);
         mHeight = mWidth;
 
+        // set UI
         setContentView(R.layout.activity_profile);
 
         mUsernameView = (TextView) findViewById(R.id.profile_username);
@@ -61,6 +63,7 @@ public class ProfileActivity extends ActionBarActivity {
         GridView photoGrid = (GridView) findViewById(R.id.profile_photo_grid);
         photoGrid.setAdapter(new ImageAdapter(this));
 
+        // dispatch android camera for updating user icon on profile icon click
         mUserIconCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +71,7 @@ public class ProfileActivity extends ActionBarActivity {
             }
         });
 
+        // ser click listener for photo's in photo grid
         photoGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 //Placeholder for activity photo view
@@ -75,9 +79,11 @@ public class ProfileActivity extends ActionBarActivity {
             }
         });
 
+        // display user icon
         setUserIcon();
     }
 
+    // method to retrieve user icon from parse, if one is not availiable use a default image
     private void setUserIcon() {
         ParseUser user = ParseUser.getCurrentUser();
         ParseFile file = (ParseFile) user.get("icon");
@@ -90,11 +96,10 @@ public class ProfileActivity extends ActionBarActivity {
             } catch (ParseException e) {
                 Log.e(TAG, e.getMessage());
             }
-
-
         }
     }
 
+    // on camera dispatch completion update the user icon with the new photo
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // do not correct rotation for native camera
         boolean profileRotate = false;

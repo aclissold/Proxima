@@ -29,11 +29,12 @@ import com.proxima.utils.Tracker;
 
 import java.util.Locale;
 
-/**
- * Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/11/14.
- * Main Activity for the app, creates three fragments for each of the three tabs. The three
- * tabs/fragments are feed, camera
- */
+//
+// Created by Andrew Clissold, Rachel Glomski, Jon Wong on 9/11/14.
+// Main Activity for the app, creates two fragments for each of the two tabs, one for camera,
+// one for map.
+//
+// Recent Version: 11/26/14
 public class TabActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     public static Context c;
@@ -56,10 +57,10 @@ public class TabActivity extends ActionBarActivity implements ActionBar.TabListe
      * {@link android.support.v13.app.FragmentStatePagerAdapter}.
      */
     /*
-Extension of FragmentStatePagerAdapter which intelligently caches
-all active fragments and manages the fragment lifecycles.
-Usage involves extending from SmartFragmentStatePagerAdapter as you would any other PagerAdapter.
-*/
+    Extension of FragmentStatePagerAdapter which intelligently caches
+    all active fragments and manages the fragment lifecycles.
+    Usage involves extending from SmartFragmentStatePagerAdapter as you would any other PagerAdapter.
+    */
     public abstract class SmartFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
         // Sparse array to keep track of registered fragments in memory
         private SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
@@ -96,16 +97,19 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
      */
     ViewPager mViewPager;
 
+    // method to return user's current location
     public Location getCurrentLocation() {
         ProximaMapFragment test = (ProximaMapFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
         currentLocation = test.getCurrentLocation();
         return currentLocation;
     }
 
+    // method to force redraw of map markers
     public void refreshMark() {
         ProximaMapFragment test = (ProximaMapFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
         test.reDoMarkers();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,7 +119,6 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
         setContentView(R.layout.activity_tab);
 
         c = this;
-
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -153,6 +156,7 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
         mViewPager.setCurrentItem(0);
     }
 
+    // on resume if a user has logged in allow them to stay logged in
     @Override
     protected void onResume() {
         super.onResume();
@@ -168,7 +172,6 @@ Usage involves extending from SmartFragmentStatePagerAdapter as you would any ot
         } else {
             Log.d(TAG, "user is logged in");
         }
-
     }
 
     @Override
