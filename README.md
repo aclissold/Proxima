@@ -4,7 +4,10 @@ following location: https://github.com/aclissold/Proxima/blob/master/README.md
 Proxima
 =======
 
-Proxima is blah blah.
+Proxima is a new social media image sharing app with a twist. Take a photo to
+add it to the public map. Proxima users can then view and comment on it—but only
+once they've gotten close enough! Have a blast exploring campus, the park,
+or wherever, discovering hundreds of memories worth thousands of words.
 
 Table of Contents
 -----------------
@@ -41,7 +44,7 @@ versions are not available, newer versions will probably suffice.
   * Android SDK Platform-tools rev. 21
   * Android SDK Build-tools rev. 21.1.1
 * **Android 5.0 (API 21)**
-  * SDK Platform API 21 rev. 1  
+  * SDK Platform API 21 rev. 1
   * Google APIs Intel x86 Atom (not Atom_64) System Image API 21 rev. 2
 * **Extras**
   * Android Support Repository rev. 9
@@ -61,35 +64,75 @@ Then, follow these steps.
 2. Choose **Nexus 6** and click **Next**
 3. Select Lollipop (API 21) targeting Google APIs (this is important or the
     Google map won't work) and click **Next**
+4. Now that you're on the **Configure AVD** screen, most default settings
+    should be appropriate, but you'll want to use hardware acceleration and
+    need to enable emulated front and back cameras (using a webcam may not
+    work properly). Ensure your settings match the screenshot below exactly
+    and click **Finish**.
+
+![AVD Configuration](https://raw.githubusercontent.com/aclissold/Proxima/master/art/screenshots/avd-configuration.png)
 
 ### Getting the Code Ready
 
-debug.keystore
+If you don't already have the source code, run the following command:
+
+    git clone https://github.com/aclissold/Proxima.git
+
+If you don't have git, a zip can also be obtained
+[here](https://github.com/aclissold/Proxima/releases).
+
+Finally, take the `debug.keystore` file and move it to
+`~/.android/debug.keystore` on your computer.
+
+* Linux / OS X: `mv debug.keystore ~/.android/debug.keystore`
+* Windows: Stick it in `C:\Users\<your username>\.android\debug.keystore`.
 
 ### Build & Run
 
-click play
+If you're opening the project for the first time, you'll need to select
+**Import Project…** from within Android Studio to load the newly
+cloned/downloaded source code.
+
+After opening the project, simply **Debug**
+![Debug](https://developer.android.com/images/tools/as-debugbutton.png)
+(or **Run**) the project, starting up the Android Virtual Device you configured
+in the previous step. If the Camera app does not show an emulated camera image,
+restart the emulator.
+
+Finally, the app will not work properly if you don't emulate location. The
+easiest way to do this: from the command line, simply run the provided
+`./geo.sh` shell script to emulate a default location. You may have to run it
+twice.
 
 Running Unit Tests
 ------------------
 
 ### Creating a Test Configuration
 
+Unfortunately, Android Studio stores the configuration needed to perform unit
+tests in a file that needs to be excluded in `.gitignore` because it differs
+for each team member, necessitating this extra step before running the tests.
+
 Within Android Studio,
 
-1. Choose Run → Edit Configurations
-2. Click the green `+` followed by Android Tests to add a test configuration
-3. Name it "test" or something similar
+1. From the system menu, select **Run** → **Edit Configurations…**
+2. Click the plus symbol (+) followed by Android Tests to add a test
+    configuration
+3. Name it "test" or something similar next to **Name:**
 4. Set the module to "app"
 5. Test "All in package"
-6. Set the package to test to `com.siteshot.siteshot.test`
-7. If desired, set target device to "Show chooser dialog"
+6. Set the package to test to `com.proxima.test`
+7. If desired, set target device to "Show chooser dialog". You can also specify
+    it to only use the AVD you created previously.
 8. Click "OK".
 
 ### Running the Test Configuration
 
 Simply toggle the configuration dropdown between "app" and "test" when
-you want to run the app or the tests, respectively.
+you want to run the app or the tests, respectively. Then **Run** or **Debug**
+as before.
+
+![Test](https://raw.githubusercontent.com/aclissold/Proxima/master/art/screenshots/test.png)
 
 ### Helpful Links
 
@@ -99,3 +142,5 @@ you want to run the app or the tests, respectively.
 
 Screenshots
 -----------
+
+TODO
