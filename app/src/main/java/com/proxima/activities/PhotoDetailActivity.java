@@ -84,7 +84,7 @@ public class PhotoDetailActivity extends ActionBarActivity {
         ParseProxyObject ppo = (ParseProxyObject) extras.getSerializable("userPhotoObject");
         byte[] data = ppo.getParseFile("photo");
         mDescription.setText(ppo.getString("description"));
-        mPostedBy.setText("Posted by: " + ppo.getString("createdBy"));
+        mPostedBy.setText("by " + ppo.getString("createdBy"));
         currentPhoto = extras.getString("currentObjectId");
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         mImagePhoto.setImageBitmap(bitmap);
