@@ -521,6 +521,7 @@ public class CameraFragment extends Fragment {
             confirmationIntent.putExtra("location", location);
             confirmationIntent.putExtra("rotateFlag", rotateFlag);
             confirmationIntent.putExtra("selfFlag", selfFlag);
+            selfFlag = false;
             getActivity().startActivity(confirmationIntent);
 
 

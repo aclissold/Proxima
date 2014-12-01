@@ -241,11 +241,11 @@ public class PhotoUtils {
         int iconOrientation;
         // portrait upload by forcing 90 degree rotation of the bitmap when uploading from the
         // embedded camera
-        if (rotateFlag) {
-            iconOrientation = 6;
+        if (rotateFlag && selfFlag) {
+            iconOrientation = 8;
         }
-        else if(rotateFlag && selfFlag){
-            iconOrientation = 4;
+        else if(rotateFlag){
+            iconOrientation = 6;
         }
         else {
             iconOrientation = 1;

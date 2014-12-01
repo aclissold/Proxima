@@ -41,11 +41,12 @@ public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActi
         assertNotNull(photoPath);
 
         boolean rotateFlag = false;
+        boolean selfFlag = false;
         // Write mock data to it.
         final Bitmap mockBitmap = createMockBitmap();
 
         // Upload it to Parse.
-        PhotoUtils.getInstance().uploadPhoto(mockBitmap, new ParseGeoPoint(), null, rotateFlag);
+        PhotoUtils.getInstance().uploadPhoto(mockBitmap, new ParseGeoPoint(), null, rotateFlag, selfFlag);
 
 
         // Get it back from Parse.
@@ -86,12 +87,13 @@ public class PhotoUtilsTest extends ActivityInstrumentationTestCase2<ProfileActi
         assertNotNull(photoPath);
 
         boolean rotateFlag = false;
+        boolean selfFlag = false;
         // Write mock data to it.
         final Bitmap mockBitmap = createMockBitmap();
 
         // Upload it to Parse.
         String description = "test description";
-        PhotoUtils.getInstance().uploadPhoto(mockBitmap, new ParseGeoPoint(), description, rotateFlag);
+        PhotoUtils.getInstance().uploadPhoto(mockBitmap, new ParseGeoPoint(), description, rotateFlag, selfFlag);
 
 
         // Get it back from Parse.
