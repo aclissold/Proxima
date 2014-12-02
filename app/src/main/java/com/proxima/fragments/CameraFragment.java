@@ -66,6 +66,7 @@ public class CameraFragment extends Fragment {
 
     boolean pauseFlag = true;
 
+    boolean selfFlag = false;
     /**
      * Default empty constructor.
      */
@@ -155,6 +156,7 @@ public class CameraFragment extends Fragment {
                         mPreview.switchCamera(mCamera);
                         // Start the preview
                         mCamera.startPreview();
+                        selfFlag = true;
                     }
                 }
             );
@@ -500,6 +502,7 @@ public class CameraFragment extends Fragment {
         public void onPictureTaken(byte[] data, Camera camera) {
             // rotate the picture for embedded camera
             boolean rotateFlag = true;
+
             File pictureFile = getOutputMediaFile();
             // create a parse photo file to facilitate uploading
             try {
@@ -517,6 +520,8 @@ public class CameraFragment extends Fragment {
             confirmationIntent.putExtra("data", data);
             confirmationIntent.putExtra("location", location);
             confirmationIntent.putExtra("rotateFlag", rotateFlag);
+            confirmationIntent.putExtra("selfFlag", selfFlag);
+            selfFlag = false;
             getActivity().startActivity(confirmationIntent);
 
 
