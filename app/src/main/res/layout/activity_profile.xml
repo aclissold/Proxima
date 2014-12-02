@@ -41,16 +41,6 @@
         android:layout_below="@+id/profile_user_icon_card"
         android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Name"
-        android:id="@+id/profile_user_name"
-        android:layout_gravity="center_horizontal"
-        android:textSize="20dp"
-        android:layout_below="@+id/profile_username"
-        android:layout_centerHorizontal="true" />
-
     <GridView
         android:id="@+id/profile_photo_grid"
         android:layout_width="match_parent"
@@ -62,7 +52,7 @@
         android:stretchMode="spacingWidthUniform"
         android:gravity="center"
         android:textFilterEnabled="false"
-        android:layout_below="@+id/profile_user_name"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/profile_username" />
 
 </RelativeLayout>

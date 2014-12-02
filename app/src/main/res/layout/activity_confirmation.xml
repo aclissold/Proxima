@@ -13,7 +13,7 @@
         android:layout_height="fill_parent"
         android:id="@+id/imageView"
         android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/button_post" />
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -23,10 +23,13 @@
         android:layout_marginBottom="38dp"
         android:gravity="center"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:background="#d2ffffff"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp" />
 
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Post"
         android:id="@+id/button_post"
@@ -35,7 +38,10 @@
         android:layout_below="@+id/edit_text"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="false" />
+        android:layout_alignParentBottom="false"
+        android:editable="false"
+        android:background="#d2ffffff"
+        android:layout_marginTop="5dp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -49,12 +55,11 @@
         android:textColor="#ff5b5b5b"
         android:background="#e6ffffff"
         android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/button_post"
         android:layout_alignParentBottom="false"
         android:layout_alignParentTop="false"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:paddingLeft="4dp"
-        android:paddingRight="4dp" />
+        android:paddingRight="4dp"
+        android:layout_alignEnd="@+id/button_post" />
 
 </RelativeLayout>
