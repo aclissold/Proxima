@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.proxima.R;
@@ -93,6 +94,7 @@ public class LoginActivity extends ActionBarActivity {
         // Store values at the time of the login attempt.
         final String username = mUsernameView.getText().toString();
         final String password = mPasswordView.getText().toString();
+        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
         String confirmPassword = mConfirmPasswordView.getText().toString();
 
         mFocusView = null;
@@ -113,6 +115,8 @@ public class LoginActivity extends ActionBarActivity {
                         showProgress(false);
                         Tracker.getInstance().trackLogin(username);
                         PhotoUtils.getInstance().downloadUserPhotos();
+                        installation.put("user", user);
+                        installation.saveInBackground();
                         finish();
                     } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
                         // don't call showProgress(false) yet
@@ -141,6 +145,7 @@ public class LoginActivity extends ActionBarActivity {
      */
     private void attemptSignUp(final String username, String password) {
         final ParseUser user = new ParseUser();
+        final ParseInstallation installation = ParseInstallation.getCurrentInstallation();
         user.setUsername(username);
         user.setPassword(password);
         user.signUpInBackground(new SignUpCallback() {
@@ -157,7 +162,8 @@ public class LoginActivity extends ActionBarActivity {
                     user.put("icon", file);
                     user.saveInBackground();
                     PhotoUtils.getInstance().downloadUserPhotos();
-
+                    installation.put("user", user);
+                    installation.saveInBackground();
                     finish();
                 } else if (e.getCode() == ParseException.USERNAME_TAKEN) {
                     mUsernameView.setError(getString(R.string.error_username_taken));
