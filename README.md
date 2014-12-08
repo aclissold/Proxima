@@ -78,8 +78,8 @@ If you don't already have the source code, run the following command:
 
     git clone https://github.com/aclissold/Proxima.git
 
-If you don't have git, a zip can also be obtained
-[here](https://github.com/aclissold/Proxima/releases).
+The, run `git submodule update --init` to clone the android-map-utils
+dependency.
 
 Finally, take the `debug.keystore` file and move it to
 `~/.android/debug.keystore` on your computer.
