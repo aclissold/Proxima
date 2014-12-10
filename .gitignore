@@ -1,10 +1,4 @@
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
-.DS_Store
-/build
-### https://raw.github.com/github/gitignore/4ddafa3728456f3e5b74c9a470e58b2adbdcc882/Android.gitignore
+### https://raw.github.com/github/gitignore/c6e6d99b65bcdfc8f248f9545fc9ae43d141d8bd/Android.gitignore
 
 # Built application files
 *.apk
