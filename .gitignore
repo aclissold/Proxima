@@ -1,4 +1,4 @@
-### https://raw.github.com/github/gitignore/c6e6d99b65bcdfc8f248f9545fc9ae43d141d8bd/Android.gitignore
+### https://raw.github.com/github/gitignore/8ab86f6bb71e85b5046f1d921bbbe5ceec9063ba/Android.gitignore
 
 # Built application files
 *.apk
@@ -17,6 +17,7 @@ gen/
 # Gradle files
 .gradle/
 build/
+/*/build/
 
 # Local configuration file (sdk path, etc)
 local.properties
